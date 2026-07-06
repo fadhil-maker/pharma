@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Clinical Tracker</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        .section { border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 25px; border-radius: 8px; background: #fafafa; }
+        .section h2 { margin-top: 0; color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; display: inline-block;}
+        input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #2980b9; }
+        .warning { background: #ffebee; border-left: 5px solid #f44336; padding: 15px; margin-top: 15px; border-radius: 4px; }
+        .success { background: #e8f5e9; border-left: 5px solid #4caf50; padding: 15px; margin-top: 15px; border-radius: 4px; }
+        .admin-note { background: #fff3cd; padding: 10px; border-radius: 5px; font-size: 14px; text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💊 Clinical Pharmacy Tracker</h1>
+        
+        <div class="admin-note">
+            <strong>Note:</strong> To add new medications to the database, log into your Django Admin panel at <br><code>YOUR_BACK4APP_URL/admin</code>
+        </div>
+
+        <div class="section">
+            <h2>1. Pharm.D Control Panel</h2>
+            
+            <label><strong>Create a Master Reaction:</strong></label>
+            <input type="text" id="reactionName" placeholder="e.g., Severe Serotonin Syndrome">
+            <button onclick="addReaction()" style="background: #27ae60;">Save Reaction to Database</button>
+
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+
+            <label><strong>Map a Drug Interaction:</strong></label>
+            <select id="drugA"><option>Loading drugs...</option></select>
+            <select id="drugB"><option>Loading drugs...</option></select>
+            <select id="reactionSelect"><option>Loading reactions...</option></select>
+            <input type="number" id="severity" placeholder="Severity Level (1-10)" min="1" max="10">
+            <button onclick="addInteraction()" style="background: #27ae60;">Lock In Interaction</button>
+        </div>
+
+        <div class="section">
+            <h2>2. Patient Timeline Tester</h2>
+            <label><strong>Simulate Patient Intake:</strong></label>
+            <select id="timelineDrug"><option>Loading drugs...</option></select>
+            <input type="datetime-local" id="timelineTime">
+            <button onclick="addToTimeline()" style="background: #f39c12;">+ Add Drug to Patient Queue</button>
+
+            <ul id="intakeList" style="background: #fff; padding: 15px; border-radius: 5px; border: 1px solid #ddd; list-style-type: square;">
+                <em>No drugs added to timeline yet.</em>
+            </ul>
+            
+            <button style="background: #e74c3c; font-size: 18px; padding: 15px;" onclick="checkTimeline()">🚨 Run Cross-Over Conflict Calculations 🚨</button>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 🛑 REPLACE THIS WITH YOUR BACK4APP URL 🛑
+        // ==========================================
+        const API_BASE = 'https://fadhilmakersorg-hjok2pz0.b4a.run/'; 
+        
+        let intakes = [];
+
+        // Fetch data from your live database
+        async function fetchData() {
+            try {
+                const drugRes = await fetch(`${API_BASE}/api/drugs/`);
+                const drugs = await drugRes.json();
+                
+                const rxRes = await fetch(`${API_BASE}/api/reactions/`);
+                const reactions = await rxRes.json();
+
+                populateSelect('drugA', drugs);
+                populateSelect('drugB', drugs);
+                populateSelect('timelineDrug', drugs);
+                populateSelect('reactionSelect', reactions);
+            } catch (e) {
+                console.error("Could not connect to API. Make sure your Back4App server is running and the API_BASE URL is correct.");
+            }
+        }
+
+        // Helper function to fill dropdowns
+        function populateSelect(id, items) {
+            const select = document.getElementById(id);
+            select.innerHTML = '';
+            if(items.length === 0) {
+                select.innerHTML = '<option>No data found in database</option>';
+                return;
+            }
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                select.appendChild(opt);
+            });
+        }
+
+        // Add a new reaction
+        async function addReaction() {
+            const name = document.getElementById('reactionName').value;
+            if(!name) return alert("Please enter a reaction name!");
+            
+            await fetch(`${API_BASE}/api/add-reaction/`, {
+                method: 'POST', 
+                body: JSON.stringify({ name, category: 'Clinical' })
+            });
+            alert('Reaction saved successfully!');
+            fetchData(); // Refresh dropdowns
+        }
+
+        // Add an interaction mapping
+        async function addInteraction() {
+            const payload = {
+                drug_a_id: document.getElementById('drugA').value,
+                drug_b_id: document.getElementById('drugB').value,
+                reaction_id: document.getElementById('reactionSelect').value,
+                severity_slider: document.getElementById('severity').value
+            };
+            if(!payload.severity_slider) return alert("Please enter a severity level!");
+
+            await fetch(`${API_BASE}/api/add-interaction/`, { 
+                method: 'POST', 
+                body: JSON.stringify(payload) 
+            });
+            alert('Interaction locked into the database!');
+        }
+
+        // Add drug to patient timeline queue
+        function addToTimeline() {
+            const drugSelect = document.getElementById('timelineDrug');
+            const time = document.getElementById('timelineTime').value;
+            if(!time) return alert("Please select an intake time!");
+
+            const drugName = drugSelect.options[drugSelect.selectedIndex].text;
+            
+            intakes.push({
+                drug_id: drugSelect.value,
+                drug_name: drugName,
+                timestamp: new Date(time).toISOString()
+            });
+
+            const list = document.getElementById('intakeList');
+            if(intakes.length === 1) list.innerHTML = ''; // Clear empty message
+            
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${drugName}</strong> administered at ${new Date(time).toLocaleString()}`;
+            list.appendChild(li);
+        }
+
+        // Calculate overlapping metabolic timelines
+        async function checkTimeline() {
+            if(intakes.length < 2) return alert("Add at least 2 drugs to the timeline to check for interactions!");
+
+            const res = await fetch(`${API_BASE}/api/check-timeline/`, {
+                method: 'POST', 
+                body: JSON.stringify({ intakes })
+            });
+            const data = await res.json();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (data.warnings && data.warnings.length > 0) {
+                data.warnings.forEach(w => {
+                    resultsDiv.innerHTML += `
+                    <div class="warning">
+                        <h3 style="margin-top:0; color:#c0392b;">⚠️ CRITICAL CONFLICT (Severity: ${w.severity}/10)</h3>
+                        <p><strong>Interaction:</strong> ${w.drug_a} + ${w.drug_b} causes <strong>${w.reaction}</strong></p>
+                        <p><strong>Overlap Window:</strong><br> ${new Date(w.overlap_start).toLocaleString()} ➔ ${new Date(w.overlap_end).toLocaleString()}</p>
+                    </div>`;
+                });
+            } else {
+                resultsDiv.innerHTML = '<div class="success"><h3>✅ Clear</h3><p>No metabolic timeline overlaps detected for these medications.</p></div>';
+            }
+        }
+
+        // Run this when the page loads
+        fetchData();
+    </script>
+</body>
+</html>
