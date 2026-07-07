@@ -2,21 +2,39 @@ import os
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
-# Load environment variables from your .env file
-load_dotenv()
+# ---------------------------------------------------------------------------
+# Load environment variables from .env file at project root
+# ---------------------------------------------------------------------------
+load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ---------------------------------------------------------------------------
+# Base directory
+# ---------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security settings
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-tht%m&s_0mn^otv_m*+u=8*bg=fkg_0yh4skdk_+n4ub&76+(!')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# ---------------------------------------------------------------------------
+# Security settings – ingested from environment, with safe production defaults
+# ---------------------------------------------------------------------------
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-CHANGE-ME-IN-PRODUCTION-x9k$mz3vqo7'
+)
 
-# Opens the server to the internet so Back4App can route traffic to it
-ALLOWED_HOSTS = ['*']
+# Strictly default to False (production-safe). Only True when .env says so.
+DEBUG = os.environ.get('DEBUG', 'False').strip().lower() == 'true'
 
-# Application definition
+# ALLOWED_HOSTS parsed from comma-separated env var
+_hosts_raw = os.environ.get('ALLOWED_HOSTS', '')
+if _hosts_raw.strip():
+    ALLOWED_HOSTS = [h.strip() for h in _hosts_raw.split(',') if h.strip()]
+else:
+    ALLOWED_HOSTS = ['*'] if DEBUG else ['127.0.0.1', 'localhost']
+
+# ---------------------------------------------------------------------------
+# Installed applications
+# ---------------------------------------------------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,14 +42,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third-party
     'corsheaders',
-    'tracker',  # Your pharmacy tracker app
+    'rest_framework',
+    'rest_framework_simplejwt',
+    # Project
+    'tracker',
 ]
 
+# ---------------------------------------------------------------------------
+# Middleware – CorsMiddleware MUST be first
+# ---------------------------------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # MUST be at the top
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Handles static files in Docker
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -42,6 +67,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
+# ---------------------------------------------------------------------------
+# Templates
+# ---------------------------------------------------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -60,16 +88,43 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Database configuration connecting to your cloud database
+# ---------------------------------------------------------------------------
+# Database – Local File-Based SQLite
+# ---------------------------------------------------------------------------
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
+# ---------------------------------------------------------------------------
+# Django REST Framework – JWT + Session auth
+# ---------------------------------------------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# ---------------------------------------------------------------------------
+# Simple JWT configuration
+# ---------------------------------------------------------------------------
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# ---------------------------------------------------------------------------
 # Password validation
+# ---------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -77,19 +132,40 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ---------------------------------------------------------------------------
 # Internationalization
+# ---------------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images) configured for Docker
+# ---------------------------------------------------------------------------
+# Static files (WhiteNoise for production)
+# ---------------------------------------------------------------------------
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
-# Allows your frontend HTML file to securely fetch data from the API
+# ---------------------------------------------------------------------------
+# CORS – allow frontend origins
+# ---------------------------------------------------------------------------
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
+# ---------------------------------------------------------------------------
+# CSRF trusted origins
+# ---------------------------------------------------------------------------
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
+
+# ---------------------------------------------------------------------------
 # Default primary key field type
+# ---------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CSRF_TRUSTED_ORIGINS = ['https://fadhilmakersorg-hjok2pz0.b4a.run']

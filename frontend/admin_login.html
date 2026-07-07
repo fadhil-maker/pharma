@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pharmacy Clinical Tracker - Clinician Authentication Portal">
+    <title>🔐 Clinician Login — Pharmacy Clinical Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #f0f4f8;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(99, 102, 241, 0.25);
+            --accent: #4f46e5;
+            --accent-light: #6366f1;
+            --cyan: #0891b2;
+            --danger: #dc2626;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            top: 0 !important; /* Fix for Google Translate banner */
+        }
+        .goog-te-banner-frame { display: none !important; }
+        .skiptranslate iframe { display: none !important; }
+        #goog-gt-tt { display: none !important; }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 40% 30%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 60% 70%, rgba(6, 182, 212, 0.07) 0%, transparent 50%);
+            z-index: -1;
+            animation: bgPulse 15s ease-in-out infinite alternate;
+        }
+        @keyframes bgPulse {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-2%, -1%) scale(1.05); }
+        }
+
+        /* ── Login container ──────────────────────────── */
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: fadeUp 0.5s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card .logo {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .login-card h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+        .login-card .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        input::placeholder { color: var(--text-muted); }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            margin-top: 6px;
+        }
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+        }
+        .btn-login:active { transform: translateY(0); }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-msg {
+            display: none;
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-sm);
+            color: #fca5a5;
+            font-size: 13px;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--cyan);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: var(--accent-light); }
+
+        .security-note {
+            margin-top: 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Login Card ────────────────────────────────────────────────────── -->
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="logo">🔐</div>
+        <h1>Clinician Access</h1>
+        <p class="subtitle">Pharmacy Clinical Tracker — Secure Admin Portal</p>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+        </form>
+
+        <div class="error-msg" id="errorMsg">Invalid credentials. Please try again.</div>
+
+        <a href="index.html" class="back-link">← Back to Patient Portal</a>
+
+        <div class="security-note">
+            🔒 This portal is secured with JWT authentication.<br>
+            Your session will expire after 60 minutes of inactivity.
+        </div>
+    </div>
+</div>
+
+<script>
+/* =========================================================================
+   Clinician Login — JWT Authentication
+   ========================================================================= */
+
+const API_BASE = 'http://127.0.0.1:8000';
+
+// If already authenticated, redirect to dashboard
+(function checkExistingAuth() {
+    const token = sessionStorage.getItem('access_token');
+    if (token) {
+        window.location.href = 'admin_dashboard.html';
+    }
+})();
+
+async function handleLogin(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const loginBtn = document.getElementById('loginBtn');
+
+    if (!username || !password) {
+        errorMsg.textContent = 'Please enter both username and password.';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    // Disable button and show loading state
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Authenticating...';
+    errorMsg.style.display = 'none';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/token/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.detail || 'Invalid credentials');
+        }
+
+        const data = await res.json();
+
+        // Store tokens securely in sessionStorage (cleared on tab close)
+        sessionStorage.setItem('access_token', data.access);
+        sessionStorage.setItem('refresh_token', data.refresh);
+
+        // Redirect to dashboard
+        window.location.href = 'admin_dashboard.html';
+    } catch (err) {
+        console.error('Login failed:', err);
+        errorMsg.textContent = err.message === 'Failed to fetch'
+            ? 'Cannot connect to server. Ensure backend is running.'
+            : 'Invalid credentials. Please try again.';
+        errorMsg.style.display = 'block';
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+    }
+}
+</script>
+
+</body>
+</html>

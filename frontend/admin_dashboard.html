@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pharmacy Clinical Tracker - Clinician Dashboard for managing drug interactions">
+    <title>⚕️ Clinician Dashboard — Pharmacy Clinical Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #f0f4f8;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(99, 102, 241, 0.25);
+            --accent: #4f46e5;
+            --accent-light: #6366f1;
+            --cyan: #0891b2;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            top: 0 !important; /* Fix for Google Translate banner */
+        }
+        .goog-te-banner-frame { display: none !important; }
+        .skiptranslate iframe { display: none !important; }
+        #goog-gt-tt { display: none !important; }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* ── Header ──────────────────────────────────── */
+        .header {
+            padding: 32px 24px 24px;
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header-left h1 {
+            font-size: clamp(22px, 4vw, 32px);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-left p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .header-actions a, .header-actions button {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-portal {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3) !important;
+            color: var(--cyan);
+        }
+        .btn-portal:hover { background: rgba(6, 182, 212, 0.25); }
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            color: var(--danger);
+        }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.25); }
+
+        /* ── Container ───────────────────────────────── */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        /* ── Card ─────────────────────────────────────── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+            transition: border-color 0.3s ease;
+        }
+        .card:hover { border-color: rgba(79, 70, 229, 0.45); }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title .step {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--accent-light);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+        }
+
+        /* ── Form elements ───────────────────────────── */
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
+        textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Buttons ──────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #059669, var(--success));
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* ── Severity slider ─────────────────────────── */
+        .severity-display {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 6px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+            padding: 0;
+            border: none;
+            background: linear-gradient(90deg, #22c55e 0%, #f59e0b 50%, #ef4444 100%);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .severity-value {
+            font-size: 20px;
+            font-weight: 800;
+            min-width: 50px;
+            text-align: center;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* ── Table ────────────────────────────────────── */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        thead th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+        }
+        tbody td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+        tbody tr:hover { background: rgba(79, 70, 229, 0.05); }
+        .sev-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            min-width: 36px;
+        }
+        .sev-low { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .sev-med { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .sev-high { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .sev-critical { background: rgba(239, 68, 68, 0.35); color: #ff4444; font-weight: 900; }
+        .remedy-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .factors-cell {
+            font-size: 11px;
+            color: var(--text-muted);
+            max-width: 150px;
+        }
+        .empty-table {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+        }
+
+        /* ── Toast ────────────────────────────────────── */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ── FDA Banner ───────────────────────────────── */
+        .banner {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .banner-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+        }
+        .banner .dismiss {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: auto;
+        }
+
+        /* ── Divider ──────────────────────────────────── */
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(100, 116, 139, 0.15);
+            margin: 20px 0;
+        }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 640px) {
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .container { padding: 0 14px 40px; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Header ────────────────────────────────────────────────────────── -->
+<div class="header">
+    <div class="header-left">
+        <h1>⚕️ Clinician Dashboard</h1>
+        <p>Pharmacy Clinical Tracker — Interaction Management Console</p>
+    </div>
+    <div class="header-actions">
+        <a href="index.html" class="btn-portal">💊 Patient Portal</a>
+        <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- ── FDA Fallback Banner ───────────────────────────────────────── -->
+    <div id="fdaBanner" class="banner banner-warning">
+        <span>⚠️ openFDA lookup unavailable. Type ingredient names manually.</span>
+        <button class="dismiss" onclick="this.parentElement.style.display='none'">&times;</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         SECTION 1: Create Reaction Definition
+         ══════════════════════════════════════════════════════════════════ -->
+    <div class="card">
+        <div class="card-title">
+            🧪 Create Reaction Definition
+            <span class="step">Step 1</span>
+        </div>
+        <div class="form-group">
+            <label for="reactionName">Reaction Name</label>
+            <input type="text" id="reactionName" placeholder="e.g., Serotonin Syndrome, QT Prolongation, Hepatotoxicity">
+        </div>
+        <button class="btn btn-success" onclick="saveReaction()">✅ Save Reaction to Database</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         SECTION 2: Map Drug Interaction
+         ══════════════════════════════════════════════════════════════════ -->
+    <div class="card">
+        <div class="card-title">
+            💊 Map Drug Interaction (INN / Generic)
+            <span class="step">Step 2</span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="drugAInput">Drug A — Active Ingredient</label>
+                <input type="text" id="drugAInput" list="fdaDrugA" placeholder="e.g., warfarin" autocomplete="off">
+                <datalist id="fdaDrugA"></datalist>
+            </div>
+            <div class="form-group">
+                <label for="drugBInput">Drug B — Active Ingredient</label>
+                <input type="text" id="drugBInput" list="fdaDrugB" placeholder="e.g., aspirin" autocomplete="off">
+                <datalist id="fdaDrugB"></datalist>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="reactionSelect">Reaction</label>
+            <select id="reactionSelect">
+                <option value="">Loading reactions...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Severity Index</label>
+            <div class="severity-display">
+                <input type="range" id="severitySlider" min="1" max="10" value="5" oninput="updateSeverityDisplay()">
+                <div class="severity-value" id="severityValue" style="color: var(--warning);">5</div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="card-title" style="font-size:15px; margin-bottom:14px;">
+            🎯 Custom Factors (Dynamic Pathology Matrix)
+            <span class="step">Optional</span>
+        </div>
+
+        <div class="form-row-3">
+            <div class="form-group">
+                <label for="minAge">Min Age</label>
+                <input type="number" id="minAge" placeholder="e.g., 18" min="0" max="150">
+            </div>
+            <div class="form-group">
+                <label for="maxAge">Max Age</label>
+                <input type="number" id="maxAge" placeholder="e.g., 65" min="0" max="150">
+            </div>
+            <div class="form-group">
+                <label for="genderFilter">Gender Filter</label>
+                <select id="genderFilter">
+                    <option value="any">Any</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="minWeight">Min Weight (kg)</label>
+                <input type="number" id="minWeight" placeholder="e.g., 40" min="0" max="300">
+            </div>
+            <div class="form-group">
+                <label for="maxWeight">Max Weight (kg)</label>
+                <input type="number" id="maxWeight" placeholder="e.g., 120" min="0" max="300">
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="form-group">
+            <label for="remedyText">Clinical Remedy Instructions</label>
+            <textarea id="remedyText" placeholder="Enter detailed clinical remedy instructions. This text will be shown to patients alongside interaction warnings.&#10;&#10;Example: Discontinue DRUG_A immediately. Monitor INR every 24 hours. Consider alternative anticoagulant therapy. Contact prescriber for dosage adjustment."></textarea>
+        </div>
+
+        <button class="btn btn-primary" onclick="lockInteraction()">🔒 Lock In Interaction Rule</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         SECTION 3: Existing Interactions Table
+         ══════════════════════════════════════════════════════════════════ -->
+    <div class="card">
+        <div class="card-title">
+            📊 Existing Interaction Rules
+            <span class="step" id="interactionCount">0 rules</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Drug A</th>
+                        <th>Drug B</th>
+                        <th>Reaction</th>
+                        <th>Severity</th>
+                        <th>Remedy</th>
+                        <th>Factors</th>
+                    </tr>
+                </thead>
+                <tbody id="interactionsTable">
+                    <tr><td colspan="6" class="empty-table">Loading interactions...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* =========================================================================
+   Clinician Dashboard — Admin Logic
+   ========================================================================= */
+
+const API_BASE = 'http://127.0.0.1:8000';
+
+// ── Auth gate: redirect to login if no token ─────────────────────────────
+(function authGate() {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = 'admin_login.html';
+    }
+})();
+
+function getAuthHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
+    };
+}
+
+function logout() {
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
+    window.location.href = 'admin_login.html';
+}
+
+
+// =========================================================================
+// LOAD DATA ON PAGE INIT
+// =========================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadReactions();
+    loadInteractions();
+    updateSeverityDisplay();
+});
+
+
+// ── Load reactions into dropdown ─────────────────────────────────────────
+async function loadReactions() {
+    try {
+        const res = await fetch(`${API_BASE}/api/reactions/`);
+        if (!res.ok) throw new Error('Failed to load reactions');
+        const data = await res.json();
+
+        const select = document.getElementById('reactionSelect');
+        select.innerHTML = '<option value="">— Select a Reaction —</option>';
+        data.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id;
+            opt.textContent = r.name;
+            select.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Load reactions error:', err);
+    }
+}
+
+
+// ── Load interactions into table ─────────────────────────────────────────
+async function loadInteractions() {
+    try {
+        const res = await fetch(`${API_BASE}/api/interactions/`);
+        if (!res.ok) throw new Error('Failed to load interactions');
+        const data = await res.json();
+
+        const tbody = document.getElementById('interactionsTable');
+        const countBadge = document.getElementById('interactionCount');
+        countBadge.textContent = `${data.length} rule${data.length !== 1 ? 's' : ''}`;
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-table">No interaction rules defined yet. Use the form above to create one.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(inter => {
+            const sevClass = inter.severity_slider <= 3 ? 'sev-low'
+                : inter.severity_slider <= 7 ? 'sev-med'
+                : inter.severity_slider === 10 ? 'sev-critical' : 'sev-high';
+
+            const remedyPreview = inter.remedy
+                ? (inter.remedy.length > 60 ? inter.remedy.substring(0, 60) + '…' : inter.remedy)
+                : '—';
+
+            let factorsStr = '—';
+            if (inter.custom_factors && Object.keys(inter.custom_factors).length > 0) {
+                const parts = [];
+                if (inter.custom_factors.min_age) parts.push(`Age ≥${inter.custom_factors.min_age}`);
+                if (inter.custom_factors.max_age) parts.push(`Age ≤${inter.custom_factors.max_age}`);
+                if (inter.custom_factors.min_weight) parts.push(`Weight ≥${inter.custom_factors.min_weight}kg`);
+                if (inter.custom_factors.max_weight) parts.push(`Weight ≤${inter.custom_factors.max_weight}kg`);
+                if (inter.custom_factors.gender && inter.custom_factors.gender !== 'any') parts.push(inter.custom_factors.gender);
+                factorsStr = parts.join('; ') || '—';
+            }
+
+            return `<tr>
+                <td><strong>${escapeHtml(inter.drug_a)}</strong></td>
+                <td><strong>${escapeHtml(inter.drug_b)}</strong></td>
+                <td>${escapeHtml(inter.reaction_name)}</td>
+                <td><span class="sev-badge ${sevClass}">${inter.severity_slider}</span></td>
+                <td class="remedy-cell" title="${escapeHtml(inter.remedy || '')}">${escapeHtml(remedyPreview)}</td>
+                <td class="factors-cell">${escapeHtml(factorsStr)}</td>
+            </tr>`;
+        }).join('');
+    } catch (err) {
+        console.error('Load interactions error:', err);
+        document.getElementById('interactionsTable').innerHTML =
+            '<tr><td colspan="6" class="empty-table" style="color:var(--danger);">Failed to load interactions. Check server connection.</td></tr>';
+    }
+}
+
+
+// =========================================================================
+// SAVE REACTION
+// =========================================================================
+
+async function saveReaction() {
+    const name = document.getElementById('reactionName').value.trim();
+    if (!name) {
+        showToast('Please enter a reaction name.', 'warning');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/add-reaction/`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name: name })
+        });
+
+        if (res.status === 401) {
+            showToast('Session expired. Please log in again.', 'error');
+            setTimeout(() => logout(), 1500);
+            return;
+        }
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Failed to save reaction');
+        }
+
+        const data = await res.json();
+        showToast(`Reaction "${data.name}" ${data.status === 'created' ? 'saved' : 'already exists'}!`, 'success');
+        document.getElementById('reactionName').value = '';
+        loadReactions();
+    } catch (err) {
+        console.error('Save reaction error:', err);
+        showToast(err.message || 'Failed to save reaction.', 'error');
+    }
+}
+
+
+// =========================================================================
+// LOCK IN INTERACTION
+// =========================================================================
+
+async function lockInteraction() {
+    const drugA = document.getElementById('drugAInput').value.trim();
+    const drugB = document.getElementById('drugBInput').value.trim();
+    const reactionId = document.getElementById('reactionSelect').value;
+    const severity = document.getElementById('severitySlider').value;
+    const remedy = document.getElementById('remedyText').value.trim();
+    const minAge = document.getElementById('minAge').value;
+    const maxAge = document.getElementById('maxAge').value;
+    const genderFilter = document.getElementById('genderFilter').value;
+    const minWeight = document.getElementById('minWeight').value;
+    const maxWeight = document.getElementById('maxWeight').value;
+
+    if (!drugA) { showToast('Please enter Drug A name.', 'warning'); return; }
+    if (!drugB) { showToast('Please enter Drug B name.', 'warning'); return; }
+    if (!reactionId) { showToast('Please select a reaction.', 'warning'); return; }
+
+    const customFactors = {};
+    if (minAge) customFactors.min_age = parseInt(minAge);
+    if (maxAge) customFactors.max_age = parseInt(maxAge);
+    if (minWeight) customFactors.min_weight = parseFloat(minWeight);
+    if (maxWeight) customFactors.max_weight = parseFloat(maxWeight);
+    if (genderFilter && genderFilter !== 'any') customFactors.gender = genderFilter;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/add-interaction/`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                drug_a: drugA,
+                drug_b: drugB,
+                reaction_id: parseInt(reactionId),
+                severity_slider: parseInt(severity),
+                remedy: remedy,
+                custom_factors: customFactors
+            })
+        });
+
+        if (res.status === 401) {
+            showToast('Session expired. Please log in again.', 'error');
+            setTimeout(() => logout(), 1500);
+            return;
+        }
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Failed to save interaction');
+        }
+
+        const data = await res.json();
+        showToast(`Interaction rule ${data.status}! ID: ${data.id}`, 'success');
+
+        // Reset form
+        document.getElementById('drugAInput').value = '';
+        document.getElementById('drugBInput').value = '';
+        document.getElementById('reactionSelect').value = '';
+        document.getElementById('severitySlider').value = 5;
+        document.getElementById('remedyText').value = '';
+        document.getElementById('minAge').value = '';
+        document.getElementById('maxAge').value = '';
+        document.getElementById('genderFilter').value = 'any';
+        document.getElementById('minWeight').value = '';
+        document.getElementById('maxWeight').value = '';
+        updateSeverityDisplay();
+
+        loadInteractions();
+    } catch (err) {
+        console.error('Lock interaction error:', err);
+        showToast(err.message || 'Failed to save interaction.', 'error');
+    }
+}
+
+
+// =========================================================================
+// openFDA AUTOCOMPLETE FOR ADMIN DRUG INPUTS
+// =========================================================================
+
+let fdaTimerA = null;
+let fdaTimerB = null;
+
+document.getElementById('drugAInput').addEventListener('input', function() {
+    clearTimeout(fdaTimerA);
+    const q = this.value.trim();
+    if (q.length < 2) return;
+    fdaTimerA = setTimeout(() => fdaLookup(q, 'fdaDrugA'), 400);
+});
+
+document.getElementById('drugBInput').addEventListener('input', function() {
+    clearTimeout(fdaTimerB);
+    const q = this.value.trim();
+    if (q.length < 2) return;
+    fdaTimerB = setTimeout(() => fdaLookup(q, 'fdaDrugB'), 400);
+});
+
+// Local medicine dataset fallback
+const COMMON_DRUGS = [
+    'aspirin', 'warfarin', 'paracetamol', 'ibuprofen', 'amoxicillin', 'citalopram', 
+    'fluoxetine', 'omeprazole', 'simvastatin', 'metformin', 'amlodipine', 'lisinopril', 
+    'losartan', 'metoprolol', 'albuterol', 'pantoprazole', 'furosemide', 'atorvastatin', 
+    'clopidogrel', 'gabapentin', 'sertraline', 'escitalopram', 'duloxetine', 'venlafaxine', 
+    'trazodone', 'bupropion', 'alprazolam', 'clonazepam', 'lorazepam', 'diazepam', 
+    'zolpidem', 'tramadol', 'oxycodone', 'hydrocodone', 'codeine', 'morphine', 'fentanyl', 
+    'methadone', 'buprenorphine', 'naloxone', 'naltrexone', 'acetaminophen', 'naproxen', 
+    'celecoxib', 'meloxicam', 'diclofenac', 'ketorolac', 'prednisone', 'dexamethasone', 
+    'hydrocortisone', 'penicillin', 'cephalexin', 'azithromycin', 'ciprofloxacin', 'levofloxacin'
+];
+
+async function fdaLookup(query, datalistId) {
+    const q = query.toLowerCase();
+    const datalist = document.getElementById(datalistId);
+    datalist.innerHTML = '';
+    const seen = new Set();
+
+    // First load from local dataset for instant results
+    COMMON_DRUGS.filter(d => d.includes(q)).forEach(drug => {
+        seen.add(drug);
+        const opt = document.createElement('option');
+        opt.value = drug;
+        datalist.appendChild(opt);
+    });
+
+    try {
+        const url = `https://api.fda.gov/drug/label.json?search=openfda.generic_name:${encodeURIComponent(query)}&limit=8`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) throw new Error('FDA API error');
+
+        const data = await res.json();
+        
+        if (data.results) {
+            data.results.forEach(item => {
+                const names = item.openfda && item.openfda.generic_name;
+                if (names && names.length > 0) {
+                    const name = names[0].toLowerCase();
+                    if (!seen.has(name)) {
+                        seen.add(name);
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        datalist.appendChild(opt);
+                    }
+                }
+            });
+        }
+        document.getElementById('fdaBanner').style.display = 'none';
+    } catch (err) {
+        console.warn('openFDA lookup failed, using local dataset only:', err.message);
+        if (seen.size === 0) {
+            document.getElementById('fdaBanner').style.display = 'flex';
+        } else {
+            document.getElementById('fdaBanner').style.display = 'none'; // Hide if we have local results
+        }
+    }
+}
+
+
+// =========================================================================
+// UI HELPERS
+// =========================================================================
+
+function updateSeverityDisplay() {
+    const val = parseInt(document.getElementById('severitySlider').value);
+    const display = document.getElementById('severityValue');
+    display.textContent = val;
+
+    if (val <= 3) {
+        display.style.color = '#4ade80';
+        display.style.background = 'rgba(34, 197, 94, 0.1)';
+    } else if (val <= 7) {
+        display.style.color = '#fbbf24';
+        display.style.background = 'rgba(245, 158, 11, 0.1)';
+    } else if (val < 10) {
+        display.style.color = '#f87171';
+        display.style.background = 'rgba(239, 68, 68, 0.1)';
+    } else {
+        display.style.color = '#ff3333';
+        display.style.background = 'rgba(239, 68, 68, 0.2)';
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function showToast(msg, type) {
+    const existing = document.querySelectorAll('.toast-msg');
+    existing.forEach(t => t.remove());
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-msg';
+    const bgColor = type === 'success'
+        ? 'linear-gradient(135deg, #059669, #10b981)'
+        : type === 'error'
+        ? 'linear-gradient(135deg, #dc2626, #ef4444)'
+        : 'linear-gradient(135deg, #d97706, #f59e0b)';
+
+    toast.style.cssText = `
+        position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+        padding: 14px 22px; border-radius: 10px;
+        font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+        color: white; max-width: 380px;
+        background: ${bgColor};
+        box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        animation: slideIn 0.3s ease;
+    `;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+[
+    {
+        "group_a": "@mefthal_spas_compound",
+        "group_b": "@acetaminophen",
+        "severity": 4,
+        "reaction": "Increased risk of hepatotoxicity with prolonged concurrent use.",
+        "remedy": "Monitor liver enzymes. Do not exceed 4g of paracetamol per day.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@ssri",
+        "severity": 6,
+        "reaction": "Increased risk of upper gastrointestinal bleeding.",
+        "remedy": "Consider prescribing a PPI if combination is necessary.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@anticoagulant",
+        "severity": 9,
+        "reaction": "High risk of severe bleeding and hemorrhage.",
+        "remedy": "Avoid combination. Use acetaminophen for pain management.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@antiplatelet",
+        "severity": 8,
+        "reaction": "Increased risk of gastrointestinal bleeding.",
+        "remedy": "Monitor for signs of bleeding. Co-administer PPI if necessary.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@ace_inhibitor",
+        "severity": 6,
+        "reaction": "Decreased antihypertensive effect and risk of acute kidney injury.",
+        "remedy": "Monitor blood pressure and renal function closely.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@arb",
+        "severity": 6,
+        "reaction": "Decreased antihypertensive effect and risk of acute kidney injury.",
+        "remedy": "Monitor blood pressure and renal function closely.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@corticosteroid",
+        "severity": 7,
+        "reaction": "Significantly increased risk of GI ulceration and bleeding.",
+        "remedy": "Avoid concurrent use or prescribe gastroprotective agents.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@opioid",
+        "group_b": "@benzodiazepine",
+        "severity": 10,
+        "reaction": "Profound respiratory depression, coma, and potential death.",
+        "remedy": "ILLEGAL/FORBIDDEN. Do not co-prescribe unless in strictly monitored ICU.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@opioid",
+        "group_b": "@z_drug",
+        "severity": 8,
+        "reaction": "Additive CNS depression and respiratory risk.",
+        "remedy": "Avoid concurrent use.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@statin",
+        "group_b": "@antibiotic_macrolide",
+        "severity": 8,
+        "reaction": "Increased risk of severe myopathy and rhabdomyolysis.",
+        "remedy": "Temporarily withhold statin therapy during antibiotic course.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@pde5_inhibitor",
+        "group_b": "@nitrate",
+        "severity": 10,
+        "reaction": "Severe and potentially fatal hypotension.",
+        "remedy": "CONTRAINDICATED. Absolute ban on concurrent use.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@acetaminophen",
+        "group_b": "@acetaminophen",
+        "severity": 10,
+        "reaction": "Acute liver failure due to overdose (Hidden double-dosing).",
+        "remedy": "Ensure total daily dose across all medications does not exceed 4,000mg.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@nsaid",
+        "group_b": "@nsaid",
+        "severity": 8,
+        "reaction": "Additive GI toxicity with no additional therapeutic benefit.",
+        "remedy": "Avoid combining multiple NSAIDs.",
+        "custom_factors": {}
+    }
+]
