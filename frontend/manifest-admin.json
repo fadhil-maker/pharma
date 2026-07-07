@@ -1,0 +1,16 @@
+{
+    "name": "Pharma Admin Engine",
+    "short_name": "Pharma Admin",
+    "description": "Secure clinician portal for managing the JSON Algorithmic Engine rules.",
+    "start_url": "/admin_login.html",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#dc2626",
+    "icons": [
+        {
+            "src": "admin-icon.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ]
+}
