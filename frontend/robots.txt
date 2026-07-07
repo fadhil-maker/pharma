@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Disallow: /admin_login.html
+Disallow: /admin_dashboard.html
+Disallow: /api/
+
+Sitemap: https://pharma.shanudigicore.com/sitemap.xml
