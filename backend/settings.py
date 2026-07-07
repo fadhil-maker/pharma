@@ -30,7 +30,7 @@ _hosts_raw = os.environ.get('ALLOWED_HOSTS', '')
 if _hosts_raw.strip():
     ALLOWED_HOSTS = [h.strip() for h in _hosts_raw.split(',') if h.strip()]
 else:
-    ALLOWED_HOSTS = ['*'] if DEBUG else ['127.0.0.1', 'localhost']
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.shanudigicore.com']
 
 # ---------------------------------------------------------------------------
 # Installed applications
