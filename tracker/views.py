@@ -212,6 +212,75 @@ def add_interaction(request):
 
 
 # =============================================================================
+# JSON ALGORITHMIC ENGINE MANAGEMENT (NEW ADMIN API)
+# =============================================================================
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Since the dashboard runs locally via VS Code auth/VPS, allow reading. Alternatively use IsAuthenticated if JWT is enforced.
+def get_engine_rules(request):
+    """Fetch the active JSON algorithmic rules."""
+    return Response({
+        'classes': DRUG_CLASSES,
+        'rules': INTERACTION_RULES
+    }, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_engine_rule(request):
+    """
+    Append a new rule directly to the JSON file and reload the engine in memory.
+    """
+    try:
+        data = request.data
+        group_a = data.get('group_a', '').strip().lower()
+        group_b = data.get('group_b', '').strip().lower()
+        severity = data.get('severity')
+        reaction = data.get('reaction', '').strip()
+        remedy = data.get('remedy', '').strip()
+
+        if not group_a or not group_b or severity is None:
+            return Response({'error': 'group_a, group_b, and severity are required.'}, status=400)
+            
+        new_rule = {
+            "group_a": group_a,
+            "group_b": group_b,
+            "severity": int(severity),
+            "reaction": reaction,
+            "remedy": remedy,
+            "custom_factors": {}
+        }
+        
+        # Add to memory
+        INTERACTION_RULES.append(new_rule)
+        
+        # Write to disk
+        rules_path = os.path.join(settings.BASE_DIR, 'tracker', 'interaction_rules.json')
+        with open(rules_path, 'w') as f:
+            json.dump(INTERACTION_RULES, f, indent=4)
+            
+        return Response({'status': 'Rule added to JSON Engine successfully!', 'rule': new_rule}, status=201)
+    except Exception as exc:
+        logger.exception("Error adding engine rule")
+        return Response({'error': str(exc)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def delete_engine_rule(request):
+    """Delete a rule by its index."""
+    try:
+        index = int(request.data.get('index', -1))
+        if 0 <= index < len(INTERACTION_RULES):
+            deleted = INTERACTION_RULES.pop(index)
+            # Write to disk
+            rules_path = os.path.join(settings.BASE_DIR, 'tracker', 'interaction_rules.json')
+            with open(rules_path, 'w') as f:
+                json.dump(INTERACTION_RULES, f, indent=4)
+            return Response({'status': 'deleted', 'rule': deleted})
+        return Response({'error': 'Invalid rule index'}, status=400)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+# =============================================================================
 # CORE TIMELINE ENGINE (PUBLIC)
 # =============================================================================
 

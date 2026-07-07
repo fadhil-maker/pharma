@@ -23,9 +23,14 @@ urlpatterns = [
     path('api/reactions/', views.get_reactions, name='get_reactions'),
     path('api/interactions/', views.get_interactions, name='get_interactions'),
 
-    # ── Authenticated write endpoints ─────────────────────────────────────
+    # ── Authenticated write endpoints (Postgres legacy) ───────────────────
     path('api/add-reaction/', views.add_reaction, name='add_reaction'),
     path('api/add-interaction/', views.add_interaction, name='add_interaction'),
+
+    # ── JSON Engine Management APIs (Admin Dashboard) ──────────────────────
+    path('api/engine/rules/', views.get_engine_rules, name='get_engine_rules'),
+    path('api/engine/rules/add/', views.add_engine_rule, name='add_engine_rule'),
+    path('api/engine/rules/delete/', views.delete_engine_rule, name='delete_engine_rule'),
 
     # ── Public timeline analysis engine ───────────────────────────────────
     path('api/check-timeline/', views.check_timeline, name='check_timeline'),
