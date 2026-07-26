@@ -1170,6 +1170,12 @@ function renderOrganImpactMap(reactionText) {
                 <span>🫀 Anatomical Organ Threat Map</span>
                 <span style="font-size:10px; opacity:0.7;">Execution Speed: &lt; 0.05ms (GPU Active)</span>
             </div>
+            <div class="organ-grid">
+                ${cardsHtml}
+            </div>
+        </div>`;
+}
+
 // Sub-1ms Patient-Friendly Plain English Medical Translator
 function getPatientFriendlyExplanation(reactionText, remedyText, drugA, drugB, severity) {
     const rx = (reactionText || '').toLowerCase();
