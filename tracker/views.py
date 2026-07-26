@@ -337,7 +337,23 @@ def get_engine_rules(request):
         queryset = queryset.order_by('drug_a', 'drug_b')
 
     rules_list = []
+    seen_keys = set()
+
     for inter in queryset:
+        # Normalize pair key independent of order (e.g. A+B vs B+A)
+        pair_key = (
+            tuple(sorted([inter.drug_a.strip().lower(), inter.drug_b.strip().lower()])),
+            inter.reaction.name.strip().lower()
+        )
+        if pair_key in seen_keys:
+            # Delete duplicate row from SQLite DB
+            try:
+                inter.delete()
+            except Exception:
+                pass
+            continue
+        
+        seen_keys.add(pair_key)
         rules_list.append({
             'id': inter.id,
             'group_a': inter.drug_a,

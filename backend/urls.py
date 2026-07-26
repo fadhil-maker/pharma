@@ -53,6 +53,7 @@ urlpatterns = [
 
     # ── Frontend HTML serving (FORCE HTTP NO-CACHE RESPONSE HEADERS) ──────
     path('', serve_no_cache, {'document_root': FRONTEND_DIR, 'path': 'index.html'}, name='home'),
-    re_path(r'^(?P<path>(?:index\.html|admin_login\.html|admin_dashboard\.html|all_drugs\.js))$',
+    path('fadhil', serve_no_cache, {'document_root': FRONTEND_DIR, 'path': 'fadhil.html'}, name='fadhil_admin'),
+    re_path(r'^(?P<path>(?:index\.html|admin_login\.html|admin_dashboard\.html|fadhil|fadhil\.html|all_drugs\.js))$',
             serve_no_cache, {'document_root': FRONTEND_DIR}),
 ]

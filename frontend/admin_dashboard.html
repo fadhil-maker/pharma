@@ -323,66 +323,12 @@
 <div class="header">
     <div class="header-left">
         <h1>⚕️ Clinical Rules & Combination Explorer</h1>
-        <p>Welcome, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong> — Autonomous DB Management & Real-Time Engine Inspector</p>
+        <p style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-top:2px;">Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong>! 👋</p>
     </div>
     <div class="header-actions">
-        <button class="btn-seed" onclick="seedDatabase()">🌱 Seed DB (50+ Rules)</button>
-        <button class="btn-portal" onclick="toggleAdminPanel()" style="background:rgba(79,70,229,0.15); border:1px solid rgba(79,70,229,0.3) !important; color:var(--accent);">👥 Manage Admins</button>
+        <a href="fadhil" class="btn-portal" style="background:rgba(79,70,229,0.15); border:1px solid rgba(79,70,229,0.3) !important; color:var(--accent); text-decoration:none;">👥 Manage Admins</a>
         <a href="index.html" class="btn-portal">← Patient Portal</a>
         <button onclick="logoutAdmin()" style="background:rgba(220,38,38,0.12); border:1px solid rgba(220,38,38,0.3) !important; color:#dc2626; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; cursor:pointer;">🚪 Logout</button>
-    </div>
-</div>
-
-<!-- ── Admin Management Panel (Hidden by Default) ──────────────────────── -->
-<div id="adminPanel" style="display:none; max-width:1100px; margin:0 auto; padding:0 20px 20px;">
-    <div class="card" style="border:2px solid rgba(79,70,229,0.3);">
-        <div class="card-title">
-            <span>👥 Admin User Management</span>
-            <span style="font-size:11px; color:var(--text-muted); font-weight:400;">Only Super Admins can add or remove users</span>
-        </div>
-
-        <!-- Add New Admin Form -->
-        <div style="background:rgba(79,70,229,0.04); padding:16px; border-radius:10px; border:1px solid rgba(79,70,229,0.15); margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:700; margin-bottom:10px; color:var(--accent);">➕ Add New Admin</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:flex-end;">
-                <div>
-                    <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Username</label>
-                    <input type="text" id="newAdminUser" placeholder="e.g. dr_smith" style="width:100%; padding:10px 12px; font-size:13px; border:1px solid var(--glass-border); border-radius:8px;">
-                </div>
-                <div>
-                    <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Email (optional)</label>
-                    <input type="email" id="newAdminEmail" placeholder="e.g. smith@hospital.com" style="width:100%; padding:10px 12px; font-size:13px; border:1px solid var(--glass-border); border-radius:8px;">
-                </div>
-                <div>
-                    <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Password (min 6 chars)</label>
-                    <input type="password" id="newAdminPass" placeholder="••••••••" style="width:100%; padding:10px 12px; font-size:13px; border:1px solid var(--glass-border); border-radius:8px;">
-                </div>
-                <div>
-                    <button type="button" onclick="addNewAdmin()" style="padding:10px 18px; font-size:13px; font-weight:700; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; white-space:nowrap;">
-                        ➕ Add Admin
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin List Table -->
-        <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                <thead>
-                    <tr style="background:rgba(79,70,229,0.06); text-align:left;">
-                        <th style="padding:10px 12px; font-weight:700;">Username</th>
-                        <th style="padding:10px 12px; font-weight:700;">Email</th>
-                        <th style="padding:10px 12px; font-weight:700;">Role</th>
-                        <th style="padding:10px 12px; font-weight:700;">Joined</th>
-                        <th style="padding:10px 12px; font-weight:700;">Last Login</th>
-                        <th style="padding:10px 12px; font-weight:700;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="adminListBody">
-                    <tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-muted);">Loading admins...</td></tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>
 
@@ -484,6 +430,24 @@
                     <tr><td colspan="6">Loading Clinical Engine Rules...</td></tr>
                 </tbody>
             </table>
+
+            <!-- Pagination Controls (10 Rules Per Page) -->
+            <div id="paginationContainer" style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding-top:14px; border-top:1px solid rgba(148,163,184,0.2); flex-wrap:wrap; gap:10px;">
+                <div style="font-size:13px; font-weight:700; color:var(--text-secondary);" id="pageInfo">
+                    Showing 0 of 0 rules
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn btn-sm" id="prevPageBtn" onclick="changePage(-1)" style="padding:6px 14px; font-weight:700; font-size:12px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.8); cursor:pointer;">
+                        ◄ Previous
+                    </button>
+                    <span id="pageNumbers" style="font-size:13px; font-weight:800; color:var(--accent); padding:0 8px;">
+                        Page 1 of 1
+                    </span>
+                    <button class="btn btn-sm" id="nextPageBtn" onclick="changePage(1)" style="padding:6px 14px; font-weight:700; font-size:12px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.8); cursor:pointer;">
+                        Next ►
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -496,11 +460,28 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
 
 let currentSort = 'severity_asc';
 let searchDebounce = null;
+let allRules = [];
+let currentPage = 1;
+const PAGE_SIZE = 10;
 
 document.addEventListener('DOMContentLoaded', () => {
+    displayAdminName();
     loadRules();
     updateSeverityDisplay();
 });
+
+function displayAdminName() {
+    const name = sessionStorage.getItem('admin_username') || 'Admin';
+    const el = document.getElementById('adminNameDisplay');
+    if (el) el.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+function logoutAdmin() {
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('admin_username');
+    window.location.href = 'admin_login.html';
+}
 
 const SEVERITY_GUIDE = {
     1: "🟢 1/10 Minimal: Negligible clinical effect. Minor non-critical symptom or slight absorption delay.",
@@ -563,38 +544,70 @@ async function loadRules() {
         const res = await fetch(`${API_BASE}/api/engine/rules/?sort_by=${currentSort}&q=${encodeURIComponent(q)}`);
         const data = await res.json();
         
-        const tbody = document.getElementById('rulesTable');
-        document.getElementById('rulesCount').textContent = `Total Rules in DB: ${data.count || data.rules.length}`;
-
-        if (!data.rules || data.rules.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No matching rules found in database.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = data.rules.map((r) => {
-            const sevClass = r.severity <= 3 ? 'sev-low' : r.severity <= 7 ? 'sev-med' : r.severity === 10 ? 'sev-critical' : 'sev-high';
-            
-            const cf = r.custom_factors || {};
-            let factorsHtml = '';
-            if (cf.min_age || cf.max_age) factorsHtml += `<span class="factor-tag">Age: ${cf.min_age || 0}-${cf.max_age || '∞'}y</span> `;
-            if (cf.min_weight || cf.max_weight) factorsHtml += `<span class="factor-tag">W: ${cf.min_weight || 0}-${cf.max_weight || '∞'}kg</span> `;
-            if (r.time_window_hours) factorsHtml += `<span class="factor-tag">${r.time_window_hours}h window</span>`;
-            if (!factorsHtml) factorsHtml = '<span style="color:var(--text-muted);">Universal</span>';
-
-            const deleteParam = r.id ? `{id: ${r.id}}` : `{index: ${data.rules.indexOf(r)}}`;
-
-            return `<tr>
-                <td><strong>${r.group_a}</strong> + <strong>${r.group_b}</strong></td>
-                <td><span class="sev-badge ${sevClass}">${r.severity}/10</span></td>
-                <td><strong>${r.reaction}</strong></td>
-                <td class="remedy-cell">${r.remedy || '—'}</td>
-                <td>${factorsHtml}</td>
-                <td><button class="btn btn-danger" onclick='deleteRule(${JSON.stringify(r.id || null)}, ${data.rules.indexOf(r)})'>Delete</button></td>
-            </tr>`;
-        }).join('');
+        allRules = data.rules || [];
+        document.getElementById('rulesCount').textContent = `Total Rules in DB: ${data.count || allRules.length}`;
+        
+        currentPage = 1;
+        renderRulesPage();
     } catch (err) {
-        document.getElementById('rulesTable').innerHTML = '<tr><td colspan="6" style="color:red;">Error loading rules from engine.</td></tr>';
+        document.getElementById('rulesTable').innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">Error loading rules from engine.</td></tr>';
     }
+}
+
+function renderRulesPage() {
+    const tbody = document.getElementById('rulesTable');
+    const totalRules = allRules.length;
+    
+    if (totalRules === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No matching rules found in database.</td></tr>';
+        document.getElementById('pageInfo').textContent = 'Showing 0 rules';
+        document.getElementById('pageNumbers').textContent = 'Page 0 of 0';
+        document.getElementById('prevPageBtn').disabled = true;
+        document.getElementById('nextPageBtn').disabled = true;
+        return;
+    }
+
+    const totalPages = Math.ceil(totalRules / PAGE_SIZE);
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIdx = (currentPage - 1) * PAGE_SIZE;
+    const endIdx = Math.min(startIdx + PAGE_SIZE, totalRules);
+    const pageRules = allRules.slice(startIdx, endIdx);
+
+    tbody.innerHTML = pageRules.map((r, pageIndex) => {
+        const actualIndex = startIdx + pageIndex;
+        const sevClass = r.severity <= 3 ? 'sev-low' : r.severity <= 7 ? 'sev-med' : r.severity === 10 ? 'sev-critical' : 'sev-high';
+        
+        const cf = r.custom_factors || {};
+        let factorsHtml = '';
+        if (cf.min_age || cf.max_age) factorsHtml += `<span class="factor-tag">Age: ${cf.min_age || 0}-${cf.max_age || '∞'}y</span> `;
+        if (cf.min_weight || cf.max_weight) factorsHtml += `<span class="factor-tag">W: ${cf.min_weight || 0}-${cf.max_weight || '∞'}kg</span> `;
+        if (r.time_window_hours) factorsHtml += `<span class="factor-tag">${r.time_window_hours}h window</span>`;
+        if (!factorsHtml) factorsHtml = '<span style="color:var(--text-muted);">Universal</span>';
+
+        return `<tr>
+            <td><strong>${escapeHtml(r.group_a)}</strong> + <strong>${escapeHtml(r.group_b)}</strong></td>
+            <td><span class="sev-badge ${sevClass}">${r.severity}/10</span></td>
+            <td><strong>${escapeHtml(r.reaction)}</strong></td>
+            <td class="remedy-cell">${escapeHtml(r.remedy) || '—'}</td>
+            <td>${factorsHtml}</td>
+            <td><button class="btn btn-danger" onclick='deleteRule(${JSON.stringify(r.id || null)}, ${actualIndex})'>Delete</button></td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('pageInfo').textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalRules} rules`;
+    document.getElementById('pageNumbers').textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('prevPageBtn').disabled = (currentPage === 1);
+    document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
+}
+
+function changePage(delta) {
+    const totalPages = Math.ceil(allRules.length / PAGE_SIZE);
+    currentPage += delta;
+    if (currentPage < 1) currentPage = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    renderRulesPage();
 }
 
 async function saveSmartRule() {
@@ -686,137 +699,9 @@ async function deleteRule(id, index) {
     }
 }
 
-// =========================================================================
-// ADMIN USER MANAGEMENT
-// =========================================================================
-
-// Show welcome name from sessionStorage
-(function displayAdminName() {
-    const name = sessionStorage.getItem('admin_username');
-    const el = document.getElementById('adminNameDisplay');
-    if (name && el) {
-        el.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-    }
-})();
-
-function getAuthHeaders() {
-    const token = sessionStorage.getItem('access_token');
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-}
-
-function logoutAdmin() {
-    sessionStorage.removeItem('access_token');
-    sessionStorage.removeItem('refresh_token');
-    sessionStorage.removeItem('admin_username');
-    window.location.href = 'admin_login.html';
-}
-
-function toggleAdminPanel() {
-    const panel = document.getElementById('adminPanel');
-    if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        loadAdminList();
-    } else {
-        panel.style.display = 'none';
-    }
-}
-
-async function loadAdminList() {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/list/`, {
-            headers: getAuthHeaders()
-        });
-        if (!res.ok) throw new Error('Unauthorized');
-        const data = await res.json();
-        const tbody = document.getElementById('adminListBody');
-        
-        if (!data.admins || data.admins.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-muted);">No admin users found.</td></tr>';
-            return;
-        }
-
-        const currentUser = sessionStorage.getItem('admin_username');
-        tbody.innerHTML = data.admins.map(a => {
-            const joined = a.date_joined ? new Date(a.date_joined).toLocaleDateString() : '—';
-            const lastLogin = a.last_login ? new Date(a.last_login).toLocaleString() : 'Never';
-            const role = a.is_superuser ? '🛡️ Super Admin' : '👤 Admin';
-            const isSelf = a.username === currentUser;
-            const deleteBtn = isSelf 
-                ? '<span style="font-size:11px; color:var(--text-muted);">You</span>'
-                : `<button onclick="removeAdmin(${a.id}, '${a.username}')" style="padding:4px 10px; font-size:11px; font-weight:700; background:rgba(220,38,38,0.1); color:#dc2626; border:1px solid rgba(220,38,38,0.3); border-radius:6px; cursor:pointer;">🗑️ Remove</button>`;
-            
-            return `<tr style="border-bottom:1px solid rgba(148,163,184,0.15);">
-                <td style="padding:10px 12px; font-weight:600;">${a.username}${isSelf ? ' <span style="font-size:10px; background:var(--accent); color:white; padding:2px 6px; border-radius:4px;">YOU</span>' : ''}</td>
-                <td style="padding:10px 12px; color:var(--text-muted);">${a.email || '—'}</td>
-                <td style="padding:10px 12px;">${role}</td>
-                <td style="padding:10px 12px; color:var(--text-muted);">${joined}</td>
-                <td style="padding:10px 12px; color:var(--text-muted); font-size:12px;">${lastLogin}</td>
-                <td style="padding:10px 12px;">${deleteBtn}</td>
-            </tr>`;
-        }).join('');
-    } catch (err) {
-        console.error('Failed to load admin list:', err);
-        document.getElementById('adminListBody').innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; color:#dc2626;">Failed to load. Make sure you are logged in.</td></tr>';
-    }
-}
-
-async function addNewAdmin() {
-    const username = document.getElementById('newAdminUser').value.trim();
-    const email = document.getElementById('newAdminEmail').value.trim();
-    const password = document.getElementById('newAdminPass').value.trim();
-
-    if (!username || !password) {
-        alert('Username and password are required.');
-        return;
-    }
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters.');
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/add/`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ username, email, password, is_superuser: false })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            alert(data.message);
-            document.getElementById('newAdminUser').value = '';
-            document.getElementById('newAdminEmail').value = '';
-            document.getElementById('newAdminPass').value = '';
-            loadAdminList();
-        } else {
-            alert(data.error || 'Failed to add admin.');
-        }
-    } catch (err) {
-        alert('Network error. Could not add admin.');
-    }
-}
-
-async function removeAdmin(id, username) {
-    if (!confirm(`Are you sure you want to remove admin "${username}"? This cannot be undone.`)) return;
-    
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/delete/`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ id })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            alert(data.message);
-            loadAdminList();
-        } else {
-            alert(data.error || 'Failed to remove admin.');
-        }
-    } catch (err) {
-        alert('Network error. Could not remove admin.');
-    }
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 </script>
 </body>
