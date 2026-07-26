@@ -28,10 +28,11 @@ urlpatterns = [
     path('api/add-reaction/', views.add_reaction, name='add_reaction'),
     path('api/add-interaction/', views.add_interaction, name='add_interaction'),
 
-    # ── JSON Engine Management APIs (Admin Dashboard) ──────────────────────
+    # ── Smart SQL Engine Management APIs (Admin Dashboard) ─────────────────
     path('api/engine/rules/', views.get_engine_rules, name='get_engine_rules'),
-    path('api/engine/rules/add/', views.add_engine_rule, name='add_engine_rule'),
+    path('api/engine/rules/add/', views.smart_check_and_add_rule, name='smart_check_and_add_rule'),
     path('api/engine/rules/delete/', views.delete_engine_rule, name='delete_engine_rule'),
+    path('api/engine/seed/', views.seed_database_api, name='seed_database_api'),
 
     # ── Public timeline analysis engine ───────────────────────────────────
     path('api/check-timeline/', views.check_timeline, name='check_timeline'),

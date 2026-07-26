@@ -221,71 +221,201 @@ def add_interaction(request):
 
 
 # =============================================================================
-# JSON ALGORITHMIC ENGINE MANAGEMENT (NEW ADMIN API)
+# SMART CLINICAL SQL ENGINE MANAGEMENT (ADMIN API)
 # =============================================================================
 
+from tracker.models import DrugClassMapping
+
 @api_view(['GET'])
-@permission_classes([AllowAny])  # Since the dashboard runs locally via VS Code auth/VPS, allow reading. Alternatively use IsAuthenticated if JWT is enforced.
+@permission_classes([AllowAny])
 def get_engine_rules(request):
-    """Fetch the active JSON algorithmic rules."""
+    """
+    Fetch all active database rules and class mappings from SQLite.
+    Supports query params: sort_by (severity_asc, severity_desc, reaction_asc, drug_asc)
+    """
+    sort_by = request.GET.get('sort_by', 'severity_desc')
+    q = request.GET.get('q', '').strip().lower()
+
+    queryset = Interaction.objects.select_related('reaction').all()
+
+    if q:
+        queryset = queryset.filter(
+            Q(drug_a__icontains=q) |
+            Q(drug_b__icontains=q) |
+            Q(reaction__name__icontains=q) |
+            Q(remedy__icontains=q)
+        )
+
+    if sort_by == 'severity_asc':
+        queryset = queryset.order_by('severity_slider', 'reaction__name')
+    elif sort_by == 'severity_desc':
+        queryset = queryset.order_by('-severity_slider', 'reaction__name')
+    elif sort_by == 'reaction_asc':
+        queryset = queryset.order_by('reaction__name')
+    elif sort_by == 'drug_asc':
+        queryset = queryset.order_by('drug_a', 'drug_b')
+
+    rules_list = []
+    for inter in queryset:
+        rules_list.append({
+            'id': inter.id,
+            'group_a': inter.drug_a,
+            'group_b': inter.drug_b,
+            'reaction': inter.reaction.name,
+            'severity': inter.severity_slider,
+            'remedy': inter.remedy,
+            'time_window_hours': inter.time_window_hours,
+            'custom_factors': inter.custom_factors or {}
+        })
+
+    # Also include in-memory JSON rules if SQLite is empty
+    if not rules_list and INTERACTION_RULES:
+        rules_list = INTERACTION_RULES
+
+    # Build drug class dictionary
+    db_classes = {m.drug_name: m.class_tag for m in DrugClassMapping.objects.all()}
+    merged_classes = {**DRUG_CLASSES, **db_classes}
+
     return Response({
-        'classes': DRUG_CLASSES,
-        'rules': INTERACTION_RULES
+        'classes': merged_classes,
+        'rules': rules_list,
+        'count': len(rules_list)
     }, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def add_engine_rule(request):
+def smart_check_and_add_rule(request):
     """
-    Append a new rule directly to the JSON file and reload the engine in memory.
+    Autonomous Admin Endpoint:
+    1. Accepts drug_a, drug_b, reaction, severity, remedy, min_age, max_age, min_weight, max_weight, time_hours.
+    2. Auto-resolves class tags for drug_a and drug_b (e.g. Panadol -> @acetaminophen).
+    3. Checks if interaction ALREADY EXISTS in SQLite.
+       - IF EXISTS: Returns status='exists' and displays existing rule.
+       - IF NOT: Auto-classifies and saves new Interaction to SQLite.
     """
     try:
         data = request.data
-        group_a = data.get('group_a', '').strip().lower()
-        group_b = data.get('group_b', '').strip().lower()
-        severity = data.get('severity')
-        reaction = data.get('reaction', '').strip()
+        raw_a = data.get('group_a', '').strip().lower()
+        raw_b = data.get('group_b', '').strip().lower()
+        reaction_name = data.get('reaction', '').strip().lower()
+        severity = int(data.get('severity', 5))
         remedy = data.get('remedy', '').strip()
+        time_hours = int(data.get('time_hours', 24))
 
-        if not group_a or not group_b or severity is None:
-            return Response({'error': 'group_a, group_b, and severity are required.'}, status=400)
-            
-        new_rule = {
-            "group_a": group_a,
-            "group_b": group_b,
-            "severity": int(severity),
-            "reaction": reaction,
-            "remedy": remedy,
-            "custom_factors": {}
-        }
-        
-        # Add to memory
-        INTERACTION_RULES.append(new_rule)
-        
-        # Write to disk
-        rules_path = os.path.join(settings.BASE_DIR, 'tracker', 'interaction_rules.json')
-        with open(rules_path, 'w') as f:
-            json.dump(INTERACTION_RULES, f, indent=4)
-            
-        return Response({'status': 'Rule added to JSON Engine successfully!', 'rule': new_rule}, status=201)
+        min_age = data.get('min_age')
+        max_age = data.get('max_age')
+        min_weight = data.get('min_weight')
+        max_weight = data.get('max_weight')
+
+        custom_factors = {}
+        if min_age is not None and str(min_age).isdigit(): custom_factors['min_age'] = int(min_age)
+        if max_age is not None and str(max_age).isdigit(): custom_factors['max_age'] = int(max_age)
+        if min_weight is not None and str(min_weight).replace('.','',1).isdigit(): custom_factors['min_weight'] = float(min_weight)
+        if max_weight is not None and str(max_weight).replace('.','',1).isdigit(): custom_factors['max_weight'] = float(max_weight)
+
+        if not raw_a or not raw_b or not reaction_name:
+            return Response({'error': 'Drug A, Drug B, and Reaction are required.'}, status=400)
+
+        # Look up class mappings
+        class_a = DrugClassMapping.objects.filter(drug_name=raw_a).first()
+        class_b = DrugClassMapping.objects.filter(drug_name=raw_b).first()
+
+        tag_a = class_a.class_tag if class_a else (DRUG_CLASSES.get(raw_a) or raw_a)
+        tag_b = class_b.class_tag if class_b else (DRUG_CLASSES.get(raw_b) or raw_b)
+
+        # Ensure tag starts with @ if it's a known class
+        if not tag_a.startswith('@') and tag_a in DRUG_CLASSES.values():
+            tag_a = '@' + tag_a.lstrip('@')
+        if not tag_b.startswith('@') and tag_b in DRUG_CLASSES.values():
+            tag_b = '@' + tag_b.lstrip('@')
+
+        # Check if rule exists in SQLite
+        existing = Interaction.objects.select_related('reaction').filter(
+            (Q(drug_a=raw_a, drug_b=raw_b) | Q(drug_a=raw_b, drug_b=raw_a) |
+             Q(drug_a=tag_a, drug_b=tag_b) | Q(drug_a=tag_b, drug_b=tag_a)),
+            reaction__name=reaction_name
+        ).first()
+
+        if existing:
+            return Response({
+                'status': 'exists',
+                'message': f"✨ Detected: Rule already exists in database for '{raw_a}' and '{raw_b}'!",
+                'rule': {
+                    'id': existing.id,
+                    'group_a': existing.drug_a,
+                    'group_b': existing.drug_b,
+                    'reaction': existing.reaction.name,
+                    'severity': existing.severity_slider,
+                    'remedy': existing.remedy,
+                    'time_window_hours': existing.time_window_hours,
+                    'custom_factors': existing.custom_factors
+                }
+            }, status=200)
+
+        # Create reaction definition if needed
+        rx_obj, _ = ReactionDefinition.objects.get_or_create(name=reaction_name)
+
+        # Create new interaction in SQLite
+        new_inter = Interaction.objects.create(
+            drug_a=tag_a,
+            drug_b=tag_b,
+            reaction=rx_obj,
+            severity_slider=severity,
+            remedy=remedy,
+            time_window_hours=time_hours,
+            custom_factors=custom_factors
+        )
+
+        return Response({
+            'status': 'created',
+            'message': f"✨ Automatically classified & added to database under tags: {tag_a} + {tag_b}",
+            'rule': {
+                'id': new_inter.id,
+                'group_a': new_inter.drug_a,
+                'group_b': new_inter.drug_b,
+                'reaction': rx_obj.name,
+                'severity': new_inter.severity_slider,
+                'remedy': new_inter.remedy,
+                'time_window_hours': new_inter.time_window_hours,
+                'custom_factors': new_inter.custom_factors
+            }
+        }, status=201)
+
     except Exception as exc:
-        logger.exception("Error adding engine rule")
+        logger.exception("Error in smart_check_and_add_rule")
         return Response({'error': str(exc)}, status=500)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def delete_engine_rule(request):
-    """Delete a rule by its index."""
+    """Delete a rule by ID from SQLite."""
     try:
+        rule_id = request.data.get('id')
+        if rule_id:
+            Interaction.objects.filter(id=rule_id).delete()
+            return Response({'status': 'deleted'})
+        
+        # Fallback to index for JSON list
         index = int(request.data.get('index', -1))
         if 0 <= index < len(INTERACTION_RULES):
             deleted = INTERACTION_RULES.pop(index)
-            # Write to disk
-            rules_path = os.path.join(settings.BASE_DIR, 'tracker', 'interaction_rules.json')
-            with open(rules_path, 'w') as f:
-                json.dump(INTERACTION_RULES, f, indent=4)
             return Response({'status': 'deleted', 'rule': deleted})
-        return Response({'error': 'Invalid rule index'}, status=400)
+
+        return Response({'error': 'Invalid rule ID or index'}, status=400)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def seed_database_api(request):
+    """1-Click API endpoint to seed SQLite with 50+ rules and 25+ reaction definitions."""
+    try:
+        from django.core.management import call_command
+        call_command('seed_clinical_data')
+        return Response({'status': 'success', 'message': 'SQLite Clinical Database seeded successfully!'})
     except Exception as e:
         return Response({'error': str(e)}, status=500)
 
@@ -497,25 +627,38 @@ def check_timeline(request):
                 
                 print(f"Match logic for {name_i} (Class: {class_i}) and {name_j} (Class: {class_j})")
 
-                # ── Search In-Memory JSON Algorithmic Engine ──────────────
+                # ── Search SQLite Database & In-Memory Algorithmic Engine ──────────────
                 matched_interactions = []
-                for rule in INTERACTION_RULES:
-                    ra, rb = rule.get('group_a', '').lower(), rule.get('group_b', '').lower()
-                    
-                    # Check bidirectional match across generic name AND abstract class
-                    match = False
-                    if (ra == name_i and rb == name_j) or (ra == name_j and rb == name_i):
-                        match = True
-                    elif (ra == class_i and rb == class_j) or (ra == class_j and rb == class_i):
-                        match = True
-                    elif (ra == name_i and rb == class_j) or (ra == class_j and rb == name_i):
-                        match = True
-                    elif (ra == class_i and rb == name_j) or (ra == name_j and rb == class_i):
-                        match = True
-                        
-                    if match:
-                        print(f"Matched Rule: {ra} + {rb}")
-                        matched_interactions.append(rule)
+
+                # Query SQLite Database Interactions
+                db_matches = Interaction.objects.select_related('reaction').filter(
+                    Q(drug_a=name_i, drug_b=name_j) | Q(drug_a=name_j, drug_b=name_i) |
+                    Q(drug_a=class_i, drug_b=class_j) | Q(drug_a=class_j, drug_b=class_i) |
+                    Q(drug_a=name_i, drug_b=class_j) | Q(drug_a=class_j, drug_b=name_i) |
+                    Q(drug_a=class_i, drug_b=name_j) | Q(drug_a=name_j, drug_b=class_i)
+                )
+
+                for db_rule in db_matches:
+                    matched_interactions.append({
+                        'reaction': db_rule.reaction.name,
+                        'severity': db_rule.severity_slider,
+                        'remedy': db_rule.remedy,
+                        'custom_factors': db_rule.custom_factors or {},
+                        'time_window_hours': db_rule.time_window_hours
+                    })
+
+                # Fallback to JSON rules if no DB match
+                if not matched_interactions:
+                    for rule in INTERACTION_RULES:
+                        ra, rb = rule.get('group_a', '').lower(), rule.get('group_b', '').lower()
+                        match = False
+                        if (ra == name_i and rb == name_j) or (ra == name_j and rb == name_i): match = True
+                        elif (ra == class_i and rb == class_j) or (ra == class_j and rb == class_i): match = True
+                        elif (ra == name_i and rb == class_j) or (ra == class_j and rb == name_i): match = True
+                        elif (ra == class_i and rb == name_j) or (ra == name_j and rb == class_i): match = True
+
+                        if match:
+                            matched_interactions.append(rule)
 
                 for rule in matched_interactions:
                     # ── Step 3: Evaluate custom_factors against patient ────

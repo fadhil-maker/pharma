@@ -64,6 +64,10 @@ class Interaction(models.Model):
         default='',
         help_text='Clinical remedy instructions returned with warnings'
     )
+    time_window_hours = models.IntegerField(
+        default=24,
+        help_text='Clearance / time-to-react window in hours'
+    )
     custom_factors = models.JSONField(
         default=dict,
         blank=True,
@@ -86,3 +90,21 @@ class Interaction(models.Model):
         ordering = ['-severity_slider', 'drug_a']
         verbose_name = 'Drug Interaction'
         verbose_name_plural = 'Drug Interactions'
+
+
+class DrugClassMapping(models.Model):
+    """
+    Maps individual drug names / brand names to active class tags (e.g. 'ibuprofen' -> '@nsaid').
+    """
+    drug_name = models.CharField(max_length=300, unique=True)
+    class_tag = models.CharField(max_length=100)
+
+    def save(self, *args, **kwargs):
+        if self.drug_name:
+            self.drug_name = self.drug_name.strip().lower()
+        if self.class_tag:
+            self.class_tag = self.class_tag.strip().lower()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.drug_name} -> {self.class_tag}"
