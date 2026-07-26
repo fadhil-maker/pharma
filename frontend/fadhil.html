@@ -74,33 +74,71 @@
 
         .hamburger-btn {
             display: none;
-            background: rgba(79, 70, 229, 0.1);
-            border: 1px solid rgba(79, 70, 229, 0.25);
-            color: var(--accent);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 800;
+            width: 42px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
             cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
+        .hamburger-btn:hover {
+            background: rgba(79, 70, 229, 0.1);
+            border-color: var(--accent);
+        }
+        .hamburger-btn .bar {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .hamburger-btn .bar::before,
+        .hamburger-btn .bar::after {
+            content: '';
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 0;
+        }
+        .hamburger-btn .bar::before { top: -6px; }
+        .hamburger-btn .bar::after { top: 6px; }
+        .hamburger-btn.active .bar { background: transparent; }
+        .hamburger-btn.active .bar::before { top: 0; transform: rotate(45deg); }
+        .hamburger-btn.active .bar::after { top: 0; transform: rotate(-45deg); }
 
         @media (max-width: 768px) {
             .hamburger-btn {
                 display: flex;
-                align-items: center;
-                gap: 6px;
             }
             .header-actions {
                 display: none;
                 width: 100%;
                 flex-direction: column;
-                gap: 8px;
-                margin-top: 12px;
-                padding: 14px;
-                background: rgba(255, 255, 255, 0.95);
-                border: 1px solid var(--glass-border);
-                border-radius: 12px;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+                gap: 6px;
+                margin-top: 14px;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(99, 102, 241, 0.15);
+                border-radius: 14px;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(99, 102, 241, 0.08);
+                animation: menuSlideIn 0.25s ease;
+            }
+            @keyframes menuSlideIn {
+                from { opacity: 0; transform: translateY(-8px); }
+                to { opacity: 1; transform: translateY(0); }
             }
             .header-actions.open {
                 display: flex;
@@ -109,7 +147,15 @@
                 width: 100%;
                 text-align: center;
                 justify-content: center;
+                padding: 12px 16px !important;
+                border-radius: 10px !important;
+                font-size: 13px !important;
             }
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
         .btn {
             font-family: 'Inter', sans-serif;
@@ -216,13 +262,13 @@
     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
         <div class="header-title">
             <h1>👥 Admin User Management</h1>
-            <p>Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong>! 👋</p>
+            <p>Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong></p>
         </div>
-        <button class="hamburger-btn" onclick="toggleMobileMenu()">☰ Menu</button>
+        <button class="hamburger-btn" id="fadhilHamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu"><span class="bar"></span></button>
     </div>
     <div class="header-actions" id="fadhilMobileMenuNav">
         <a href="admin_dashboard.html" class="btn btn-outline">⚕️ Clinical Dashboard</a>
-        <button onclick="logoutAdmin()" class="btn btn-danger">🚪 Logout</button>
+        <button onclick="logoutAdmin()" class="btn btn-danger">Logout</button>
     </div>
 </div>
 
@@ -306,7 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function toggleMobileMenu() {
     const nav = document.getElementById('fadhilMobileMenuNav');
+    const btn = document.getElementById('fadhilHamburgerBtn');
     if (nav) nav.classList.toggle('open');
+    if (btn) btn.classList.toggle('active');
 }
 
 function displayAdminName() {

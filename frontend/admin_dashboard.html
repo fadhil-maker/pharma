@@ -78,7 +78,7 @@
         }
         .header-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         .header-actions a, .header-actions button {
@@ -170,51 +170,111 @@
             margin-bottom: 16px;
         }
 
-        /* ── Hamburger Menu ───────────────────────────── */
+        /* ── Hamburger Menu (Animated 3-bar icon) ──────── */
         .hamburger-btn {
             display: none;
-            background: rgba(79, 70, 229, 0.1);
-            border: 1px solid rgba(79, 70, 229, 0.25);
-            color: var(--accent);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 800;
+            width: 42px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
             cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-
-        /* ── Pagination Buttons (Outside Table Wrapper) ── */
-        .pag-btn {
-            padding: 8px 14px;
-            font-weight: 700;
-            font-size: 12px;
-            border-radius: 8px;
-            border: none;
+        .hamburger-btn:hover {
+            background: rgba(79, 70, 229, 0.1);
+            border-color: var(--accent);
+        }
+        .hamburger-btn .bar {
+            display: block;
+            width: 18px;
+            height: 2px;
             background: var(--accent);
-            color: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .hamburger-btn .bar::before,
+        .hamburger-btn .bar::after {
+            content: '';
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 0;
+        }
+        .hamburger-btn .bar::before { top: -6px; }
+        .hamburger-btn .bar::after { top: 6px; }
+        .hamburger-btn.active .bar { background: transparent; }
+        .hamburger-btn.active .bar::before { top: 0; transform: rotate(45deg); }
+        .hamburger-btn.active .bar::after { top: 0; transform: rotate(-45deg); }
+
+        /* ── Pagination Controls (Symbol-only, premium) ── */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 14px 0 0;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pagination-bar .page-info {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: -0.01em;
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pag-btn {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: white;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-            white-space: nowrap;
-        }
-        .pag-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            box-shadow: none;
-            background: #94a3b8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         .pag-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
             transform: translateY(-1px);
-            opacity: 0.95;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+        .pag-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            background: rgba(241, 245, 249, 0.5);
+            box-shadow: none;
         }
         .pag-badge {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--accent);
-            background: rgba(79, 70, 229, 0.1);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
             padding: 6px 14px;
-            border-radius: 20px;
             white-space: nowrap;
+            letter-spacing: -0.01em;
         }
 
         /* ── Responsive Mobile & Tablet Breakpoints ── */
@@ -237,8 +297,6 @@
         @media (max-width: 768px) {
             .hamburger-btn {
                 display: flex;
-                align-items: center;
-                gap: 6px;
             }
             .header {
                 padding: 20px 16px 16px;
@@ -247,13 +305,19 @@
                 display: none;
                 width: 100%;
                 flex-direction: column;
-                gap: 8px;
-                margin-top: 12px;
-                padding: 14px;
-                background: rgba(255, 255, 255, 0.95);
-                border: 1px solid var(--glass-border);
-                border-radius: 12px;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+                gap: 6px;
+                margin-top: 14px;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(99, 102, 241, 0.15);
+                border-radius: 14px;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(99, 102, 241, 0.08);
+                animation: menuSlideIn 0.25s ease;
+            }
+            @keyframes menuSlideIn {
+                from { opacity: 0; transform: translateY(-8px); }
+                to { opacity: 1; transform: translateY(0); }
             }
             .header-actions.open {
                 display: flex;
@@ -262,6 +326,9 @@
                 width: 100%;
                 text-align: center;
                 justify-content: center;
+                padding: 12px 16px !important;
+                border-radius: 10px !important;
+                font-size: 13px !important;
             }
             .card {
                 padding: 20px 16px;
@@ -272,16 +339,12 @@
             .form-row-4 {
                 grid-template-columns: 1fr 1fr;
             }
-            #paginationContainer {
-                flex-direction: column;
-                align-items: center;
+            .pagination-bar {
+                justify-content: center;
                 text-align: center;
-                gap: 12px;
             }
             .pagination-controls {
-                width: 100%;
                 justify-content: center;
-                flex-wrap: wrap;
             }
         }
 
@@ -441,14 +504,14 @@
     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
         <div class="header-left">
             <h1>⚕️ Clinical Rules & Combination Explorer</h1>
-            <p style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-top:2px;">Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong>! 👋</p>
+            <p style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-top:2px;">Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong></p>
         </div>
-        <button class="hamburger-btn" onclick="toggleMobileMenu()">☰ Menu</button>
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu"><span class="bar"></span></button>
     </div>
     <div class="header-actions" id="mobileMenuNav">
         <a href="fadhil" class="btn-portal" style="background:rgba(79,70,229,0.15); border:1px solid rgba(79,70,229,0.3) !important; color:var(--accent); text-decoration:none;">👥 Manage Admins</a>
         <a href="index.html" class="btn-portal">← Patient Portal</a>
-        <button onclick="logoutAdmin()" style="background:rgba(220,38,38,0.12); border:1px solid rgba(220,38,38,0.3) !important; color:#dc2626; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; cursor:pointer;">🚪 Logout</button>
+        <button onclick="logoutAdmin()" style="background:rgba(220,38,38,0.12); border:1px solid rgba(220,38,38,0.3) !important; color:#dc2626; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; cursor:pointer;">Logout</button>
     </div>
 </div>
 
@@ -552,17 +615,15 @@
             </table>
         </div>
 
-        <!-- Standalone Pagination Controls OUTSIDE Table Wrapper -->
-        <div id="paginationContainer" style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; padding-top:16px; border-top:1px solid rgba(148,163,184,0.2); flex-wrap:wrap; gap:12px;">
-            <div style="font-size:13px; font-weight:700; color:var(--text-secondary);" id="pageInfo">
-                Showing 0 of 0 rules
-            </div>
-            <div class="pagination-controls" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                <button id="firstPageBtn" onclick="goToPage(1)" class="pag-btn">⇤ First</button>
-                <button id="prevPageBtn" onclick="changePage(-1)" class="pag-btn">◄ Prev</button>
-                <span id="pageNumbers" class="pag-badge">Page 1 of 1</span>
-                <button id="nextPageBtn" onclick="changePage(1)" class="pag-btn">Next ►</button>
-                <button id="lastPageBtn" onclick="goToLastPage()" class="pag-btn">Last ⇥</button>
+        <!-- Pagination Controls -->
+        <div class="pagination-bar" id="paginationContainer">
+            <span class="page-info" id="pageInfo">Showing 0 of 0 rules</span>
+            <div class="pagination-controls">
+                <button id="firstPageBtn" onclick="goToPage(1)" class="pag-btn" title="First page">«</button>
+                <button id="prevPageBtn" onclick="changePage(-1)" class="pag-btn" title="Previous page">‹</button>
+                <span id="pageNumbers" class="pag-badge">1 / 1</span>
+                <button id="nextPageBtn" onclick="changePage(1)" class="pag-btn" title="Next page">›</button>
+                <button id="lastPageBtn" onclick="goToLastPage()" class="pag-btn" title="Last page">»</button>
             </div>
         </div>
     </div>
@@ -674,7 +735,9 @@ async function loadRules() {
 
 function toggleMobileMenu() {
     const nav = document.getElementById('mobileMenuNav');
+    const btn = document.getElementById('hamburgerBtn');
     if (nav) nav.classList.toggle('open');
+    if (btn) btn.classList.toggle('active');
 }
 
 function renderRulesPage() {
@@ -683,8 +746,8 @@ function renderRulesPage() {
     
     if (totalRules === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No matching rules found in database.</td></tr>';
-        document.getElementById('pageInfo').textContent = 'Showing 0 rules';
-        document.getElementById('pageNumbers').textContent = 'Page 0 of 0';
+        document.getElementById('pageInfo').textContent = 'No rules';
+        document.getElementById('pageNumbers').textContent = '0 / 0';
         document.getElementById('firstPageBtn').disabled = true;
         document.getElementById('prevPageBtn').disabled = true;
         document.getElementById('nextPageBtn').disabled = true;
@@ -721,8 +784,8 @@ function renderRulesPage() {
         </tr>`;
     }).join('');
 
-    document.getElementById('pageInfo').textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalRules} rules`;
-    document.getElementById('pageNumbers').textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('pageInfo').textContent = `${startIdx + 1}–${endIdx} of ${totalRules}`;
+    document.getElementById('pageNumbers').textContent = `${currentPage} / ${totalPages}`;
     
     document.getElementById('firstPageBtn').disabled = (currentPage === 1);
     document.getElementById('prevPageBtn').disabled = (currentPage === 1);
