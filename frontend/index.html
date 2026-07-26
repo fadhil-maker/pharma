@@ -723,15 +723,15 @@
             <div class="unified-row">
                 <div>
                     <label for="drugSearch" style="font-weight:700;">Search or Type Medication</label>
-                    <input type="text" id="drugSearch" list="fdaSuggestions" placeholder="e.g. Paracetamol, Advil, Aspirin..." autocomplete="off">
+                    <input type="text" id="drugSearch" list="fdaSuggestions" placeholder="e.g. Paracetamol, Advil, Aspirin..." autocomplete="off" onkeypress="if(event.key === 'Enter'){ addToQueue(); event.preventDefault(); }">
                     <datalist id="fdaSuggestions"></datalist>
                 </div>
                 <div>
                     <label for="intakeTime" style="font-weight:700;">Intake Timestamp</label>
-                    <input type="datetime-local" id="intakeTime">
+                    <input type="datetime-local" id="intakeTime" onkeypress="if(event.key === 'Enter'){ addToQueue(); event.preventDefault(); }">
                 </div>
                 <div>
-                    <button class="btn btn-cyan" onclick="addToQueue()" style="height:45px; padding:0 24px; font-weight:800; white-space:nowrap;">
+                    <button type="button" class="btn btn-cyan" onclick="addToQueue(); return false;" style="height:45px; padding:0 24px; font-weight:800; white-space:nowrap;">
                         ➕ Add Medication
                     </button>
                 </div>
@@ -994,34 +994,45 @@ function showToast(msg, type = 'info') {
 // =========================================================================
 
 function addToQueue() {
-    const searchInput = document.getElementById('drugSearch');
-    const timeInput = document.getElementById('intakeTime');
-    
-    const drugName = searchInput.value.trim();
-    let timestamp = timeInput.value;
+    try {
+        const searchInput = document.getElementById('drugSearch');
+        const timeInput = document.getElementById('intakeTime');
+        
+        if (!searchInput) {
+            alert('Error: Drug search input element not found.');
+            return;
+        }
 
-    if (!drugName) {
-        showToast('Please enter or scan a medication name first.', 'warning');
+        const drugName = searchInput.value.trim();
+        let timestamp = timeInput ? timeInput.value : '';
+
+        if (!drugName) {
+            try { showToast('Please enter or scan a medication name first.', 'warning'); } catch(e) { alert('Please enter or scan a medication name first.'); }
+            searchInput.focus();
+            return;
+        }
+
+        let isoDateStr = new Date().toISOString();
+        if (timestamp) {
+            const parsedDate = new Date(timestamp);
+            if (!isNaN(parsedDate.getTime())) {
+                isoDateStr = parsedDate.toISOString();
+            }
+        }
+
+        intakes.push({
+            drug_name: drugName.toLowerCase(),
+            timestamp: isoDateStr
+        });
+
+        renderQueue();
+        try { showToast(`✅ Added ${drugName} to queue!`); } catch(e) {}
+        searchInput.value = '';
         searchInput.focus();
-        return;
+    } catch (err) {
+        console.error('addToQueue error:', err);
+        alert('Could not add medication: ' + err.message);
     }
-
-    if (!timestamp) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        timestamp = now.toISOString().slice(0, 16);
-        timeInput.value = timestamp;
-    }
-
-    intakes.push({
-        drug_name: drugName.toLowerCase(),
-        timestamp: new Date(timestamp).toISOString()
-    });
-
-    renderQueue();
-    showToast(`✅ Added ${drugName} to queue!`);
-    searchInput.value = '';
-    searchInput.focus();
 }
 
 function removeFromQueue(index) {
