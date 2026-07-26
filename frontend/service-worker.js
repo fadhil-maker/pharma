@@ -1,51 +1,26 @@
-const CACHE_NAME = 'pharma-tracker-v2';
-const ASSETS_TO_CACHE = [
-    './',
-    './index.html',
-    './manifest.json',
-    './icon.png'
-];
+// SELF-DESTRUCTING SERVICE WORKER
+// This service worker immediately unregisters itself and clears ALL caches.
+// Once deployed, it will break the old cache loop permanently.
 
-// Install Event — cache assets and activate immediately
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-        .then(cache => cache.addAll(ASSETS_TO_CACHE))
-    );
-    self.skipWaiting(); // Force instant activation (don't wait for old tabs to close)
+self.addEventListener('install', () => {
+    self.skipWaiting();
 });
 
-// Activate Event — delete ALL old caches
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames
-                    .filter(name => name !== CACHE_NAME)
-                    .map(name => caches.delete(name))
-            );
+        Promise.all([
+            // Delete every single cache
+            caches.keys().then(names => Promise.all(names.map(n => caches.delete(n)))),
+            // Unregister this service worker
+            self.registration.unregister()
+        ]).then(() => {
+            // Force all open tabs to reload with fresh content from server
+            self.clients.matchAll().then(clients => {
+                clients.forEach(client => client.navigate(client.url));
+            });
         })
     );
-    self.clients.claim(); // Take control of all open tabs immediately
 });
 
-// Fetch Event — NETWORK-FIRST strategy (always get fresh content)
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        fetch(event.request)
-            .then(networkResponse => {
-                // Got fresh response from server — update cache and return it
-                if (networkResponse && networkResponse.status === 200) {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, responseClone);
-                    });
-                }
-                return networkResponse;
-            })
-            .catch(() => {
-                // Network failed (offline) — fall back to cache
-                return caches.match(event.request);
-            })
-    );
-});
+// NEVER intercept fetch — always go to network
+self.addEventListener('fetch', () => {});

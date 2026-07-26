@@ -1368,17 +1368,20 @@ function showToast(msg, type) {
 
 <script>
 // =========================================================================
-// PWA SERVICE WORKER — FORCED AUTO-UPDATE REGISTRATION
+// NUCLEAR CACHE KILLER — Unregister ALL service workers & clear ALL caches
 // =========================================================================
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
-            .then(reg => {
-                console.log('ServiceWorker registered!', reg.scope);
-                // Force check for updates on every page load
-                reg.update();
-            })
-            .catch(err => console.error('ServiceWorker registration failed:', err));
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(reg => {
+            reg.unregister().then(() => console.log('SW unregistered:', reg.scope));
+        });
+    });
+}
+if ('caches' in window) {
+    caches.keys().then(names => {
+        names.forEach(name => {
+            caches.delete(name).then(() => console.log('Cache deleted:', name));
+        });
     });
 }
 </script>
