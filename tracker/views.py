@@ -107,6 +107,31 @@ def delete_admin(request):
     target_user.delete()
     return Response({'message': f'Admin "{name}" has been removed.'})
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reset_admin_password(request):
+    """Reset password for an admin user. Only superusers can do this."""
+    if not request.user.is_superuser:
+        return Response({'error': 'Only super admins can reset passwords.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    target_id = request.data.get('id')
+    new_password = request.data.get('password', '').strip()
+
+    if not target_id or not new_password:
+        return Response({'error': 'Admin ID and new password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    if len(new_password) < 6:
+        return Response({'error': 'Password must be at least 6 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        target_user = User.objects.get(id=target_id)
+    except User.DoesNotExist:
+        return Response({'error': 'Admin not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    target_user.set_password(new_password)
+    target_user.save()
+    return Response({'message': f'Password for admin "{target_user.username}" successfully reset!'})
+
 # ── Metabolic baseline constants ──────────────────────────────────────────────
 ACTIVATION_OFFSET_MINUTES = 30   # Default minutes until drug becomes active
 CLEARANCE_WINDOW_HOURS = 24      # Default hours until drug clears the system

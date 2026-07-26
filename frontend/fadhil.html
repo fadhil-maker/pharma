@@ -426,7 +426,10 @@ async function loadAdmins() {
 
             const actionBtn = isSelf
                 ? '<span style="font-size:11px; font-weight:700; color:var(--accent); background:rgba(79,70,229,0.1); padding:4px 8px; border-radius:6px;">YOU (ACTIVE)</span>'
-                : `<button onclick="removeAdmin(${a.id}, '${escapeHtml(a.username)}')" class="btn btn-danger" style="padding:4px 10px; font-size:11px;">🗑️ Delete</button>`;
+                : `<div style="display:flex; gap:6px;">
+                    <button onclick="resetAdminPassword(${a.id}, '${escapeHtml(a.username)}')" class="btn btn-outline" style="padding:4px 8px; font-size:11px; width:auto; border-radius:6px;">🔑 Reset Password</button>
+                    <button onclick="removeAdmin(${a.id}, '${escapeHtml(a.username)}')" class="btn btn-danger" style="padding:4px 8px; font-size:11px; width:auto; border-radius:6px;">🗑️ Delete</button>
+                   </div>`;
 
             return `<tr>
                 <td style="font-weight:700;">${escapeHtml(a.username)}</td>
@@ -471,6 +474,31 @@ async function handleCreateAdmin(e) {
         }
     } catch (err) {
         alert('Network error adding admin.');
+    }
+}
+
+async function resetAdminPassword(id, username) {
+    const newPwd = prompt(`Enter new password for admin "${username}" (min 6 characters):`);
+    if (!newPwd) return;
+    if (newPwd.length < 6) {
+        alert('⚠️ Password must be at least 6 characters long.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/reset-password/`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ id, password: newPwd })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert(`✅ ${data.message}`);
+        } else {
+            alert(`⚠️ ${data.error || 'Could not reset password.'}`);
+        }
+    } catch (err) {
+        alert('Network error resetting password.');
     }
 }
 

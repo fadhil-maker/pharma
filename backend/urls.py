@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/admin/list/', views.list_admins, name='list_admins'),
     path('api/admin/add/', views.add_admin, name='add_admin'),
     path('api/admin/delete/', views.delete_admin, name='delete_admin'),
+    path('api/admin/reset-password/', views.reset_admin_password, name='reset_admin_password'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
