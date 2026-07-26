@@ -293,7 +293,10 @@
                 </div>
                 <div class="form-group">
                     <label for="newPassword">Password * (min 6 chars)</label>
-                    <input type="password" id="newPassword" placeholder="••••••••" required autocomplete="new-password">
+                    <div style="position:relative;">
+                        <input type="text" id="newPassword" placeholder="Enter password" required autocomplete="new-password" style="padding-right:40px; font-family:'Inter',sans-serif;">
+                        <button type="button" onclick="togglePwdVisibility()" id="pwdToggleBtn" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:16px; color:var(--text-muted);" title="Toggle visibility">👁</button>
+                    </div>
                 </div>
                 <div>
                     <button type="submit" class="btn btn-accent" style="height:42px; width:100%;">
@@ -355,6 +358,18 @@ function toggleMobileMenu() {
     const btn = document.getElementById('fadhilHamburgerBtn');
     if (nav) nav.classList.toggle('open');
     if (btn) btn.classList.toggle('active');
+}
+
+function togglePwdVisibility() {
+    const inp = document.getElementById('newPassword');
+    const btn = document.getElementById('pwdToggleBtn');
+    if (inp.type === 'text') {
+        inp.type = 'password';
+        btn.textContent = '👁';
+    } else {
+        inp.type = 'text';
+        btn.textContent = '🙈';
+    }
 }
 
 function displayAdminName() {
