@@ -381,6 +381,158 @@ EXPANDED_CLINICAL_RULES = [
         "reaction": "Additive QTc prolongation leading to Torsades de Pointes and fatal cardiac arrest.",
         "remedy": "Perform serial ECG monitoring. Discontinue if QTc exceeds 500ms.",
         "custom_factors": {}
+    },
+    {
+        "group_a": "digoxin",
+        "group_b": "furosemide",
+        "severity": 8,
+        "reaction": "Loop diuretic-induced hypokalemia sensitizing the myocardium to fatal digoxin toxicity.",
+        "remedy": "Monitor serum potassium and digoxin levels closely; co-administer potassium supplements.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "lisinopril",
+        "group_b": "potassium chloride",
+        "severity": 8,
+        "reaction": "ACE inhibitor inhibition of aldosterone excretion leading to life-threatening hyperkalemia.",
+        "remedy": "Avoid routine potassium supplementation unless hypokalemia is documented.",
+        "custom_factors": {"min_age": 50}
+    },
+    {
+        "group_a": "metoprolol",
+        "group_b": "clonidine",
+        "severity": 8,
+        "reaction": "Exaggerated rebound hypertensive crisis upon clonidine withdrawal due to unopposed alpha-stimulation.",
+        "remedy": "Taper clonidine slowly and discontinue beta-blocker several days prior.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "amlodipine",
+        "group_b": "simvastatin",
+        "severity": 6,
+        "reaction": "CYP3A4 competition increasing simvastatin exposure and risk of myopathy.",
+        "remedy": "Limit simvastatin dose to maximum 20mg daily when co-administered with amlodipine.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "sucralfate",
+        "group_b": "ciprofloxacin",
+        "severity": 7,
+        "reaction": "Aluminum chelation in stomach preventing fluoroquinolone GI absorption.",
+        "remedy": "Administer ciprofloxacin at least 2 hours before or 6 hours after sucralfate.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@ssri",
+        "group_b": "sumatriptan",
+        "severity": 7,
+        "reaction": "Synergistic serotonergic stimulation causing serotonin syndrome symptoms (tremor, hyperreflexia).",
+        "remedy": "Monitor patient for weakness, hyperreflexia, and incoordination.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "haloperidol",
+        "group_b": "amiodarone",
+        "severity": 9,
+        "reaction": "Severe cumulative QTc interval prolongation causing ventricular tachycardia (Torsades de Pointes).",
+        "remedy": "Avoid combination. Use alternative non-QTc prolonging antipsychotic.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "valproic acid",
+        "group_b": "lamotrigine",
+        "severity": 8,
+        "reaction": "Inhibition of lamotrigine glucuronidation doubling its half-life and triggering toxic epidermal necrolysis / Stevens-Johnson Syndrome.",
+        "remedy": "Reduce initial lamotrigine dose by 50% and titrate slowly.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "metformin",
+        "group_b": "ethanol",
+        "severity": 8,
+        "reaction": "Alcohol potentiates metformin's effect on lactate metabolism, triggering fatal lactic acidosis.",
+        "remedy": "Advise patient to avoid excessive acute or chronic alcohol consumption.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "insulin glargine",
+        "group_b": "@beta_blocker",
+        "severity": 7,
+        "reaction": "Beta-blocker masks early warning symptoms of hypoglycemia (tachycardia, tremors), except diaphoresis.",
+        "remedy": "Educate patient to recognize sweating as primary sign of low blood sugar.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "glimepiride",
+        "group_b": "fluconazole",
+        "severity": 8,
+        "reaction": "CYP2C9 inhibition blocking sulfonylurea breakdown and triggering severe, prolonged hypoglycemic shock.",
+        "remedy": "Monitor blood glucose closely and reduce sulfonylurea dose.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "methotrexate",
+        "group_b": "ibuprofen",
+        "severity": 9,
+        "reaction": "NSAID inhibition of renal prostaglandin clearance causing acute methotrexate toxicity and pancytopenia.",
+        "remedy": "Avoid high-dose methotrexate co-administration with NSAIDs.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "cyclosporine",
+        "group_b": "diltiazem",
+        "severity": 7,
+        "reaction": "CYP3A4 inhibition by diltiazem raising cyclosporine trough levels.",
+        "remedy": "Monitor cyclosporine levels and reduce dose as clinically indicated.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "montelukast",
+        "group_b": "prednisone",
+        "severity": 2,
+        "reaction": "Synergistic therapeutic anti-inflammatory action with minor additive liver metabolism.",
+        "remedy": "Standard asthma maintenance protocol; no special monitoring required.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "diphenhydramine",
+        "group_b": "ethanol",
+        "severity": 7,
+        "reaction": "Potent additive central nervous system depression causing severe psychomotor impairment.",
+        "remedy": "Warn patient against consuming alcohol while taking sedating antihistamines.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "warfarin",
+        "group_b": "metronidazole",
+        "severity": 9,
+        "reaction": "Inhibition of S-warfarin CYP2C9 metabolism causing massive INR spike and internal hemorrhage.",
+        "remedy": "Reduce warfarin dose by 35-50% and monitor INR within 3 days.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "phenytoin",
+        "group_b": "folic acid",
+        "severity": 4,
+        "reaction": "Folic acid replacement acts as co-factor accelerating phenytoin hepatic clearance, reducing seizure control.",
+        "remedy": "Monitor therapeutic phenytoin serum levels when initiating folic acid.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "theophylline",
+        "group_b": "erythromycin",
+        "severity": 8,
+        "reaction": "Macrolide inhibition of hepatic CYP1A2 leading to toxic theophylline levels and tachyarrhythmias.",
+        "remedy": "Reduce theophylline dosage by 25-50% during macrolide therapy.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "spironolactone",
+        "group_b": "losartan",
+        "severity": 8,
+        "reaction": "Synergistic inhibition of renal potassium excretion resulting in dangerous hyperkalemia.",
+        "remedy": "Monitor serum potassium at baseline and 1 week after initiation.",
+        "custom_factors": {"min_age": 55}
     }
 ]
 
