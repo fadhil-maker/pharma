@@ -933,10 +933,18 @@ async function fetchFDASuggestions(query) {
         
         if (data.results) {
             data.results.forEach(item => {
-                const names = item.openfda && item.openfda.generic_name;
+                const openfda = item.openfda;
+                if (!openfda) return;
+                
+                // Prioritize brand name over generic for patient friendliness
+                const names = openfda.brand_name || openfda.generic_name;
                 if (names && names.length > 0) {
                     const name = names[0].toLowerCase();
-                    if (!seen.has(name)) {
+                    
+                    // Filter out overly complex chemical/IUPAC names
+                    const isComplex = name.length > 35 || /[(),\[\]]/.test(name);
+                    
+                    if (!isComplex && !seen.has(name)) {
                         addOption(name);
                     }
                 }
