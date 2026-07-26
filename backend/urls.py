@@ -11,6 +11,16 @@ from tracker import views
 # Resolve the frontend directory relative to BASE_DIR
 FRONTEND_DIR = settings.BASE_DIR / 'frontend'
 
+from django.views.decorators.cache import never_cache
+
+@never_cache
+def serve_no_cache(request, path, document_root=None):
+    response = serve(request, path, document_root=document_root)
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
+
 urlpatterns = [
     # Django admin
     path('admin/', admin.site.urls),
@@ -37,10 +47,8 @@ urlpatterns = [
     # ── Public timeline analysis engine ───────────────────────────────────
     path('api/check-timeline/', views.check_timeline, name='check_timeline'),
 
-    # ── Frontend HTML serving ─────────────────────────────────────────────
-    # Root URL serves the patient portal
-    path('', serve, {'document_root': FRONTEND_DIR, 'path': 'index.html'}, name='home'),
-    # Serve any file from the frontend directory (login, dashboard, etc.)
-    re_path(r'^(?P<path>(?:index\.html|admin_login\.html|admin_dashboard\.html))$',
-            serve, {'document_root': FRONTEND_DIR}),
+    # ── Frontend HTML serving (FORCE HTTP NO-CACHE RESPONSE HEADERS) ──────
+    path('', serve_no_cache, {'document_root': FRONTEND_DIR, 'path': 'index.html'}, name='home'),
+    re_path(r'^(?P<path>(?:index\.html|admin_login\.html|admin_dashboard\.html|all_drugs\.js))$',
+            serve_no_cache, {'document_root': FRONTEND_DIR}),
 ]
