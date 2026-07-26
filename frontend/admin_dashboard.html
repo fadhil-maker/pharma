@@ -338,15 +338,12 @@
 
         <div id="feedbackBanner" class="feedback-banner"></div>
         
-        <div class="form-row">
-            <div class="form-group">
-                <label>Drug A (Brand or Generic Name)</label>
-                <input type="text" id="groupA" placeholder="e.g. Panadol, Advil, Aspirin..." required>
-            </div>
-            <div class="form-group">
-                <label>Drug B (Brand or Generic Name)</label>
-                <input type="text" id="groupB" placeholder="e.g. Coumadin, Sertraline, Ibuprofen..." required>
-            </div>
+        <div class="form-group" style="margin-bottom:16px;">
+            <label style="font-weight:700; color:var(--text-primary); font-size:14px;">💊 Medications in Combination (Enter 2, 3, 4, 5+ drugs separated by commas)</label>
+            <input type="text" id="multiDrugs" placeholder="e.g. Panadol, Advil, Aspirin, Sertraline, Warfarin (supports 2 to 10+ drugs at once)" style="width:100%; font-size:14px; padding:12px 14px;" required>
+            <span style="font-size:11px; color:var(--text-muted); display:block; margin-top:4px;">
+                💡 <strong>Multi-Drug Mode:</strong> Type as many drugs as you want separated by commas. The system will automatically generate all interaction pairs!
+            </span>
         </div>
 
         <div class="form-row-3">
@@ -543,8 +540,7 @@ async function loadRules() {
 }
 
 async function saveSmartRule() {
-    const groupA = document.getElementById('groupA').value.trim();
-    const groupB = document.getElementById('groupB').value.trim();
+    const multiDrugs = document.getElementById('multiDrugs').value.trim();
     const reaction = document.getElementById('reactionText').value.trim();
     const severity = document.getElementById('severitySlider').value;
     const remedy = document.getElementById('remedyText').value.trim();
@@ -557,8 +553,8 @@ async function saveSmartRule() {
     const banner = document.getElementById('feedbackBanner');
     banner.style.display = 'none';
 
-    if (!groupA || !groupB || !reaction) {
-        alert("Drug A, Drug B, and Reaction are required!");
+    if (!multiDrugs || !reaction) {
+        alert("Please enter medications (at least 2 separated by commas) and the clinical reaction!");
         return;
     }
 
@@ -567,8 +563,7 @@ async function saveSmartRule() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                group_a: groupA,
-                group_b: groupB,
+                drugs: multiDrugs,
                 reaction: reaction,
                 severity: severity,
                 remedy: remedy,

@@ -293,19 +293,20 @@ def get_engine_rules(request):
 def smart_check_and_add_rule(request):
     """
     Autonomous Admin Endpoint:
-    1. Accepts drug_a, drug_b, reaction, severity, remedy, min_age, max_age, min_weight, max_weight, time_hours.
-    2. Auto-resolves class tags for drug_a and drug_b (e.g. Panadol -> @acetaminophen).
-    3. Checks if interaction ALREADY EXISTS in SQLite.
-       - IF EXISTS: Returns status='exists' and displays existing rule.
-       - IF NOT: Auto-classifies and saves new Interaction to SQLite.
+    1. Accepts group_a, group_b, or drugs (comma-separated list of 2, 3, 4, 5+ drugs), reaction, severity, remedy, min_age, max_age, min_weight, max_weight, time_hours.
+    2. Auto-resolves class tags for all drugs (e.g. Panadol -> @acetaminophen).
+    3. Auto-generates pairwise combinations if 3+ drugs are submitted.
+    4. Saves/Updates Interactions in SQLite.
     """
     try:
         data = request.data
-        raw_a = data.get('group_a', '').strip().lower()
-        raw_b = data.get('group_b', '').strip().lower()
-        reaction_name = data.get('reaction', '').strip().lower()
+        raw_a = str(data.get('group_a', '')).strip().lower()
+        raw_b = str(data.get('group_b', '')).strip().lower()
+        raw_drugs = str(data.get('drugs', '')).strip().lower()
+        
+        reaction_name = str(data.get('reaction', '')).strip().lower()
         severity = int(data.get('severity', 5))
-        remedy = data.get('remedy', '').strip()
+        remedy = str(data.get('remedy', '')).strip()
         time_hours = int(data.get('time_hours', 24))
 
         min_age = data.get('min_age')
@@ -319,44 +320,95 @@ def smart_check_and_add_rule(request):
         if min_weight is not None and str(min_weight).replace('.','',1).isdigit(): custom_factors['min_weight'] = float(min_weight)
         if max_weight is not None and str(max_weight).replace('.','',1).isdigit(): custom_factors['max_weight'] = float(max_weight)
 
-        if not raw_a or not raw_b or not reaction_name:
-            return Response({'error': 'Drug A, Drug B, and Reaction are required.'}, status=400)
+        if not reaction_name:
+            return Response({'error': 'Clinical Reaction Definition is required.'}, status=400)
 
-        # Look up class mappings
-        class_a = DrugClassMapping.objects.filter(drug_name=raw_a).first()
-        class_b = DrugClassMapping.objects.filter(drug_name=raw_b).first()
+        # Build list of all submitted drugs
+        submitted_drugs = []
+        if raw_drugs:
+            submitted_drugs = [d.strip() for d in raw_drugs.split(',') if d.strip()]
+        else:
+            if ',' in raw_a:
+                submitted_drugs.extend([d.strip() for d in raw_a.split(',') if d.strip()])
+            elif raw_a:
+                submitted_drugs.append(raw_a)
 
-        tag_a = class_a.class_tag if class_a else (DRUG_CLASSES.get(raw_a) or raw_a)
-        tag_b = class_b.class_tag if class_b else (DRUG_CLASSES.get(raw_b) or raw_b)
+            if ',' in raw_b:
+                submitted_drugs.extend([d.strip() for d in raw_b.split(',') if d.strip()])
+            elif raw_b:
+                submitted_drugs.append(raw_b)
 
-        # Ensure tag starts with @ if it's a known class
-        if not tag_a.startswith('@') and tag_a in DRUG_CLASSES.values():
-            tag_a = '@' + tag_a.lstrip('@')
-        if not tag_b.startswith('@') and tag_b in DRUG_CLASSES.values():
-            tag_b = '@' + tag_b.lstrip('@')
+        # Deduplicate
+        submitted_drugs = list(dict.fromkeys(submitted_drugs))
 
-        # Check if rule exists in SQLite
-        existing = Interaction.objects.select_related('reaction').filter(
-            (Q(drug_a=raw_a, drug_b=raw_b) | Q(drug_a=raw_b, drug_b=raw_a) |
-             Q(drug_a=tag_a, drug_b=tag_b) | Q(drug_a=tag_b, drug_b=tag_a)),
-            reaction__name=reaction_name
-        ).first()
+        if len(submitted_drugs) < 2:
+            return Response({'error': 'Please provide at least 2 drugs (e.g. Panadol, Advil, Aspirin) to create an interaction rule.'}, status=400)
 
-        if existing:
+        rx_obj, _ = ReactionDefinition.objects.get_or_create(name=reaction_name)
+        created_rules = []
+        existing_rules = []
+
+        # Generate all pairwise combinations
+        from itertools import combinations
+        pairs = list(combinations(submitted_drugs, 2))
+
+        for drug_x, drug_y in pairs:
+            # Look up class mappings
+            class_x = DrugClassMapping.objects.filter(drug_name=drug_x).first()
+            class_y = DrugClassMapping.objects.filter(drug_name=drug_y).first()
+
+            tag_x = class_x.class_tag if class_x else (DRUG_CLASSES.get(drug_x) or drug_x)
+            tag_y = class_y.class_tag if class_y else (DRUG_CLASSES.get(drug_y) or drug_y)
+
+            if not tag_x.startswith('@') and tag_x in DRUG_CLASSES.values(): tag_x = '@' + tag_x.lstrip('@')
+            if not tag_y.startswith('@') and tag_y in DRUG_CLASSES.values(): tag_y = '@' + tag_y.lstrip('@')
+
+            existing = Interaction.objects.select_related('reaction').filter(
+                (Q(drug_a=drug_x, drug_b=drug_y) | Q(drug_a=drug_y, drug_b=drug_x) |
+                 Q(drug_a=tag_x, drug_b=tag_y) | Q(drug_a=tag_y, drug_b=tag_x)),
+                reaction__name=reaction_name
+            ).first()
+
+            if existing:
+                existing_rules.append(f"{drug_x} + {drug_y}")
+            else:
+                new_rule = Interaction.objects.create(
+                    drug_a=tag_x,
+                    drug_b=tag_y,
+                    reaction=rx_obj,
+                    severity_slider=severity,
+                    remedy=remedy,
+                    time_window_hours=time_hours,
+                    custom_factors=custom_factors
+                )
+                created_rules.append({
+                    'id': new_rule.id,
+                    'group_a': tag_x,
+                    'group_b': tag_y,
+                    'reaction': reaction_name,
+                    'severity': severity,
+                    'remedy': remedy
+                })
+
+        if created_rules:
+            msg = f"🎉 Successfully created interaction rule across {len(created_rules)} drug pair(s) for [{', '.join(submitted_drugs)}]!"
+            if existing_rules:
+                msg += f" (Note: {len(existing_rules)} pair(s) already existed)."
+            return Response({
+                'status': 'created',
+                'message': msg,
+                'created_count': len(created_rules),
+                'rules': created_rules
+            }, status=201)
+        else:
             return Response({
                 'status': 'exists',
-                'message': f"✨ Detected: Rule already exists in database for '{raw_a}' and '{raw_b}'!",
-                'rule': {
-                    'id': existing.id,
-                    'group_a': existing.drug_a,
-                    'group_b': existing.drug_b,
-                    'reaction': existing.reaction.name,
-                    'severity': existing.severity_slider,
-                    'remedy': existing.remedy,
-                    'time_window_hours': existing.time_window_hours,
-                    'custom_factors': existing.custom_factors
-                }
+                'message': f"✨ Detected: All drug pair combinations for [{', '.join(submitted_drugs)}] already exist in database!",
+                'existing_pairs': existing_rules
             }, status=200)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
 
         # Create reaction definition if needed
         rx_obj, _ = ReactionDefinition.objects.get_or_create(name=reaction_name)
