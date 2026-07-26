@@ -239,11 +239,16 @@ def get_engine_rules(request):
     queryset = Interaction.objects.select_related('reaction').all()
 
     if q:
+        # Resolve class tag for q if it's a known generic/brand name
+        mapped_cls = DrugClassMapping.objects.filter(drug_name=q).first()
+        mapped_tag = mapped_cls.class_tag if mapped_cls else (DRUG_CLASSES.get(q) or q)
+        if not mapped_tag.startswith('@') and mapped_tag in DRUG_CLASSES.values():
+            mapped_tag = '@' + mapped_tag.lstrip('@')
+
         queryset = queryset.filter(
-            Q(drug_a__icontains=q) |
-            Q(drug_b__icontains=q) |
-            Q(reaction__name__icontains=q) |
-            Q(remedy__icontains=q)
+            Q(drug_a__icontains=q) | Q(drug_b__icontains=q) |
+            Q(drug_a__icontains=mapped_tag) | Q(drug_b__icontains=mapped_tag) |
+            Q(reaction__name__icontains=q) | Q(remedy__icontains=q)
         )
 
     if sort_by == 'severity_asc':
