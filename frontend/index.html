@@ -1368,12 +1368,16 @@ function showToast(msg, type) {
 
 <script>
 // =========================================================================
-// PWA SERVICE WORKER REGISTRATION
+// PWA SERVICE WORKER — FORCED AUTO-UPDATE REGISTRATION
 // =========================================================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('ServiceWorker registered!', reg.scope))
+        navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
+            .then(reg => {
+                console.log('ServiceWorker registered!', reg.scope);
+                // Force check for updates on every page load
+                reg.update();
+            })
             .catch(err => console.error('ServiceWorker registration failed:', err));
     });
 }
