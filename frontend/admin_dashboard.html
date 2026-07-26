@@ -355,8 +355,11 @@
                 <input type="text" id="reactionText" placeholder="e.g. Gastrointestinal Bleeding" required>
             </div>
             <div class="form-group">
-                <label>Severity (<span id="severityValue">5</span>/10)</label>
+                <label>Severity Index (<span id="severityValue" style="color:var(--accent); font-weight:800;">5</span>/10)</label>
                 <input type="range" id="severitySlider" min="1" max="10" value="5" oninput="updateSeverityDisplay()">
+                <div id="severityGuideBox" style="margin-top:8px; padding:8px 12px; border-radius:8px; background:rgba(79,70,229,0.08); border:1px solid rgba(79,70,229,0.2); font-size:12px; font-weight:600; color:var(--text-secondary);">
+                    Loading severity guide...
+                </div>
             </div>
             <div class="form-group">
                 <label>Clearance Window (Hours)</label>
@@ -444,9 +447,43 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSeverityDisplay();
 });
 
+const SEVERITY_GUIDE = {
+    1: "🟢 1/10 Minimal: Negligible clinical effect. Minor non-critical symptom or slight absorption delay.",
+    2: "🟢 2/10 Minor: Slight drug overlap (e.g. mild drowsiness, caffeine half-life extension). No intervention required.",
+    3: "🟢 3/10 Mild Caution: Minor interaction. Monitor patient if symptomatic; routine clinical care is sufficient.",
+    4: "🟡 4/10 Moderate: Noticeable clinical risk (e.g. mild liver enzyme shift, blood pressure shift). Periodic monitoring recommended.",
+    5: "🟡 5/10 Moderate Action: Significant risk (e.g. GI discomfort, altered drug absorption). Dose adjustment or protective agent advised.",
+    6: "🟡 6/10 Substantial Risk: Substantial interaction (e.g. NSAID + ACE inhibitor renal risk). Active clinical monitoring required.",
+    7: "🔴 7/10 Severe Risk: High risk of organ impairment or bleeding (e.g. Clopidogrel + Omeprazole). Switch drug or co-prescribe protective agent.",
+    8: "🔴 8/10 Critical Caution: Severe toxicity or organ damage risk (e.g. Statin + Macrolide rhabdomyolysis). Avoid combination or reduce dose by 50%.",
+    9: "🔴 9/10 Extreme Danger: Extreme risk of organ failure, massive hemorrhage, or cardiac arrest (e.g. Warfarin + Aspirin). Avoid combination.",
+    10: "🚨 10/10 ABSOLUTE CONTRAINDICATION: Fatal risk (e.g. Opioid + Benzodiazepine respiratory collapse, Sildenafil + Nitrate fatal hypotension). ILLEGAL TO COMBINE."
+};
+
 function updateSeverityDisplay() {
     const val = parseInt(document.getElementById('severitySlider').value);
     document.getElementById('severityValue').textContent = val;
+    const box = document.getElementById('severityGuideBox');
+    if (box) {
+        box.textContent = SEVERITY_GUIDE[val] || "Custom Severity Level";
+        if (val <= 3) {
+            box.style.background = "rgba(16, 185, 129, 0.12)";
+            box.style.borderColor = "rgba(16, 185, 129, 0.3)";
+            box.style.color = "#065f46";
+        } else if (val <= 6) {
+            box.style.background = "rgba(217, 119, 6, 0.12)";
+            box.style.borderColor = "rgba(217, 119, 6, 0.3)";
+            box.style.color = "#92400e";
+        } else if (val <= 9) {
+            box.style.background = "rgba(220, 38, 38, 0.12)";
+            box.style.borderColor = "rgba(220, 38, 38, 0.3)";
+            box.style.color = "#991b1b";
+        } else {
+            box.style.background = "rgba(127, 29, 29, 0.9)";
+            box.style.borderColor = "#7f1d1d";
+            box.style.color = "#ffffff";
+        }
+    }
 }
 
 function setSort(sortType) {
