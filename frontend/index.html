@@ -677,6 +677,52 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
             color: var(--success);
         }
+        .premium-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            padding: 8px;
+        }
+        .premium-dropdown.show {
+            display: block;
+            animation: fadeInDown 0.2s ease-out;
+        }
+        .premium-dropdown-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .premium-dropdown-item::before {
+            content: '💊';
+            font-size: 16px;
+            opacity: 0.7;
+        }
+        .premium-dropdown-item:hover, .premium-dropdown-item.active {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
     <script src="all_drugs.js"></script>
 </head>
@@ -739,10 +785,10 @@
         <!-- Add Medication Form (Drug Name + Intake Time in One Unified Row) -->
         <div style="background: rgba(148, 163, 184, 0.06); padding: 18px; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); margin-bottom: 18px;">
             <div class="unified-row">
-                <div>
+                <div style="position: relative;">
                     <label for="drugSearch" style="font-weight:700;">Search or Type Medication</label>
-                    <input type="text" id="drugSearch" list="fdaSuggestions" placeholder="e.g. Paracetamol, Advil, Aspirin..." autocomplete="off" onkeypress="if(event.key === 'Enter'){ addToQueue(); event.preventDefault(); }">
-                    <datalist id="fdaSuggestions"></datalist>
+                    <input type="text" id="drugSearch" placeholder="e.g. Paracetamol, Advil, Aspirin..." autocomplete="off" onkeydown="handleDropdownKey(event)">
+                    <div id="premiumDrugDropdown" class="premium-dropdown"></div>
                 </div>
                 <div>
                     <label for="intakeTime" style="font-weight:700;">Intake Timestamp</label>
@@ -832,8 +878,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearTimeout(fdaDebounceTimer);
                 const query = this.value.trim();
                 if (query.length < 2) {
-                    const datalist = document.getElementById('fdaSuggestions');
-                    if (datalist) datalist.innerHTML = '';
+                    const dropdown = document.getElementById('premiumDrugDropdown');
+                    if (dropdown) dropdown.classList.remove('show');
                     return;
                 }
                 fdaDebounceTimer = setTimeout(() => fetchFDASuggestions(query), 400);
@@ -844,18 +890,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+let currentFocus = -1;
+
 async function fetchFDASuggestions(query) {
     const q = query.toLowerCase();
-    const datalist = document.getElementById('fdaSuggestions');
-    datalist.innerHTML = '';
+    const dropdown = document.getElementById('premiumDrugDropdown');
+    dropdown.innerHTML = '';
     const seen = new Set();
+    let hasResults = false;
+    currentFocus = -1;
+
+    const addOption = (name) => {
+        seen.add(name);
+        hasResults = true;
+        const item = document.createElement('div');
+        item.className = 'premium-dropdown-item';
+        item.textContent = name;
+        item.onclick = () => {
+            document.getElementById('drugSearch').value = name;
+            dropdown.classList.remove('show');
+            document.getElementById('drugSearch').focus();
+        };
+        dropdown.appendChild(item);
+    };
 
     // First load from local dataset for instant results
     COMMON_DRUGS.filter(d => d.includes(q)).forEach(drug => {
-        seen.add(drug);
-        const opt = document.createElement('option');
-        opt.value = drug;
-        datalist.appendChild(opt);
+        addOption(drug);
     });
 
     try {
@@ -876,15 +937,11 @@ async function fetchFDASuggestions(query) {
                 if (names && names.length > 0) {
                     const name = names[0].toLowerCase();
                     if (!seen.has(name)) {
-                        seen.add(name);
-                        const opt = document.createElement('option');
-                        opt.value = name;
-                        datalist.appendChild(opt);
+                        addOption(name);
                     }
                 }
             });
         }
-
         document.getElementById('fdaBanner').style.display = 'none';
     } catch (err) {
         console.warn('openFDA fetch failed, using local dataset only:', err.message);
@@ -894,7 +951,62 @@ async function fetchFDASuggestions(query) {
             document.getElementById('fdaBanner').style.display = 'none'; // Hide if we have local results
         }
     }
+
+    if (hasResults && query.length > 0) {
+        dropdown.classList.add('show');
+    } else {
+        dropdown.classList.remove('show');
+    }
 }
+
+function handleDropdownKey(e) {
+    const dropdown = document.getElementById('premiumDrugDropdown');
+    const items = dropdown.getElementsByClassName('premium-dropdown-item');
+    if (!dropdown.classList.contains('show') || items.length === 0) {
+        if (e.key === 'Enter') {
+            addToQueue();
+            e.preventDefault();
+        }
+        return;
+    }
+    
+    if (e.key === 'ArrowDown') {
+        currentFocus++;
+        addActive(items);
+        e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+        currentFocus--;
+        addActive(items);
+        e.preventDefault();
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentFocus > -1) {
+            if (items[currentFocus]) items[currentFocus].click();
+        } else {
+            addToQueue();
+        }
+    }
+}
+
+function addActive(items) {
+    if (!items) return false;
+    for (let i = 0; i < items.length; i++) {
+        items[i].classList.remove('active');
+    }
+    if (currentFocus >= items.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (items.length - 1);
+    items[currentFocus].classList.add('active');
+    items[currentFocus].scrollIntoView({ block: 'nearest' });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function (e) {
+    const searchInput = document.getElementById('drugSearch');
+    const dropdown = document.getElementById('premiumDrugDropdown');
+    if (e.target !== searchInput && e.target !== dropdown && !dropdown.contains(e.target)) {
+        if (dropdown) dropdown.classList.remove('show');
+    }
+});
 
 
 // =========================================================================
