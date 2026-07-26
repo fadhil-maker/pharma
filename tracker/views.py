@@ -9,6 +9,7 @@ The timeline check endpoint remains public for patient use.
 import os
 import json
 import logging
+import re
 from datetime import datetime, timedelta, timezone
 from django.conf import settings
 
@@ -755,7 +756,10 @@ def check_timeline(request):
         # ── Step 1: Compute metabolic activity windows ────────────────────
         windows = []
         for item in intakes:
-            drug_name = item.get('drug_name', '').strip().lower()
+            raw_name = item.get('drug_name', '').strip().lower()
+            # Remove optical/stereoisomer prefixes like (+)-, (-)-, (R)-, (S)-, d-, l-
+            drug_name = re.sub(r'^\s*(\([+-]\)-?|\([RS]\)-?|[dl]-)', '', raw_name, flags=re.IGNORECASE).strip()
+            
             timestamp = item.get('timestamp', '')
             print(f"Processing drug: {drug_name} at {timestamp}")
 
