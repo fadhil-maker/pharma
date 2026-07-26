@@ -154,20 +154,76 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 16px;
             margin-bottom: 16px;
         }
         .form-row-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 14px;
+            gap: 16px;
             margin-bottom: 16px;
         }
         .form-row-4 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 14px;
+            gap: 16px;
             margin-bottom: 16px;
+        }
+
+        /* ── Responsive Mobile & Tablet Breakpoints ── */
+        @media (max-width: 860px) {
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            .form-row-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sort-controls {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 24px 16px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .header-actions {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .header-actions a, .header-actions button {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+            .card {
+                padding: 20px 16px;
+            }
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            .form-row-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            #paginationContainer {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 12px;
+            }
+            .pagination-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
         }
 
         .btn {
@@ -179,20 +235,22 @@
             border-radius: var(--radius-sm);
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             width: 100%;
             background: linear-gradient(135deg, var(--accent), var(--accent-light));
             color: white;
-            transition: opacity 0.2s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
         }
-        .btn:hover { opacity: 0.9; }
+        .btn:hover { opacity: 0.95; transform: translateY(-1px); }
         .btn-danger {
             background: linear-gradient(135deg, #dc2626, #ef4444);
             padding: 6px 12px;
             width: auto;
             border-radius: 6px;
             font-size: 12px;
+            box-shadow: none;
         }
 
         /* ── Auto-Detection Feedback Banner ─────────── */
@@ -432,18 +490,18 @@
             </table>
 
             <!-- Pagination Controls (10 Rules Per Page) -->
-            <div id="paginationContainer" style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding-top:14px; border-top:1px solid rgba(148,163,184,0.2); flex-wrap:wrap; gap:10px;">
+            <div id="paginationContainer">
                 <div style="font-size:13px; font-weight:700; color:var(--text-secondary);" id="pageInfo">
                     Showing 0 of 0 rules
                 </div>
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <button class="btn btn-sm" id="prevPageBtn" onclick="changePage(-1)" style="padding:6px 14px; font-weight:700; font-size:12px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.8); cursor:pointer;">
+                <div class="pagination-controls" style="display:flex; gap:10px; align-items:center;">
+                    <button id="prevPageBtn" onclick="changePage(-1)" style="padding:8px 16px; font-weight:700; font-size:13px; border-radius:8px; border:none; background:var(--accent); color:white; cursor:pointer; transition:opacity 0.2s ease; box-shadow:0 4px 12px rgba(79,70,229,0.2);">
                         ◄ Previous
                     </button>
-                    <span id="pageNumbers" style="font-size:13px; font-weight:800; color:var(--accent); padding:0 8px;">
+                    <span id="pageNumbers" style="font-size:13px; font-weight:800; color:var(--accent); background:rgba(79,70,229,0.1); padding:6px 14px; border-radius:20px; white-space:nowrap;">
                         Page 1 of 1
                     </span>
-                    <button class="btn btn-sm" id="nextPageBtn" onclick="changePage(1)" style="padding:6px 14px; font-weight:700; font-size:12px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.8); cursor:pointer;">
+                    <button id="nextPageBtn" onclick="changePage(1)" style="padding:8px 16px; font-weight:700; font-size:13px; border-radius:8px; border:none; background:var(--accent); color:white; cursor:pointer; transition:opacity 0.2s ease; box-shadow:0 4px 12px rgba(79,70,229,0.2);">
                         Next ►
                     </button>
                 </div>
