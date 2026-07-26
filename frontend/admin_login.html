@@ -275,6 +275,7 @@ async function handleLogin(e) {
         // Store tokens securely in sessionStorage (cleared on tab close)
         sessionStorage.setItem('access_token', data.access);
         sessionStorage.setItem('refresh_token', data.refresh);
+        sessionStorage.setItem('admin_username', username);
 
         // Redirect to dashboard
         window.location.href = 'admin_dashboard.html';

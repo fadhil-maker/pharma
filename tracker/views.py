@@ -31,6 +31,82 @@ def setup_admin(request):
     User.objects.create_superuser('admin', 'admin@example.com', 'adminpassword123')
     return JsonResponse({"status": "Success! Admin account created. Username: admin | Password: adminpassword123"})
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_profile(request):
+    """Return the currently logged-in admin's profile."""
+    user = request.user
+    return Response({
+        'username': user.username,
+        'email': user.email,
+        'is_superuser': user.is_superuser,
+        'date_joined': user.date_joined.strftime('%Y-%m-%d %H:%M'),
+        'last_login': user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else None,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_admins(request):
+    """Return list of all admin/staff users."""
+    users = User.objects.filter(is_staff=True).values(
+        'id', 'username', 'email', 'is_superuser', 'date_joined', 'last_login'
+    )
+    return Response({'admins': list(users)})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_admin(request):
+    """Add a new admin user. Only superusers can do this."""
+    if not request.user.is_superuser:
+        return Response({'error': 'Only super admins can add new admins.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    username = request.data.get('username', '').strip()
+    password = request.data.get('password', '').strip()
+    email = request.data.get('email', '').strip()
+    make_super = request.data.get('is_superuser', False)
+
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    if len(password) < 6:
+        return Response({'error': 'Password must be at least 6 characters.'}, status=status.HTTP_400_BAD_REQUEST)
+    if User.objects.filter(username=username).exists():
+        return Response({'error': f'Username "{username}" already exists.'}, status=status.HTTP_409_CONFLICT)
+    
+    user = User.objects.create_user(username=username, email=email, password=password)
+    user.is_staff = True
+    if make_super:
+        user.is_superuser = True
+    user.save()
+    
+    return Response({'message': f'Admin "{username}" created successfully!'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_admin(request):
+    """Delete an admin user. Only superusers can do this. Cannot delete yourself."""
+    if not request.user.is_superuser:
+        return Response({'error': 'Only super admins can remove admins.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    target_id = request.data.get('id')
+    if not target_id:
+        return Response({'error': 'Admin ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        target_user = User.objects.get(id=target_id)
+    except User.DoesNotExist:
+        return Response({'error': 'Admin not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if target_user.id == request.user.id:
+        return Response({'error': 'You cannot delete your own account.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    name = target_user.username
+    target_user.delete()
+    return Response({'message': f'Admin "{name}" has been removed.'})
+
 # ── Metabolic baseline constants ──────────────────────────────────────────────
 ACTIVATION_OFFSET_MINUTES = 30   # Default minutes until drug becomes active
 CLEARANCE_WINDOW_HOURS = 24      # Default hours until drug clears the system

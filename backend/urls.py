@@ -27,6 +27,10 @@ urlpatterns = [
 
     # ── JWT Authentication endpoints ──────────────────────────────────────
     path('api/setup-admin/', views.setup_admin, name='setup_admin'),
+    path('api/admin/me/', views.admin_profile, name='admin_profile'),
+    path('api/admin/list/', views.list_admins, name='list_admins'),
+    path('api/admin/add/', views.add_admin, name='add_admin'),
+    path('api/admin/delete/', views.delete_admin, name='delete_admin'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
