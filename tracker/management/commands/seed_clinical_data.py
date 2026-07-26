@@ -7,6 +7,30 @@ from tracker.models import ReactionDefinition, Interaction, DrugClassMapping
 # 50+ Comprehensive Clinical Rules covering major drug classes & interactions
 EXPANDED_CLINICAL_RULES = [
     {
+        "group_a": "@antacid",
+        "group_b": "ascorbic acid",
+        "severity": 1,
+        "reaction": "Minor non-critical delay in vitamin C absorption due to transient gastric pH shift.",
+        "remedy": "Routine dietary intake; no clinical intervention required.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "caffeine",
+        "group_b": "@acetaminophen",
+        "severity": 2,
+        "reaction": "Slight prolongation of caffeine metabolic clearance causing mild alertness.",
+        "remedy": "Informational only; no dose adjustment necessary.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@antihistamine",
+        "group_b": "@antacid",
+        "severity": 3,
+        "reaction": "Mild reduction in peak antihistamine serum concentration.",
+        "remedy": "Take with water 1 hour apart if symptomatic relief is delayed.",
+        "custom_factors": {}
+    },
+    {
         "group_a": "@mefthal_spas_compound",
         "group_b": "@acetaminophen",
         "severity": 4,
