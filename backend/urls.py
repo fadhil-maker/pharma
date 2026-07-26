@@ -16,6 +16,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # ── JWT Authentication endpoints ──────────────────────────────────────
+    path('api/setup-admin/', views.setup_admin, name='setup_admin'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 

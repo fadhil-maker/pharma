@@ -19,8 +19,17 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import ReactionDefinition, Interaction
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
+
+def setup_admin(request):
+    if User.objects.filter(username='admin').exists():
+        return JsonResponse({"status": "Admin already exists! You can log in with username: admin | password: adminpassword123"})
+    
+    User.objects.create_superuser('admin', 'admin@example.com', 'adminpassword123')
+    return JsonResponse({"status": "Success! Admin account created. Username: admin | Password: adminpassword123"})
 
 # ── Metabolic baseline constants ──────────────────────────────────────────────
 ACTIVATION_OFFSET_MINUTES = 30   # Default minutes until drug becomes active
