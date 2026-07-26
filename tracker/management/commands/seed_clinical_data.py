@@ -533,6 +533,198 @@ EXPANDED_CLINICAL_RULES = [
         "reaction": "Synergistic inhibition of renal potassium excretion resulting in dangerous hyperkalemia.",
         "remedy": "Monitor serum potassium at baseline and 1 week after initiation.",
         "custom_factors": {"min_age": 55}
+    },
+    {
+        "group_a": "tamoxifen",
+        "group_b": "paroxetine",
+        "severity": 8,
+        "reaction": "Potent CYP2D6 inhibition blocking conversion of tamoxifen to active endoxifen, increasing breast cancer recurrence risk.",
+        "remedy": "Avoid paroxetine. Switch antidepressant to citalopram or venlafaxine.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "cisplatin",
+        "group_b": "gentamicin",
+        "severity": 9,
+        "reaction": "Additive nephrotoxicity and irreversible ototoxicity leading to acute renal failure and permanent deafness.",
+        "remedy": "Avoid combination if possible; perform serial renal panel and audiometry.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "fluorouracil",
+        "group_b": "warfarin",
+        "severity": 9,
+        "reaction": "Inhibition of CYP2C9 by fluorouracil resulting in massive INR elevation and internal bleeding.",
+        "remedy": "Monitor INR frequently and reduce anticoagulant dosage.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "cyclophosphamide",
+        "group_b": "allopurinol",
+        "severity": 8,
+        "reaction": "Enhanced bone marrow suppression and severe leukopenia due to delayed metabolite clearance.",
+        "remedy": "Monitor complete blood counts weekly.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "phenobarbital",
+        "group_b": "oral contraceptives",
+        "severity": 7,
+        "reaction": "Potent hepatic CYP induction accelerating contraceptive breakdown and causing unplanned pregnancy.",
+        "remedy": "Advise non-hormonal barrier contraception.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "oxcarbazepine",
+        "group_b": "hydrochlorothiazide",
+        "severity": 8,
+        "reaction": "Additive renal hyponatremia leading to severe confusion, seizures, and cerebral edema.",
+        "remedy": "Monitor serum sodium levels regularly.",
+        "custom_factors": {"min_age": 50}
+    },
+    {
+        "group_a": "antacid",
+        "group_b": "ketoconazole",
+        "severity": 7,
+        "reaction": "Gastric acid neutralization preventing dissolution and absorption of azole antifungal.",
+        "remedy": "Administer ketoconazole with an acidic beverage (cola) or 2 hours prior to antacids.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "metoclopramide",
+        "group_b": "haloperidol",
+        "severity": 9,
+        "reaction": "Additive dopamine D2 blockade causing severe extrapyramidal symptoms, dystonia, and tardive dyskinesia.",
+        "remedy": "Avoid concurrent use.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "domperidone",
+        "group_b": "erythromycin",
+        "severity": 9,
+        "reaction": "CYP3A4 inhibition increasing domperidone levels and causing fatal QTc prolongation / cardiac arrest.",
+        "remedy": "CONTRAINDICATED. Do not combine domperidone with macrolides.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "dabigatran",
+        "group_b": "dronedarone",
+        "severity": 9,
+        "reaction": "P-glycoprotein inhibition doubling dabigatran plasma concentration and major bleeding risk.",
+        "remedy": "Avoid concurrent use in patients with renal impairment.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "rivaroxaban",
+        "group_b": "ketoconazole",
+        "severity": 9,
+        "reaction": "Combined CYP3A4 and P-gp inhibition causing 160% increase in rivaroxaban AUC and hemorrhage risk.",
+        "remedy": "Avoid concurrent systemic azole antifungal therapy with rivaroxaban.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "ticagrelor",
+        "group_b": "clarithromycin",
+        "severity": 8,
+        "reaction": "Strong CYP3A4 inhibition leading to elevated ticagrelor exposure and bleeding toxicity.",
+        "remedy": "Avoid co-administration of potent CYP3A4 inhibitors with ticagrelor.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "clozapine",
+        "group_b": "ciprofloxacin",
+        "severity": 9,
+        "reaction": "Potent CYP1A2 inhibition by ciprofloxacin doubling clozapine levels, precipitating seizures and sedation.",
+        "remedy": "Reduce clozapine dose by 50% and monitor plasma concentrations.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "lithium",
+        "group_b": "lisinopril",
+        "severity": 8,
+        "reaction": "ACE inhibitor reduction of GFR causing decreased lithium clearance and lithium neurotoxicity.",
+        "remedy": "Monitor serum lithium concentrations weekly when starting ACE inhibitors.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "venlafaxine",
+        "group_b": "phenelzine",
+        "severity": 10,
+        "reaction": "Severe, fatal Serotonin Syndrome and malignant hyperthermia.",
+        "remedy": "CONTRAINDICATED. Allow a 14-day washout period between MAOIs and SNRIs.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "bupropion",
+        "group_b": "selegiline",
+        "severity": 10,
+        "reaction": "Additive catecholamine stimulation resulting in severe hypertensive crisis and intracranial hemorrhage.",
+        "remedy": "CONTRAINDICATED. Do not combine bupropion with MAO-B inhibitors.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "ritonavir",
+        "group_b": "midazolam",
+        "severity": 10,
+        "reaction": "Extreme CYP3A4 inhibition causing prolonged, severe sedation and life-threatening respiratory depression.",
+        "remedy": "CONTRAINDICATED. Avoid oral midazolam in patients taking protease inhibitors.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "rifampin",
+        "group_b": "warfarin",
+        "severity": 8,
+        "reaction": "Profound hepatic CYP2C9 and CYP3A4 induction accelerating warfarin clearance and loss of anticoagulation.",
+        "remedy": "Increase warfarin dosage and monitor INR every 2 days during co-therapy.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "vancomycin",
+        "group_b": "piperacillin-tazobactam",
+        "severity": 8,
+        "reaction": "Synergistic nephrotoxicity significantly increasing incidence of acute kidney injury.",
+        "remedy": "Monitor serum creatinine daily; consider alternative beta-lactam coverage.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "theophylline",
+        "group_b": "fluvoxamine",
+        "severity": 9,
+        "reaction": "Potent CYP1A2 inhibition causing 3-fold to 5-fold increase in theophylline levels and fatal seizures.",
+        "remedy": "Avoid combination. Use non-CYP1A2 inhibiting SSRI.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "hydroxychloroquine",
+        "group_b": "azithromycin",
+        "severity": 8,
+        "reaction": "Additive cardiac QTc prolongation and increased risk of ventricular arrhythmias.",
+        "remedy": "Obtain baseline ECG and monitor QTc interval.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "glimepiride",
+        "group_b": "trimethoprim-sulfamethoxazole",
+        "severity": 9,
+        "reaction": "CYP2C9 inhibition and protein displacement causing severe, prolonged hypoglycemic coma.",
+        "remedy": "Monitor blood glucose frequently; reduce sulfonylurea dose.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "levothyroxine",
+        "group_b": "ferrous sulfate",
+        "severity": 5,
+        "reaction": "Chelation binding in intestinal lumen reducing thyroid hormone absorption and causing hypothyroidism.",
+        "remedy": "Separate oral iron and levothyroxine administration by at least 4 hours.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "bromocriptine",
+        "group_b": "pseudoephedrine",
+        "severity": 8,
+        "reaction": "Additive sympathomimetic and vasoconstrictive stimulation triggering severe hypertension and stroke.",
+        "remedy": "Avoid concurrent use of oral decongestants with dopamine agonists.",
+        "custom_factors": {}
     }
 ]
 
