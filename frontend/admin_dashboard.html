@@ -170,6 +170,53 @@
             margin-bottom: 16px;
         }
 
+        /* ── Hamburger Menu ───────────────────────────── */
+        .hamburger-btn {
+            display: none;
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.25);
+            color: var(--accent);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* ── Pagination Buttons (Outside Table Wrapper) ── */
+        .pag-btn {
+            padding: 8px 14px;
+            font-weight: 700;
+            font-size: 12px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            white-space: nowrap;
+        }
+        .pag-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+            background: #94a3b8;
+        }
+        .pag-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+        .pag-badge {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent);
+            background: rgba(79, 70, 229, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
         /* ── Responsive Mobile & Tablet Breakpoints ── */
         @media (max-width: 860px) {
             .form-row-3 {
@@ -187,18 +234,29 @@
             }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
             .header {
-                padding: 24px 16px 16px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 14px;
+                padding: 20px 16px 16px;
             }
             .header-actions {
+                display: none;
                 width: 100%;
-                display: flex;
                 flex-direction: column;
                 gap: 8px;
+                margin-top: 12px;
+                padding: 14px;
+                background: rgba(255, 255, 255, 0.95);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            }
+            .header-actions.open {
+                display: flex;
             }
             .header-actions a, .header-actions button {
                 width: 100%;
@@ -222,7 +280,8 @@
             }
             .pagination-controls {
                 width: 100%;
-                justify-content: space-between;
+                justify-content: center;
+                flex-wrap: wrap;
             }
         }
 
@@ -379,11 +438,14 @@
 <body>
 
 <div class="header">
-    <div class="header-left">
-        <h1>⚕️ Clinical Rules & Combination Explorer</h1>
-        <p style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-top:2px;">Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong>! 👋</p>
+    <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+        <div class="header-left">
+            <h1>⚕️ Clinical Rules & Combination Explorer</h1>
+            <p style="font-size:14px; font-weight:600; color:var(--text-secondary); margin-top:2px;">Welcome back, <strong id="adminNameDisplay" style="color:var(--accent);">Admin</strong>! 👋</p>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMobileMenu()">☰ Menu</button>
     </div>
-    <div class="header-actions">
+    <div class="header-actions" id="mobileMenuNav">
         <a href="fadhil" class="btn-portal" style="background:rgba(79,70,229,0.15); border:1px solid rgba(79,70,229,0.3) !important; color:var(--accent); text-decoration:none;">👥 Manage Admins</a>
         <a href="index.html" class="btn-portal">← Patient Portal</a>
         <button onclick="logoutAdmin()" style="background:rgba(220,38,38,0.12); border:1px solid rgba(220,38,38,0.3) !important; color:#dc2626; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; cursor:pointer;">🚪 Logout</button>
@@ -488,26 +550,24 @@
                     <tr><td colspan="6">Loading Clinical Engine Rules...</td></tr>
                 </tbody>
             </table>
+        </div>
 
-            <!-- Pagination Controls (10 Rules Per Page) -->
-            <div id="paginationContainer">
-                <div style="font-size:13px; font-weight:700; color:var(--text-secondary);" id="pageInfo">
-                    Showing 0 of 0 rules
-                </div>
-                <div class="pagination-controls" style="display:flex; gap:10px; align-items:center;">
-                    <button id="prevPageBtn" onclick="changePage(-1)" style="padding:8px 16px; font-weight:700; font-size:13px; border-radius:8px; border:none; background:var(--accent); color:white; cursor:pointer; transition:opacity 0.2s ease; box-shadow:0 4px 12px rgba(79,70,229,0.2);">
-                        ◄ Previous
-                    </button>
-                    <span id="pageNumbers" style="font-size:13px; font-weight:800; color:var(--accent); background:rgba(79,70,229,0.1); padding:6px 14px; border-radius:20px; white-space:nowrap;">
-                        Page 1 of 1
-                    </span>
-                    <button id="nextPageBtn" onclick="changePage(1)" style="padding:8px 16px; font-weight:700; font-size:13px; border-radius:8px; border:none; background:var(--accent); color:white; cursor:pointer; transition:opacity 0.2s ease; box-shadow:0 4px 12px rgba(79,70,229,0.2);">
-                        Next ►
-                    </button>
-                </div>
+        <!-- Standalone Pagination Controls OUTSIDE Table Wrapper -->
+        <div id="paginationContainer" style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; padding-top:16px; border-top:1px solid rgba(148,163,184,0.2); flex-wrap:wrap; gap:12px;">
+            <div style="font-size:13px; font-weight:700; color:var(--text-secondary);" id="pageInfo">
+                Showing 0 of 0 rules
+            </div>
+            <div class="pagination-controls" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <button id="firstPageBtn" onclick="goToPage(1)" class="pag-btn">⇤ First</button>
+                <button id="prevPageBtn" onclick="changePage(-1)" class="pag-btn">◄ Prev</button>
+                <span id="pageNumbers" class="pag-badge">Page 1 of 1</span>
+                <button id="nextPageBtn" onclick="changePage(1)" class="pag-btn">Next ►</button>
+                <button id="lastPageBtn" onclick="goToLastPage()" class="pag-btn">Last ⇥</button>
             </div>
         </div>
     </div>
+
+</div>
 
 </div>
 
@@ -612,6 +672,11 @@ async function loadRules() {
     }
 }
 
+function toggleMobileMenu() {
+    const nav = document.getElementById('mobileMenuNav');
+    if (nav) nav.classList.toggle('open');
+}
+
 function renderRulesPage() {
     const tbody = document.getElementById('rulesTable');
     const totalRules = allRules.length;
@@ -620,8 +685,10 @@ function renderRulesPage() {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No matching rules found in database.</td></tr>';
         document.getElementById('pageInfo').textContent = 'Showing 0 rules';
         document.getElementById('pageNumbers').textContent = 'Page 0 of 0';
+        document.getElementById('firstPageBtn').disabled = true;
         document.getElementById('prevPageBtn').disabled = true;
         document.getElementById('nextPageBtn').disabled = true;
+        document.getElementById('lastPageBtn').disabled = true;
         return;
     }
 
@@ -656,16 +723,29 @@ function renderRulesPage() {
 
     document.getElementById('pageInfo').textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalRules} rules`;
     document.getElementById('pageNumbers').textContent = `Page ${currentPage} of ${totalPages}`;
+    
+    document.getElementById('firstPageBtn').disabled = (currentPage === 1);
     document.getElementById('prevPageBtn').disabled = (currentPage === 1);
     document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
+    document.getElementById('lastPageBtn').disabled = (currentPage === totalPages);
 }
 
 function changePage(delta) {
     const totalPages = Math.ceil(allRules.length / PAGE_SIZE);
-    currentPage += delta;
-    if (currentPage < 1) currentPage = 1;
-    if (currentPage > totalPages) currentPage = totalPages;
+    goToPage(currentPage + delta);
+}
+
+function goToPage(pageNum) {
+    const totalPages = Math.ceil(allRules.length / PAGE_SIZE) || 1;
+    if (pageNum < 1) pageNum = 1;
+    if (pageNum > totalPages) pageNum = totalPages;
+    currentPage = pageNum;
     renderRulesPage();
+}
+
+function goToLastPage() {
+    const totalPages = Math.ceil(allRules.length / PAGE_SIZE) || 1;
+    goToPage(totalPages);
 }
 
 async function saveSmartRule() {
