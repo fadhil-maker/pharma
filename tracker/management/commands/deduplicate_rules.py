@@ -22,8 +22,8 @@ class Command(BaseCommand):
         delete_ids = [r.id for r in to_delete]
         if delete_ids:
             purged_count = Interaction.objects.filter(id__in=delete_ids).delete()[0]
-            self.stdout.write(self.style.SUCCESS(f"✅ Successfully purged {purged_count} duplicate interaction rule(s) from database!"))
+            self.stdout.write(self.style.SUCCESS(f"Successfully purged {purged_count} duplicate interaction rule(s) from database!"))
         else:
-            self.stdout.write(self.style.SUCCESS("✨ No duplicate rules found in database."))
+            self.stdout.write(self.style.SUCCESS("No duplicate rules found in database."))
 
-        self.stdout.write(self.style.SUCCESS(f"Total Rules: {total_before} → {Interaction.objects.count()} clean unique rules remaining."))
+        self.stdout.write(self.style.SUCCESS(f"Total Rules: {total_before} -> {Interaction.objects.count()} clean unique rules remaining."))
