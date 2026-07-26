@@ -798,27 +798,32 @@ let fdaDebounceTimer = null;
 
 // COMMON_DRUGS is defined globally in all_drugs.js
 
-// ── Set default intake time to now ────────────────────────────────────────
-(function setDefaultTime() {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    const isoStr = now.toISOString().slice(0, 16);
-    document.getElementById('intakeTime').value = isoStr;
-})();
+// ── Set default intake time & DOM Event Listeners ──────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const timeEl = document.getElementById('intakeTime');
+        if (timeEl && !timeEl.value) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            timeEl.value = now.toISOString().slice(0, 16);
+        }
 
-
-// =========================================================================
-// openFDA AUTOCOMPLETE WITH GRACEFUL DEGRADATION
-// =========================================================================
-
-document.getElementById('drugSearch').addEventListener('input', function() {
-    clearTimeout(fdaDebounceTimer);
-    const query = this.value.trim();
-    if (query.length < 2) {
-        document.getElementById('fdaSuggestions').innerHTML = '';
-        return;
+        const drugSearchEl = document.getElementById('drugSearch');
+        if (drugSearchEl) {
+            drugSearchEl.addEventListener('input', function() {
+                clearTimeout(fdaDebounceTimer);
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    const datalist = document.getElementById('fdaSuggestions');
+                    if (datalist) datalist.innerHTML = '';
+                    return;
+                }
+                fdaDebounceTimer = setTimeout(() => fetchFDASuggestions(query), 400);
+            });
+        }
+    } catch (e) {
+        console.warn('DOM Init notice:', e);
     }
-    fdaDebounceTimer = setTimeout(() => fetchFDASuggestions(query), 400);
 });
 
 async function fetchFDASuggestions(query) {
@@ -879,19 +884,23 @@ async function fetchFDASuggestions(query) {
 // =========================================================================
 
 // -- Prescription OCR (OCR.space API) --
-document.getElementById('ocrFileInput').addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+document.addEventListener('DOMContentLoaded', () => {
+    const ocrInput = document.getElementById('ocrFileInput');
+    if (!ocrInput) return;
 
-    const progressDiv = document.getElementById('ocrProgress');
-    const barFill = document.getElementById('ocrBarFill');
-    const statusText = document.getElementById('ocrStatusText');
-    const ocrWarning = document.getElementById('ocrWarningBanner');
+    ocrInput.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    progressDiv.style.display = 'block';
-    ocrWarning.style.display = 'none';
-    barFill.style.width = '20%';
-    statusText.textContent = 'Uploading to OCR engine...';
+        const progressDiv = document.getElementById('ocrProgress');
+        const barFill = document.getElementById('ocrBarFill');
+        const statusText = document.getElementById('ocrStatusText');
+        const ocrWarning = document.getElementById('ocrWarningBanner');
+
+        if (progressDiv) progressDiv.style.display = 'block';
+        if (ocrWarning) ocrWarning.style.display = 'none';
+        if (barFill) barFill.style.width = '20%';
+        if (statusText) statusText.textContent = 'Uploading to OCR engine...';
 
     const formData = new FormData();
     formData.append("file", file);
@@ -963,8 +972,9 @@ document.getElementById('ocrFileInput').addEventListener('change', async functio
         ocrWarning.style.display = 'flex';
     } finally {
         this.value = '';  // Clear file input
-        setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
+        setTimeout(() => { if (progressDiv) progressDiv.style.display = 'none'; }, 3000);
     }
+    });
 });
 
 function showScanSuccess(msg) {
