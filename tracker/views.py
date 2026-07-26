@@ -838,6 +838,12 @@ def check_timeline(request):
                         if match:
                             matched_interactions.append(rule)
 
+                if matched_interactions:
+                    # Sort by severity descending and take only the most severe rule
+                    # This prevents duplicate warnings (e.g. exact match vs class match)
+                    matched_interactions.sort(key=lambda x: x.get('severity', 0), reverse=True)
+                    matched_interactions = [matched_interactions[0]]
+
                 for rule in matched_interactions:
                     # ── Step 3: Evaluate custom_factors against patient ────
                     if not _evaluate_custom_factors(
