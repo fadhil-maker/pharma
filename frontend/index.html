@@ -694,29 +694,44 @@
         </div>
     </div>
 
-    <!-- ── Drug Search + OCR ─────────────────────────────────────────────── -->
+    <!-- ── Unified Medication & Intake Section ──────────────────────────────── -->
     <div class="card">
         <div class="card-title">
-            🔍 Active Ingredient Search
-            <span class="badge">INN / Generic</span>
+            💊 Medication Search & Intake Logger
+            <span class="badge" id="queueCount">0 items queued</span>
         </div>
 
-        <div class="form-group">
-            <label for="drugSearch">Search by Generic Name (openFDA)</label>
-            <input type="text" id="drugSearch" list="fdaSuggestions" placeholder="Type: paracetamol, aspirin, ibuprofen..." autocomplete="off">
-            <datalist id="fdaSuggestions"></datalist>
+        <!-- Add Medication Form (Drug Name + Intake Time in One Row) -->
+        <div style="background: rgba(148, 163, 184, 0.06); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); margin-bottom: 18px;">
+            <div class="form-row" style="grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+                <div>
+                    <label for="drugSearch" style="font-weight:700;">Drug Name (Search or Type)</label>
+                    <input type="text" id="drugSearch" list="fdaSuggestions" placeholder="e.g. Paracetamol, Advil, Aspirin..." autocomplete="off">
+                    <datalist id="fdaSuggestions"></datalist>
+                </div>
+                <div>
+                    <label for="intakeTime" style="font-weight:700;">Intake Timestamp</label>
+                    <input type="datetime-local" id="intakeTime">
+                </div>
+                <div>
+                    <button class="btn btn-cyan" onclick="addToQueue()" style="height:42px; padding:0 22px; font-weight:800; white-space:nowrap;">
+                        ➕ Add Medication
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div class="scanner-container">
+        <!-- Prescription OCR Scanner in Same Section -->
+        <div class="scanner-container" style="margin-bottom:18px;">
             <div class="scanner-tabs">
-                <div class="scanner-tab active">Prescription OCR Scanner</div>
+                <div class="scanner-tab active">📷 Prescription OCR Image Scanner</div>
             </div>
             <div class="scanner-pane active" id="pane-ocr">
-                <div class="ocr-zone" id="ocrZone">
+                <div class="ocr-zone" id="ocrZone" style="padding:14px;">
                     <input type="file" id="ocrFileInput" accept="image/*">
-                    <div class="icon">📄</div>
-                    <p><strong>Upload Prescription</strong></p>
-                    <p style="font-size:11px; margin-top:4px; color:var(--text-muted);">Powered by High-Speed Cloud OCR</p>
+                    <div class="icon" style="font-size:24px;">📄</div>
+                    <p style="margin-top:4px;"><strong>Upload Prescription Photo</strong></p>
+                    <p style="font-size:11px; margin-top:2px; color:var(--text-muted);">Auto-extracts drug names & adds to queue instantly</p>
                 </div>
                 <div class="ocr-progress" id="ocrProgress">
                     <div class="bar-track"><div class="bar-fill" id="ocrBarFill"></div></div>
@@ -724,33 +739,21 @@
                 </div>
             </div>
         </div>
-        <div class="scan-badge scan-badge-success" id="scanBadge">✅ Scan Successful</div>
-    </div>
+        <div class="scan-badge scan-badge-success" id="scanBadge" style="margin-bottom:14px;">✅ Scan Successful</div>
 
-    <!-- ── Medication Queue ──────────────────────────────────────────────── -->
-    <div class="card">
-        <div class="card-title">
-            📋 Medication Intake Queue
-            <span class="badge" id="queueCount">0 items</span>
+        <!-- Queued Medications List & Action -->
+        <div style="margin-top:10px;">
+            <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-secondary); display:block; margin-bottom:8px;">
+                📋 Queued Medications for Analysis
+            </label>
+            <ul class="queue-list" id="queueList">
+                <li class="queue-empty">No medications in queue. Add at least 2 drugs to analyze timeline interactions.</li>
+            </ul>
+
+            <button class="btn btn-danger" onclick="analyzeTimeline()" style="margin-top:14px; width:100%; font-size:15px; font-weight:900; padding:14px;">
+                🚨 Analyze Timeline — Run Multi-Drug Conflict Engine
+            </button>
         </div>
-
-        <div style="display:grid; grid-template-columns:1fr auto; gap:10px; margin-bottom:16px;">
-            <div>
-                <label for="intakeTime">Intake Timestamp</label>
-                <input type="datetime-local" id="intakeTime">
-            </div>
-            <div style="display:flex; align-items:flex-end;">
-                <button class="btn btn-cyan" onclick="addToQueue()" style="height:45px;">+ Add</button>
-            </div>
-        </div>
-
-        <ul class="queue-list" id="queueList">
-            <li class="queue-empty">No medications in queue. Add at least 2 drugs to analyze interactions.</li>
-        </ul>
-
-        <button class="btn btn-danger" onclick="analyzeTimeline()" style="margin-top:12px;">
-            🚨 Analyze Timeline — Run Conflict Calculations
-        </button>
     </div>
 
     <!-- ── Results ───────────────────────────────────────────────────────── -->
