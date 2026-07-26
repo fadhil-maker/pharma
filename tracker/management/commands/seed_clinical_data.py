@@ -245,6 +245,118 @@ EXPANDED_CLINICAL_RULES = [
         "reaction": "P-glycoprotein and CYP3A4 inhibition causing fatal colchicine toxicity.",
         "remedy": "CONTRAINDICATED in patients with renal or hepatic impairment.",
         "custom_factors": {}
+    },
+    {
+        "group_a": "@antifungal_azole",
+        "group_b": "@statin",
+        "severity": 8,
+        "reaction": "Potent CYP3A4 inhibition leading to elevated statin levels and rhabdomyolysis.",
+        "remedy": "Temporarily discontinue statin during azole antifungal course.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "theophylline",
+        "group_b": "ciprofloxacin",
+        "severity": 8,
+        "reaction": "Inhibition of CYP1A2 leading to theophylline toxicity (seizures, cardiac arrhythmias).",
+        "remedy": "Reduce theophylline dosage by 50% and monitor serum levels.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "cyclosporine",
+        "group_b": "st. john's wort",
+        "severity": 10,
+        "reaction": "Induction of P-glycoprotein and CYP3A4 causing acute organ transplant rejection.",
+        "remedy": "CONTRAINDICATED. Avoid St. John's wort in transplant recipients.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "tacrolimus",
+        "group_b": "@antifungal_azole",
+        "severity": 9,
+        "reaction": "CYP3A4 inhibition causing severe tacrolimus nephrotoxicity and neurotoxicity.",
+        "remedy": "Reduce tacrolimus dose and monitor trough whole-blood levels closely.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@anticonvulsant",
+        "group_b": "valproic acid",
+        "severity": 7,
+        "reaction": "Displacement from plasma proteins and inhibition of metabolism leading to hyperammonemia.",
+        "remedy": "Monitor serum valproate and ammonia levels.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@antihistamine",
+        "group_b": "@benzodiazepine",
+        "severity": 6,
+        "reaction": "Additive central nervous system depression, sedation, and psychomotor impairment.",
+        "remedy": "Advise patient to avoid driving or operating machinery.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "tizanidine",
+        "group_b": "ciprofloxacin",
+        "severity": 10,
+        "reaction": "Severe CYP1A2 inhibition causing profound hypotension, somnolence, and psychomotor impairment.",
+        "remedy": "CONTRAINDICATED. Do not combine tizanidine with ciprofloxacin.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "lithium",
+        "group_b": "@nsaid",
+        "severity": 8,
+        "reaction": "Inhibition of renal prostaglandin synthesis reducing lithium excretion and causing toxicity.",
+        "remedy": "Monitor serum lithium levels; consider reducing lithium dose by 25%.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "phenelzine",
+        "group_b": "meperidine",
+        "severity": 10,
+        "reaction": "Severe cardiovascular collapse, hyperpyrexia, and fatal Serotonin Syndrome.",
+        "remedy": "CONTRAINDICATED. Allow a 14-day washout period between MAOIs and opioids.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "linezolid",
+        "group_b": "@ssri",
+        "severity": 9,
+        "reaction": "Reversible MAO inhibition by linezolid leading to Serotonin Syndrome.",
+        "remedy": "Avoid concurrent use unless urgent infection management requires it with close ICU monitoring.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "@loop_diuretic",
+        "group_b": "aminoglycoside",
+        "severity": 8,
+        "reaction": "Additive ototoxicity and nephrotoxicity leading to permanent hearing loss.",
+        "remedy": "Monitor renal function and perform serial audiometric testing.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "spironolactone",
+        "group_b": "trimethoprim",
+        "severity": 9,
+        "reaction": "Blockade of renal sodium channels resulting in severe hyperkalemia and sudden cardiac death.",
+        "remedy": "Avoid combination, especially in elderly or diabetic patients.",
+        "custom_factors": {"min_age": 55}
+    },
+    {
+        "group_a": "fluconazole",
+        "group_b": "warfarin",
+        "severity": 9,
+        "reaction": "Inhibition of CYP2C9 resulting in marked INR elevation and massive internal bleeding.",
+        "remedy": "Reduce warfarin dose by 50% and monitor INR every 48 hours.",
+        "custom_factors": {}
+    },
+    {
+        "group_a": "amiodarone",
+        "group_b": "levofloxacin",
+        "severity": 9,
+        "reaction": "Additive QTc prolongation leading to Torsades de Pointes and fatal cardiac arrest.",
+        "remedy": "Perform serial ECG monitoring. Discontinue if QTc exceeds 500ms.",
+        "custom_factors": {}
     }
 ]
 
