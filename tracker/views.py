@@ -757,8 +757,8 @@ def check_timeline(request):
         windows = []
         for item in intakes:
             raw_name = item.get('drug_name', '').strip().lower()
-            # Remove optical/stereoisomer prefixes like (+)-, (-)-, (R)-, (S)-, d-, l-
-            drug_name = re.sub(r'^\s*(\([+-]\)-?|\([RS]\)-?|[dl]-)', '', raw_name, flags=re.IGNORECASE).strip()
+            # Remove optical/stereoisomer prefixes like (+)-, (-)-, (±)-, (R)-, (S)-, d-, l-
+            drug_name = re.sub(r'^\s*(\([+\-±]\)-?|\([RS]\)-?|[dl]-)', '', raw_name, flags=re.IGNORECASE).strip()
             
             timestamp = item.get('timestamp', '')
             print(f"Processing drug: {drug_name} at {timestamp}")
