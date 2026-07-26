@@ -975,21 +975,42 @@ function showScanSuccess(msg) {
 }
 
 
+function showToast(msg, type = 'info') {
+    let toast = document.getElementById('appToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'appToast';
+        toast.style.cssText = 'position:fixed; bottom:24px; right:24px; background:#0f172a; color:#fff; padding:12px 20px; border-radius:10px; font-weight:700; font-size:13px; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; transition:all 0.3s ease; display:none;';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.background = type === 'warning' ? '#d97706' : type === 'error' ? '#dc2626' : '#0f172a';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3500);
+}
+
 // =========================================================================
 // MEDICATION INTAKE QUEUE
 // =========================================================================
 
 function addToQueue() {
-    const drugName = document.getElementById('drugSearch').value.trim();
-    const timestamp = document.getElementById('intakeTime').value;
+    const searchInput = document.getElementById('drugSearch');
+    const timeInput = document.getElementById('intakeTime');
+    
+    const drugName = searchInput.value.trim();
+    let timestamp = timeInput.value;
 
     if (!drugName) {
-        showToast('Please enter or scan a drug name first.', 'warning');
+        showToast('Please enter or scan a medication name first.', 'warning');
+        searchInput.focus();
         return;
     }
+
     if (!timestamp) {
-        showToast('Please select an intake time.', 'warning');
-        return;
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        timestamp = now.toISOString().slice(0, 16);
+        timeInput.value = timestamp;
     }
 
     intakes.push({
@@ -998,7 +1019,9 @@ function addToQueue() {
     });
 
     renderQueue();
-    document.getElementById('drugSearch').value = '';
+    showToast(`✅ Added ${drugName} to queue!`);
+    searchInput.value = '';
+    searchInput.focus();
 }
 
 function removeFromQueue(index) {
