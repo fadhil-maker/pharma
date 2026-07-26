@@ -1126,8 +1126,48 @@ function renderOrganImpactMap(reactionText) {
                 <span>🫀 Anatomical Organ Threat Map</span>
                 <span style="font-size:10px; opacity:0.7;">Execution Speed: &lt; 0.05ms (GPU Active)</span>
             </div>
-            <div class="organ-grid">
-                ${cardsHtml}
+// Sub-1ms Patient-Friendly Plain English Medical Translator
+function getPatientFriendlyExplanation(reactionText, remedyText, drugA, drugB, severity) {
+    const rx = (reactionText || '').toLowerCase();
+    const rem = (remedyText || '').toLowerCase();
+    
+    let plainMeaning = `Taking ${drugA} and ${drugB} together causes a drug conflict in your body.`;
+    let plainAction = `Talk to your pharmacist or doctor before taking these medications together.`;
+
+    if (rx.includes('gi toxicity') || rx.includes('gastrointestinal') || rx.includes('ulcer') || rx.includes('bleed') || rx.includes('nsaid')) {
+        plainMeaning = `Taking ${drugA} and ${drugB} together doubles your risk of severe stomach pain, acid reflux, and stomach ulcers, without giving you any extra pain relief.`;
+        plainAction = `Do NOT take both of these painkillers at the same time. Take only one, or consult your pharmacist for a safe alternative.`;
+    } else if (rx.includes('serotonin') || rx.includes('cns') || rx.includes('sedation') || rx.includes('apnea')) {
+        plainMeaning = `This combination causes dangerous drowsiness, slow breathing, or severe brain chemistry overload.`;
+        plainAction = `Do NOT drive or operate machinery. Avoid taking these medicines together unless specifically instructed by your physician.`;
+    } else if (rx.includes('cardiac') || rx.includes('qtc') || rx.includes('arrhythmia') || rx.includes('hypotension')) {
+        plainMeaning = `Combining these drugs can cause your blood pressure to drop rapidly or cause irregular heartbeats.`;
+        plainAction = `Sit down if you feel dizzy. Seek immediate medical advice before taking your next dose.`;
+    } else if (rx.includes('hepatotoxicity') || rx.includes('liver')) {
+        plainMeaning = `Taking these together puts excessive stress on your liver, which can lead to liver toxicity or damage over time.`;
+        plainAction = `Do not exceed recommended daily limits. Avoid drinking alcohol while taking these medications.`;
+    } else if (rx.includes('kidney') || rx.includes('renal') || rx.includes('hyperkalemia')) {
+        plainMeaning = `This combination reduces kidney function and can build up dangerous potassium levels in your blood.`;
+        plainAction = `Stay well hydrated and have a doctor check your routine blood work.`;
+    } else if (rx.includes('rhabdomyolysis') || rx.includes('myopathy') || rx.includes('muscle')) {
+        plainMeaning = `Taking these together can cause severe muscle breakdown and kidney stress.`;
+        plainAction = `Stop taking the medication and report any unexpected muscle pain or dark urine to your doctor immediately.`;
+    }
+
+    if (remedyText && remedyText.length > 5) {
+        plainAction = `${remedyText} (${plainAction})`;
+    }
+
+    return `
+        <div style="margin-top:16px; padding:16px; border-radius:12px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(6, 182, 212, 0.08)); border:1.5px solid rgba(79, 70, 229, 0.25);">
+            <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--accent); margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <span>💡 SIMPLE PATIENT ADVICE (PLAIN ENGLISH SUMMARY)</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:8px; line-height:1.5;">
+                🗣️ <strong>What this means:</strong> ${escapeHtml(plainMeaning)}
+            </div>
+            <div style="font-size:13px; font-weight:800; color:#dc2626; background:rgba(239, 68, 68, 0.12); padding:10px 12px; border-radius:8px; border:1px solid rgba(239, 68, 68, 0.3); line-height:1.5;">
+                🛑 <strong>Action to Take:</strong> ${escapeHtml(plainAction)}
             </div>
         </div>`;
 }
@@ -1179,6 +1219,7 @@ function renderResults(warnings) {
                         </div>
                     </div>
                     ${renderOrganImpactMap(w.reaction)}
+                    ${getPatientFriendlyExplanation(w.reaction, w.remedy, w.drug_a, w.drug_b, w.severity)}
                     ${renderFactorPills(w.custom_factors)}
                 </div>`;
         }
@@ -1198,7 +1239,7 @@ function renderResults(warnings) {
                     <span class="detail-value">${escapeHtml(w.drug_b)}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Reaction</span>
+                    <span class="detail-label">Clinical Reaction</span>
                     <span class="detail-value">${escapeHtml(w.reaction)}</span>
                 </div>
                 <div class="detail-row">
@@ -1206,9 +1247,10 @@ function renderResults(warnings) {
                     <span class="detail-value" style="font-size:12px;">${formatDT(w.overlap_start)} → ${formatDT(w.overlap_end)}</span>
                 </div>
                 ${renderOrganImpactMap(w.reaction)}
+                ${getPatientFriendlyExplanation(w.reaction, w.remedy, w.drug_a, w.drug_b, w.severity)}
                 ${w.remedy ? `
-                    <div class="remedy-block">
-                        <strong>Clinical Remedy:</strong><br>${escapeHtml(w.remedy)}
+                    <div class="remedy-block" style="margin-top:12px;">
+                        <strong>Clinical Protocol / Remedy:</strong><br>${escapeHtml(w.remedy)}
                     </div>` : ''}
                 ${renderFactorPills(w.custom_factors)}
             </div>`;
