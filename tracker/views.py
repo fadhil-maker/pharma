@@ -94,7 +94,7 @@ def list_interactions(request):
     page = int(request.GET.get('page', 1))
     limit = int(request.GET.get('limit', 10))
     
-    qs = Interaction.objects.select_related('reaction').all()
+    qs = Interaction.objects.select_related('reaction').all().order_by('id')
     if search_q:
         qs = qs.filter(
             models.Q(drug_a__icontains=search_q) | 
