@@ -101,9 +101,9 @@ def list_interactions(request):
     
     if search_q:
         qs = qs.filter(
-            models.Q(drug_a__icontains=search_q) | 
-            models.Q(drug_b__icontains=search_q) | 
-            models.Q(reaction__name__icontains=search_q)
+            Q(drug_a__icontains=search_q) | 
+            Q(drug_b__icontains=search_q) | 
+            Q(reaction__name__icontains=search_q)
         )
         
     if min_severity and min_severity.isdigit():
