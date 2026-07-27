@@ -343,40 +343,6 @@
             </div>
         </header>
 
-        <!-- ── Patient Vitals Header ── -->
-        <div class="patient-vitals">
-            <div class="vital-group">
-                <div class="vital-item">
-                    <span class="vital-label">Patient Name</span>
-                    <span class="vital-value editable-vital" id="vitalName" contenteditable="true" onblur="saveVitals()">John Doe</span>
-                </div>
-                <div class="vital-item">
-                    <span class="vital-label">Age</span>
-                    <span class="vital-value editable-vital" id="vitalAge" contenteditable="true" onblur="saveVitals()">35 YRS</span>
-                </div>
-                <div class="vital-item">
-                    <span class="vital-label">Gender</span>
-                    <span class="vital-value editable-vital" id="vitalGender" contenteditable="true" onblur="saveVitals()">MALE</span>
-                </div>
-                <div class="vital-item">
-                    <span class="vital-label">Weight</span>
-                    <span class="vital-value editable-vital" id="vitalWeight" contenteditable="true" onblur="saveVitals()">180 LBS</span>
-                </div>
-            </div>
-            <div class="vital-status">
-                <div class="status-dot"></div>
-                LIVE BIOMETRIC SYNC
-            </div>
-        </div>
-        <style>
-            
-            .editable-vital { border-bottom: 1px dashed rgba(0,0,0,0.2); cursor: text; outline: none; transition: 0.2s; min-width: 50px; display: inline-block; }
-            .editable-vital:empty:before { content: 'Click to set'; opacity: 0.4; }
-    
-            .editable-vital:focus { border-bottom-color: var(--accent); color: var(--accent); }
-            [data-theme="dark"] .editable-vital { border-bottom-color: rgba(255,255,255,0.2); }
-        </style>
-
         <!-- ── Main Dashboard Grid ── -->
         <div class="dashboard-grid">
             
