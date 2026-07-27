@@ -516,7 +516,7 @@ function toggleTheme() {
 
 // ── 2. Dynamic Vitals ──────────────────────────────────────────────────────
 
-function openVitalsModal() {
+function _unused_openVitalsModal() {
     document.getElementById('inputName').value = document.getElementById('vitalName').textContent;
     document.getElementById('inputAge').value = document.getElementById('vitalAge').textContent;
     document.getElementById('inputGender').value = document.getElementById('vitalGender').textContent;
@@ -546,23 +546,33 @@ function handleSaveVitalsForm(e) {
     closeVitalsModal();
 }
 
-function saveVitals() {
+function handleSavePatientForm(e) {
+    if (e) e.preventDefault();
     const vitals = {
-        name: document.getElementById('vitalName').textContent,
-        age: document.getElementById('vitalAge').textContent,
-        gender: document.getElementById('vitalGender').textContent,
-        weight: document.getElementById('vitalWeight').textContent
+        name: document.getElementById('patientNameInput').value.trim() || 'John Doe',
+        age: document.getElementById('patientAgeInput').value.trim() || '35',
+        gender: document.getElementById('patientGenderInput').value || 'MALE',
+        weight: document.getElementById('patientWeightInput').value.trim() || '180'
     };
     localStorage.setItem('patientVitals', JSON.stringify(vitals));
+    document.getElementById('patientStatusText').textContent = 'Profile Saved';
+    setTimeout(() => {
+        document.getElementById('patientStatusText').textContent = 'Profile Active';
+    }, 2000);
 }
 
 function loadVitals() {
     const vitals = JSON.parse(localStorage.getItem('patientVitals'));
     if (vitals) {
-        document.getElementById('vitalName').textContent = vitals.name || 'John Doe';
-        document.getElementById('vitalAge').textContent = vitals.age || '35 YRS';
-        document.getElementById('vitalGender').textContent = vitals.gender || 'MALE';
-        document.getElementById('vitalWeight').textContent = vitals.weight || '180 LBS';
+        document.getElementById('patientNameInput').value = vitals.name || 'John Doe';
+        document.getElementById('patientAgeInput').value = vitals.age || '35';
+        document.getElementById('patientGenderInput').value = vitals.gender || 'MALE';
+        document.getElementById('patientWeightInput').value = vitals.weight || '180';
+    } else {
+        document.getElementById('patientNameInput').value = 'John Doe';
+        document.getElementById('patientAgeInput').value = '35';
+        document.getElementById('patientGenderInput').value = 'MALE';
+        document.getElementById('patientWeightInput').value = '180';
     }
     
     // Load theme
