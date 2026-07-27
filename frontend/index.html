@@ -167,6 +167,49 @@
         
         .organ-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
         .organ-card { background: var(--bg-main); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border-light); font-weight: 700; font-size: 13px; }
+    
+        /* Dashboard Grid Layout (Desktop & Mobile) */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 32px;
+            width: 100%;
+            align-items: start;
+        }
+        
+        .left-column { display: flex; flex-direction: column; gap: 32px; }
+        .right-column { display: flex; flex-direction: column; gap: 32px; position: sticky; top: 24px; }
+        
+        @media (max-width: 992px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .right-column { position: relative; top: 0; }
+        }
+        
+        /* Dropzone UI Update */
+        .scanner-dropzone {
+            background: rgba(14, 165, 233, 0.03); 
+            border: 2px dashed var(--accent); 
+            border-radius: var(--radius-lg); 
+            padding: 40px 20px; 
+            text-align: center; 
+            transition: all 0.3s ease; 
+        }
+        .scanner-dropzone:hover { background: rgba(14, 165, 233, 0.08); }
+        .scanner-icons { display: flex; justify-content: center; gap: 20px; font-size: 48px; margin-bottom: 16px; }
+        .scanner-btn-group { display: flex; justify-content: center; gap: 16px; margin-top: 24px; }
+        .scanner-btn { padding: 10px 20px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; font-weight: 700; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; }
+        .scanner-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+        /* Drug Logger Update */
+        .logger-row { display: grid; grid-template-columns: 1fr 140px 140px; gap: 12px; align-items: end; margin-bottom: 24px; }
+        @media (max-width: 600px) { .logger-row { grid-template-columns: 1fr; } }
+        
+        .drug-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--border-light); padding-top: 16px; }
+        .drug-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 600; }
+        .drug-item-info { display: flex; gap: 16px; color: var(--text-main); }
+        .drug-item-time { color: var(--text-muted); font-size: 14px; }
+        .drug-item-remove { color: var(--text-muted); cursor: pointer; font-weight: 700; }
+        .drug-item-remove:hover { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -181,74 +224,126 @@
             <span id="themeText">Light</span>
         </button>
     </header>
-
-    <!-- ── 2. Hero Section ────────────────────────────────────────────────── -->
-    <div class="hero-card">
-        <h1 class="hero-title">Clinical Drug Conflict & Timeline Engine</h1>
-        <p class="hero-subtitle">Sub-millisecond dynamic interaction analysis, 11-organ system threat mapping, and instant OCR prescription scanner.</p>
+    <!-- ── Hero Section ────────────────────────────────────────────────── -->
+    <div style="text-align: center; margin: 40px 0;">
+        <h1 class="hero-title">Clinical Pharmacy Tracker</h1>
+        <p class="hero-subtitle">Premium cross-reference engine for 64,000+ FDA-approved interactions.</p>
     </div>
 
-    <!-- ── 3. Premium Free AI Scanner Dropzone ────────────────────────────── -->
-    <div class="card">
-        <div class="card-title">📷 Premium Free Scanner</div>
-        <div class="scanner-dropzone" onclick="document.getElementById('ocrFile').click()">
-            <div class="scanner-icon">📸</div>
-            <div class="scanner-text">Snap or Drag Medicine Box / Prescription Photo</div>
-            <div class="scanner-subtext">Auto-detects drug names & adds them to your intake timeline instantly</div>
-            <input type="file" id="ocrFile" accept="image/*" style="display:none" onchange="handleOCRScan(this)">
-        </div>
-    </div>
-
-    <!-- ── 4. Unlimited Drug Intake & Timeline Logger ─────────────────────── -->
-    <div class="card">
-        <div class="card-title">💊 Medication Intake Timeline Logger</div>
-        
-        <div class="input-group">
-            <div style="position:relative;">
-                <input type="text" id="drugInput" placeholder="Type drug name (e.g., Methotrexate, Ibuprofen)..." autocomplete="off" oninput="handleAutocomplete(this.value)">
-                <div id="drugDropdown" class="premium-dropdown"></div>
+    <div class="dashboard-grid">
+        <!-- ── LEFT COLUMN ──────────────────────────────────────────────── -->
+        <div class="left-column">
+            
+            <!-- PREMIUM CAMERA & FILE UPLOAD DROPZONE -->
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-title">PREMIUM CAMERA & FILE UPLOAD DROPZONE</div>
+                <div class="scanner-dropzone">
+                    <div class="scanner-icons">
+                        <span>📦</span> <span>📸</span> <span>📁</span>
+                    </div>
+                    <div style="font-weight: 600; color: var(--text-main); margin-bottom: 4px;">Scan Medicine Box or Upload Prescription.</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">(Drag & drop or Click)</div>
+                    
+                    <div class="scanner-btn-group">
+                        <button class="scanner-btn" onclick="document.getElementById('ocrFile').click()">[+] Take Photo</button>
+                        <button class="scanner-btn" onclick="document.getElementById('ocrFile').click()">[ ] Upload File</button>
+                    </div>
+                    <input type="file" id="ocrFile" accept="image/*" style="display:none" onchange="handleOCRScan(this)">
+                </div>
             </div>
-            <input type="datetime-local" id="intakeTime">
-            <button class="btn btn-accent" onclick="addDrugToQueue()">➕ Add Drug</button>
+
+            <!-- SIMPLE DRUG LOGGER -->
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-title">SIMPLE DRUG LOGGER</div>
+                <form onsubmit="handleAddDrug(event)">
+                    <div class="logger-row">
+                        <div>
+                            <label>Drug Name</label>
+                            <input type="text" id="drugInput" placeholder="Aspirin" required autocomplete="off">
+                            <div id="drugSuggestions" class="premium-dropdown"></div>
+                        </div>
+                        <div>
+                            <label>Timestamp</label>
+                            <select id="timeInput">
+                                <option>09:00 AM</option>
+                                <option>10:30 AM</option>
+                                <option>12:00 PM</option>
+                                <option>02:15 PM</option>
+                                <option>06:45 PM</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-cyan" style="width: 100%; height: 50px;">[+] Add Drug</button>
+                    </div>
+                </form>
+                
+                <ul class="drug-list" id="drugListUI">
+                    <!-- Example Items (Will be populated by JS) -->
+                    <li class="drug-item" style="color: var(--text-muted); justify-content: center; border: none;">No drugs logged yet.</li>
+                </ul>
+                <div style="display:flex; justify-content: space-between; margin-top: 16px; align-items: center;">
+                    <div style="font-size:12px; color:var(--text-muted); font-weight:700;" id="totalLoggedCount">0 DRUGS</div>
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer;" onclick="clearProfile()">Clear List [X]</span>
+                </div>
+            </div>
+
         </div>
 
-        <div class="queue-header">
-            <span style="font-weight:800; font-size:14px; text-transform:uppercase; color:var(--text-muted);">📋 Queued Medications (<span id="queueCount">0</span>)</span>
-            <button style="background:none; border:none; color:var(--danger); font-weight:700; cursor:pointer; font-size:12px;" onclick="clearQueue()">🗑️ Clear All</button>
+        <!-- ── RIGHT COLUMN ─────────────────────────────────────────────── -->
+        <div class="right-column">
+            
+            <!-- LIVE RESULTS & ANALYSIS -->
+            <div class="card" style="margin-bottom: 0; text-align: center;">
+                <div class="card-title" style="justify-content: center;">LIVE RESULTS & ANALYSIS</div>
+                <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 24px;">SEVERITY WARNING GAUGE (1-10)</div>
+                
+                <div class="severity-gauge">
+                    <div class="severity-needle" id="gaugeNeedle" style="transform: rotate(-90deg);"></div>
+                </div>
+                
+                <div style="font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 900; color: var(--text-main); line-height: 1;" id="severityScore">0</div>
+                <div style="font-weight: 700; color: var(--text-muted); margin-top: 8px;" id="severityLabel">No Risk / Safe</div>
+                
+                <div id="interactionDetails" style="margin-top: 24px; text-align: left; display: none;">
+                    <!-- Dynamically populated by JS -->
+                </div>
+            </div>
+
+            <!-- 3D ANATOMICAL ORGAN THREAT MAP -->
+            <div class="card" style="margin-bottom: 0; text-align: center;">
+                <div class="card-title" style="justify-content: center;">3D ANATOMICAL ORGAN THREAT MAP</div>
+                
+                <div style="position: relative; width: 100%; max-width: 250px; margin: 20px auto 0;">
+                    <!-- Fallback SVG Torso -->
+                    <svg viewBox="0 0 200 300" style="width: 100%; height: auto; opacity: 0.15; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));">
+                        <path d="M70,30 Q100,10 130,30 Q150,50 160,90 Q170,150 150,220 Q130,280 100,290 Q70,280 50,220 Q30,150 40,90 Q50,50 70,30 Z" fill="none" stroke="var(--text-main)" stroke-width="2"/>
+                        <!-- Grid Lines for 3D effect -->
+                        <path d="M40,90 Q100,110 160,90 M30,150 Q100,170 170,150 M50,220 Q100,240 150,220 M100,10 L100,290 M70,30 L70,280 M130,30 L130,280" fill="none" stroke="var(--text-main)" stroke-width="0.5"/>
+                    </svg>
+                    
+                    <!-- Dynamic Organ Threat Overlays -->
+                    <div id="organThreats" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        <!-- Example Heart (Hidden by default, JS will show them) -->
+                        <div class="organ-blip" id="blipHeart" style="position: absolute; top: 25%; left: 55%; display: none;">
+                            <div style="width: 20px; height: 20px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 15px #ef4444;"></div>
+                            <div style="position: absolute; left: 25px; top: -5px; background: var(--card-bg); border: 1px solid var(--border-light); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-soft);">Heart<br><span style="color:#ef4444">High</span></div>
+                        </div>
+                        <div class="organ-blip" id="blipLiver" style="position: absolute; top: 45%; left: 35%; display: none;">
+                            <div style="width: 20px; height: 20px; background: #dd6b20; border-radius: 50%; box-shadow: 0 0 15px #dd6b20;"></div>
+                            <div style="position: absolute; right: 25px; top: -5px; background: var(--card-bg); border: 1px solid var(--border-light); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-soft); text-align: right;">Liver<br><span style="color:#dd6b20">Moderate</span></div>
+                        </div>
+                        <div class="organ-blip" id="blipKidneys" style="position: absolute; top: 60%; left: 50%; display: none;">
+                            <div style="width: 20px; height: 20px; background: #eab308; border-radius: 50%; box-shadow: 0 0 15px #eab308;"></div>
+                            <div style="position: absolute; left: 25px; top: -5px; background: var(--card-bg); border: 1px solid var(--border-light); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-soft);">Kidneys<br><span style="color:#eab308">Low</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 24px; font-style: italic;">Real-time API organ mapping.</div>
+            </div>
+
         </div>
-
-        <ul class="queue-list" id="queueList">
-            <li style="padding:12px; color:var(--text-muted); font-size:13px; text-align:center;">No medications added yet. Add at least 2 drugs to analyze interactions.</li>
-        </ul>
-
-        <button class="btn btn-danger" onclick="runAnalysis()">🚨 Analyze Timeline & Organ Conflicts</button>
     </div>
-
-    <!-- ── 5. Live Analysis Results & 11-Organ Threat Map ──────────────────── -->
-    <div id="resultsContainer"></div>
-
-    <!-- ── 6. Developer Attribution Footer ────────────────────────────────── -->
-    <footer>
-    </footer>
-
-    <!-- Zuloo Premium Footer -->
-    <footer style="margin-top: 60px; padding: 40px 20px; text-align: center; border-top: 1px solid var(--card-border); width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-        <a href="https://zuloo.vercel.app" target="_blank" rel="noopener" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            <svg width="48" height="48" viewBox="280 180 220 220" xmlns="http://www.w3.org/2000/svg">
-              <path d="M 320 200 L 460 200 L 340 320 L 460 320 A 20 20 0 0 1 480 340 L 480 360 A 20 20 0 0 1 460 380 L 320 380 L 440 260 L 320 260 A 20 20 0 0 1 300 240 L 300 220 A 20 20 0 0 1 320 200 Z" fill="none" stroke="var(--accent)" stroke-width="24px" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span style="font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 900; color: var(--text-main); letter-spacing: 1px;">Zuloo</span>
-        </a>
-        <p style="font-size: 13px; color: var(--text-muted); max-width: 400px; line-height: 1.6;">
-            Premium UI engineering and modern web architecture. 
-            <br>© 2026 Zuloo. All rights reserved.
-        </p>
-    </footer>
-
-
-</div>
-
-<script>
+    <script>
 /* =========================================================================
    Single-Page Clinical Engine Logic
    ========================================================================= */
@@ -466,7 +561,15 @@ function renderResults(warnings) {
         `;
     }).join('');
 }
-</script>
+
+        function removeDrug(drugName) {
+            let drugs = JSON.parse(localStorage.getItem('patientProfile')) || [];
+            drugs = drugs.filter(d => d !== drugName);
+            localStorage.setItem('patientProfile', JSON.stringify(drugs));
+            renderProfile();
+            analyzeInteractions();
+        }
+        </script>
 
 </body>
 </html>
