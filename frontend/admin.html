@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Pharma Tracker Admin Dashboard by Zuloo">
     <title>Admin Console — Clinical Master Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -86,6 +88,7 @@
         <div style="display:flex; align-items:center; gap:14px;">
             <span style="font-size:13px; color:#94a3b8;">Logged in as: <b id="adminName" style="color:#fff;">admin</b></span>
             <button class="btn btn-cyan" onclick="openAdminModal()">👤 + Create Admin</button>
+            <button class="btn btn-ghost" onclick="openManageAdminsModal()">⚙️ Manage Admins</button>
             <button class="btn btn-ghost" onclick="logout()">Logout ➔</button>
         </div>
     </div>
@@ -489,7 +492,114 @@ async function deleteRule(id) {
         loadDashboardData();
     } catch(e) { alert('Failed to delete rule.'); }
 }
+
+        function openManageAdminsModal() {
+            const container = document.getElementById('adminsListContainer');
+            let admins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
+            
+            if (admins.length === 0) {
+                container.innerHTML = '<p style="font-size:13px; color:#94a3b8;">No additional admins found.</p>';
+            } else {
+                container.innerHTML = admins.map(a => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0b1324; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; margin-bottom: 8px;">
+                        <span style="font-weight: 700; color: #fff;">${a.username}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 11px;" onclick="openEditAdminModal('${a.username}', '${a.password}')">Edit</button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px;" onclick="deleteAdmin('${a.username}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('manageAdminsModal').classList.add('show');
+        }
+
+        function closeManageAdminsModal() {
+            document.getElementById('manageAdminsModal').classList.remove('show');
+        }
+
+        function deleteAdmin(username) {
+            if(confirm('Are you sure you want to delete admin: ' + username + '?')) {
+                let admins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
+                admins = admins.filter(a => a.username !== username);
+                localStorage.setItem('pharma_admins', JSON.stringify(admins));
+                openManageAdminsModal(); // refresh
+                updateAdminCount();
+            }
+        }
+
+        function openEditAdminModal(oldUser, oldPass) {
+            document.getElementById('editAdminOldUsername').value = oldUser;
+            document.getElementById('editAdminUsername').value = oldUser;
+            document.getElementById('editAdminPassword').value = oldPass;
+            closeManageAdminsModal();
+            document.getElementById('editAdminModal').classList.add('show');
+        }
+
+        function closeEditAdminModal() {
+            document.getElementById('editAdminModal').classList.remove('show');
+            openManageAdminsModal();
+        }
+
+        function saveEditAdmin() {
+            const oldUser = document.getElementById('editAdminOldUsername').value;
+            const newUser = document.getElementById('editAdminUsername').value.trim();
+            const newPass = document.getElementById('editAdminPassword').value.trim();
+            
+            if(!newUser || !newPass) return alert('Fill all fields');
+            
+            let admins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
+            let target = admins.find(a => a.username === oldUser);
+            if(target) {
+                target.username = newUser;
+                target.password = newPass;
+                localStorage.setItem('pharma_admins', JSON.stringify(admins));
+                
+                // If they edited themselves, update login session
+                if(localStorage.getItem('adminUser') === oldUser) {
+                    localStorage.setItem('adminUser', newUser);
+                    document.getElementById('adminName').textContent = newUser;
+                }
+            }
+            
+            document.getElementById('editAdminModal').classList.remove('show');
+            openManageAdminsModal();
+        }
+
 </script>
+
+
+    <!-- Manage Admins Modal -->
+    <div class="modal-overlay" id="manageAdminsModal">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 20px; font-family: 'Outfit'; color: var(--cyan-neon);">⚙️ Manage Admins</h3>
+            <div id="adminsListContainer" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px;">
+                <!-- Admins injected here -->
+            </div>
+            <button class="btn btn-ghost" style="width: 100%;" onclick="closeManageAdminsModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Edit Admin Modal -->
+    <div class="modal-overlay" id="editAdminModal">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 20px; font-family: 'Outfit'; color: var(--cyan-neon);">✏️ Edit Admin</h3>
+            <input type="hidden" id="editAdminOldUsername">
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div>
+                    <label>New Username</label>
+                    <input type="text" id="editAdminUsername" required>
+                </div>
+                <div>
+                    <label>New Password</label>
+                    <input type="password" id="editAdminPassword" required>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-ghost" style="flex: 1;" onclick="closeEditAdminModal()">Cancel</button>
+                <button class="btn btn-cyan" style="flex: 1;" onclick="saveEditAdmin()">Save Changes</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
