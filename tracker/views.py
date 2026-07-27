@@ -89,10 +89,26 @@ def add_admin(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_interactions(request):
-    """List all custom rules in database."""
-    interactions = Interaction.objects.select_related('reaction').all()
+    """List rules in database with server-side pagination & search."""
+    search_q = request.GET.get('search', '').strip().lower()
+    page = int(request.GET.get('page', 1))
+    limit = int(request.GET.get('limit', 10))
+    
+    qs = Interaction.objects.select_related('reaction').all()
+    if search_q:
+        qs = qs.filter(
+            models.Q(drug_a__icontains=search_q) | 
+            models.Q(drug_b__icontains=search_q) | 
+            models.Q(reaction__name__icontains=search_q)
+        )
+    
+    total_count = qs.count()
+    start = (page - 1) * limit
+    end = start + limit
+    page_qs = qs[start:end]
+    
     data = []
-    for item in interactions:
+    for item in page_qs:
         data.append({
             'id': item.id,
             'drug_a': item.drug_a,
@@ -104,7 +120,13 @@ def list_interactions(request):
             'organ_bitmask': item.organ_bitmask,
             'custom_factors': item.custom_factors
         })
-    return Response({'interactions': data})
+    return Response({
+        'total': total_count,
+        'page': page,
+        'limit': limit,
+        'total_pages': (total_count + limit - 1) // limit if total_count > 0 else 1,
+        'interactions': data
+    })
 
 
 @api_view(['POST'])

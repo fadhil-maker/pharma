@@ -201,10 +201,9 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
     ? 'http://127.0.0.1:8000' 
     : 'https://pharma.shanudigicore.com';
 
-let allRules = [];
-let filteredRulesList = [];
-let currentPage = 1;
-const itemsPerPage = 10;
+let currentSearch = '';
+let totalServerRules = 0;
+let totalServerPages = 1;
 
 document.addEventListener('DOMContentLoaded', () => {
     const adminUser = localStorage.getItem('adminUser');
@@ -226,13 +225,7 @@ function closeAdminModal() { document.getElementById('adminModal').classList.rem
 
 async function loadDashboardData() {
     try {
-        const resRules = await fetch(`${API_BASE}/api/admin/interactions/`);
-        const dataRules = await resRules.json();
-        allRules = dataRules.interactions || [];
-        filteredRulesList = [...allRules];
-        document.getElementById('ruleCount').textContent = allRules.length;
-        currentPage = 1;
-        renderPaginatedRules();
+        await fetchPageData(1);
 
         const resAdmins = await fetch(`${API_BASE}/api/admin/list/`);
         const dataAdmins = await resAdmins.json();
@@ -242,57 +235,65 @@ async function loadDashboardData() {
     }
 }
 
+let searchTimer;
 function filterRules(query) {
-    const q = query.toLowerCase().trim();
-    if (!q) {
-        filteredRulesList = [...allRules];
-    } else {
-        filteredRulesList = allRules.filter(r => r.drug_a.toLowerCase().includes(q) || r.drug_b.toLowerCase().includes(q) || r.reaction.toLowerCase().includes(q));
-    }
-    currentPage = 1;
-    renderPaginatedRules();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        currentSearch = query.trim();
+        currentPage = 1;
+        fetchPageData(1);
+    }, 300);
 }
 
 function changePage(delta) {
-    const totalPages = Math.ceil(filteredRulesList.length / itemsPerPage) || 1;
-    currentPage += delta;
-    if (currentPage < 1) currentPage = 1;
-    if (currentPage > totalPages) currentPage = totalPages;
-    renderPaginatedRules();
+    const targetPage = currentPage + delta;
+    if (targetPage >= 1 && targetPage <= totalServerPages) {
+        currentPage = targetPage;
+        fetchPageData(currentPage);
+    }
 }
 
-function renderPaginatedRules() {
+async function fetchPageData(page = 1) {
     const tbody = document.getElementById('rulesTable');
-    const totalItems = filteredRulesList.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#94a3b8; text-align:center;">Loading database rules...</td></tr>';
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/interactions/?page=${page}&limit=10&search=${encodeURIComponent(currentSearch)}`);
+        const data = await res.json();
+        
+        totalServerRules = data.total || 0;
+        totalServerPages = data.total_pages || 1;
+        currentPage = data.page || 1;
 
-    if (totalItems === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="color:#94a3b8; text-align:center;">No matching database rules found.</td></tr>';
-        document.getElementById('pageIndicator').textContent = 'Page 0 of 0';
-        document.getElementById('btnPrev').disabled = true;
-        document.getElementById('btnNext').disabled = true;
-        return;
+        document.getElementById('ruleCount').textContent = totalServerRules.toLocaleString();
+        
+        const rules = data.interactions || [];
+        if (rules.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="color:#94a3b8; text-align:center;">No matching database rules found.</td></tr>';
+            document.getElementById('pageIndicator').textContent = 'Page 0 of 0';
+            document.getElementById('btnPrev').disabled = true;
+            document.getElementById('btnNext').disabled = true;
+            return;
+        }
+
+        tbody.innerHTML = rules.map(r => `
+            <tr>
+                <td>#${r.id}</td>
+                <td><b>${r.drug_a}</b> + <b>${r.drug_b}</b></td>
+                <td><span style="color:#ef4444; font-weight:800;">${r.severity}/10</span></td>
+                <td>
+                    <div><b>Reaction:</b> ${r.reaction}</div>
+                    <div style="color:#94a3b8; font-size:12px; margin-top:2px;"><b>Remedy:</b> ${r.remedy || 'N/A'}</div>
+                </td>
+                <td><button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteRule(${r.id})">Delete</button></td>
+            </tr>
+        `).join('');
+
+        document.getElementById('pageIndicator').textContent = `Page ${currentPage.toLocaleString()} of ${totalServerPages.toLocaleString()} (${totalServerRules.toLocaleString()} total rules)`;
+        document.getElementById('btnPrev').disabled = (currentPage <= 1);
+        document.getElementById('btnNext').disabled = (currentPage >= totalServerPages);
+    } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#ef4444; text-align:center;">Failed to load rules from server.</td></tr>';
     }
-
-    const startIdx = (currentPage - 1) * itemsPerPage;
-    const pageRules = filteredRulesList.slice(startIdx, startIdx + itemsPerPage);
-
-    tbody.innerHTML = pageRules.map(r => `
-        <tr>
-            <td>#${r.id}</td>
-            <td><b>${r.drug_a}</b> + <b>${r.drug_b}</b></td>
-            <td><span style="color:#ef4444; font-weight:800;">${r.severity}/10</span></td>
-            <td>
-                <div><b>Reaction:</b> ${r.reaction}</div>
-                <div style="color:#94a3b8; font-size:12px; margin-top:2px;"><b>Remedy:</b> ${r.remedy || 'N/A'}</div>
-            </td>
-            <td><button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteRule(${r.id})">Delete</button></td>
-        </tr>
-    `).join('');
-
-    document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages} (${totalItems} total rules)`;
-    document.getElementById('btnPrev').disabled = (currentPage === 1);
-    document.getElementById('btnNext').disabled = (currentPage === totalPages);
 }
 
 async function handleAddAdmin(e) {
