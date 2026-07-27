@@ -290,10 +290,31 @@
 </head>
 <body>
 
-    <!-- 3D Hanging Pill Theme Toggle -->
-    <div class="theme-pill-wrapper" onclick="toggleTheme()" title="Toggle Theme">
-        <img src="assets/pill.png" alt="Toggle Theme" style="height: 110px;  filter: drop-shadow(0 20px 20px rgba(0,0,0,0.2));">
+        <!-- Sleek Enterprise Theme Switcher -->
+    <div class="theme-switch-container" onclick="toggleTheme()" title="Toggle Theme" style="position: absolute; top: 32px; right: 5%; z-index: 1000; cursor: pointer;">
+        <div class="theme-switch-glass">
+            <span id="themeIcon">☀️</span>
+            <span id="themeLabel" style="font-size: 13px; font-weight: 700; color: var(--text-main);">Light</span>
+        </div>
     </div>
+    <style>
+        .theme-switch-glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+        .theme-switch-glass:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+    </style>
 
     <div class="app-container">
         
@@ -494,6 +515,37 @@ function toggleTheme() {
 }
 
 // ── 2. Dynamic Vitals ──────────────────────────────────────────────────────
+
+function openVitalsModal() {
+    document.getElementById('inputName').value = document.getElementById('vitalName').textContent;
+    document.getElementById('inputAge').value = document.getElementById('vitalAge').textContent;
+    document.getElementById('inputGender').value = document.getElementById('vitalGender').textContent;
+    document.getElementById('inputWeight').value = document.getElementById('vitalWeight').textContent;
+    document.getElementById('vitalsModal').style.display = 'flex';
+}
+
+function closeVitalsModal() {
+    document.getElementById('vitalsModal').style.display = 'none';
+}
+
+function handleSaveVitalsForm(e) {
+    e.preventDefault();
+    const vitals = {
+        name: document.getElementById('inputName').value.trim() || 'John Doe',
+        age: document.getElementById('inputAge').value.trim() || '35 YRS',
+        gender: document.getElementById('inputGender').value || 'MALE',
+        weight: document.getElementById('inputWeight').value.trim() || '180 LBS'
+    };
+    
+    document.getElementById('vitalName').textContent = vitals.name;
+    document.getElementById('vitalAge').textContent = vitals.age;
+    document.getElementById('vitalGender').textContent = vitals.gender;
+    document.getElementById('vitalWeight').textContent = vitals.weight;
+    
+    localStorage.setItem('patientVitals', JSON.stringify(vitals));
+    closeVitalsModal();
+}
+
 function saveVitals() {
     const vitals = {
         name: document.getElementById('vitalName').textContent,
