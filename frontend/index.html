@@ -20,42 +20,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Light Theme (Primary Default) */
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --card-bg: #ffffff;
-            --card-border: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent: #0d9488;
-            --accent-glow: rgba(13, 148, 136, 0.15);
-            --danger: #dc2626;
-            --danger-bg: rgba(220, 38, 38, 0.08);
-            --warning: #d97706;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
+            --bg-main: #e0e5ec;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --accent: #3182ce;
+            --shadow-light: rgba(255, 255, 255, 0.7);
+            --shadow-dark: rgba(163, 177, 198, 0.6);
+            --neu-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            --neu-inset: inset 6px 6px 10px var(--shadow-dark), -6px -6px 10px var(--shadow-light);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --success: #38a169;
         }
-
+        
         [data-theme="dark"] {
-            /* Dark Theme (Hanging Toggle) */
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-            --card-bg: rgba(30, 41, 59, 0.75);
-            --card-border: rgba(148, 163, 184, 0.15);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.25);
-            --danger: #ef4444;
-            --danger-bg: rgba(239, 68, 68, 0.15);
-            --warning: #f59e0b;
-            --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            --bg-main: #1a202c;
+            --text-main: #f7fafc;
+            --text-muted: #a0aec0;
+            --accent: #63b3ed;
+            --shadow-light: rgba(255, 255, 255, 0.03);
+            --shadow-dark: rgba(0, 0, 0, 0.6);
+            --neu-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            --neu-inset: inset 6px 6px 10px var(--shadow-dark), -6px -6px 10px var(--shadow-light);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, color 0.3s ease; }
 
         body {
-            background: var(--bg-gradient);
+            background: var(--bg-main);
             color: var(--text-main);
             min-height: 100vh;
             padding: 24px 16px;
@@ -64,259 +58,101 @@
             align-items: center;
         }
 
-        .app-container {
-            max-width: 1000px;
-            width: 100%;
-        }
+        .app-container { max-width: 1000px; width: 100%; position: relative; }
 
-        /* ── Top Header & Hanging Theme Toggle ────────────────────────────── */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        /* Hanging Pill Theme Toggle */
-        .theme-toggle-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 6px 16px;
-            border-radius: 999px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--text-main);
-            box-shadow: var(--shadow);
-        }
-
-        .theme-toggle-btn:hover {
-            border-color: var(--accent);
-        }
-
-        /* ── Hero Section ─────────────────────────────────────────────────── */
-        .hero-card {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .hero-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .hero-subtitle {
-            color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        /* ── Cards & Containers ────────────────────────────────────────────── */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(12px);
-        }
-
-        .card-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* ── Scanner Dropzone ─────────────────────────────────────────────── */
-        .scanner-dropzone {
-            border: 2px dashed var(--accent);
-            background: var(--accent-glow);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .scanner-dropzone:hover {
-            opacity: 0.9;
-        }
-
-        .scanner-icon { font-size: 36px; margin-bottom: 8px; }
-        .scanner-text { font-weight: 700; font-size: 15px; }
-        .scanner-subtext { font-size: 12px; color: var(--text-muted); }
-
-        /* ── Form Inputs & Dynamic Dropdown ───────────────────────────────── */
-        .input-group {
-            display: grid;
-            grid-template-columns: 1fr 180px 140px;
-            gap: 12px;
-            position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .input-group { grid-template-columns: 1fr; }
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-        }
-
-        input:focus { border-color: var(--accent); }
-
-        .btn {
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            border: none;
-            font-weight: 800;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-accent { background: var(--accent); color: #fff; }
-        .btn-danger { background: var(--danger); color: #fff; width: 100%; margin-top: 16px; font-size: 16px; padding: 16px; }
-
-        /* Premium Dropdown */
-        .premium-dropdown {
+        /* Custom 3D Hanging Pill Toggle */
+        .pill-toggle-container {
             position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            max-height: 220px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .premium-dropdown.show { display: block; }
-        .premium-dropdown-item {
-            padding: 10px 16px;
+            top: -24px;
+            right: 40px;
+            transform-origin: top center;
+            animation: swing 4s infinite ease-in-out;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            z-index: 100;
+        }
+        .metal-ring {
+            width: 20px;
+            height: 20px;
+            border: 4px solid #cbd5e0;
+            border-radius: 50%;
+            margin: 0 auto;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3), 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        .pill-body {
+            width: 32px;
+            height: 70px;
+            background: linear-gradient(to bottom, #ffffff 50%, #3182ce 50%);
+            border-radius: 16px;
+            margin: -4px auto 0;
+            box-shadow: 
+                inset -4px -4px 8px rgba(0,0,0,0.2),
+                inset 4px 4px 8px rgba(255,255,255,0.8),
+                6px 15px 20px rgba(0,0,0,0.15);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        [data-theme="dark"] .pill-body {
+            background: linear-gradient(to bottom, #2d3748 50%, #63b3ed 50%);
+            box-shadow: 
+                inset -4px -4px 8px rgba(0,0,0,0.5),
+                inset 4px 4px 8px rgba(255,255,255,0.1),
+                6px 15px 20px rgba(0,0,0,0.4);
+        }
+        .pill-body::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 6px;
+            height: 60px;
+            background: linear-gradient(to right, rgba(255,255,255,0.5), transparent);
+            border-radius: 3px;
+        }
+        @keyframes swing {
+            0% { transform: rotate(4deg); }
+            50% { transform: rotate(-4deg); }
+            100% { transform: rotate(4deg); }
         }
 
-        .premium-dropdown-item:hover, .premium-dropdown-item.active {
-            background: var(--accent-glow);
-            color: var(--accent);
-        }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .brand-logo { display: flex; align-items: center; gap: 12px; font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); text-decoration: none; }
 
-        /* ── Queue List ───────────────────────────────────────────────────── */
-        .queue-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            margin-bottom: 12px;
-        }
+        .hero-title { font-family: 'Outfit', sans-serif; font-size: 34px; font-weight: 800; margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.05); }
+        .hero-subtitle { color: var(--text-muted); font-size: 16px; margin-bottom: 32px; text-align: center; }
 
-        .queue-list { list-style: none; }
-        .queue-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: rgba(148, 163, 184, 0.08);
-            border-radius: var(--radius-sm);
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
+        .card { background: var(--bg-main); border-radius: var(--radius-lg); padding: 32px; margin-bottom: 32px; box-shadow: var(--neu-shadow); border: none; }
+        .card-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
 
-        /* ── Results & Organ Threat Map (11 Organ Systems) ────────────────── */
-        .organ-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
+        .scanner-dropzone { background: var(--bg-main); border-radius: var(--radius-md); padding: 40px; text-align: center; cursor: pointer; box-shadow: var(--neu-inset); transition: all 0.2s ease; border: 2px solid transparent; }
+        .scanner-dropzone:hover { box-shadow: inset 8px 8px 14px var(--shadow-dark), inset -8px -8px 14px var(--shadow-light); border-color: rgba(49, 130, 206, 0.3); }
 
-        .organ-card {
-            background: rgba(148, 163, 184, 0.06);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            text-align: center;
-            opacity: 0.4;
-        }
+        .input-group { display: grid; grid-template-columns: 1fr 180px 140px; gap: 16px; position: relative; }
+        @media (max-width: 768px) { .input-group { grid-template-columns: 1fr; } .pill-toggle-container { right: 10px; transform: scale(0.8); } .hero-title{font-size:26px;} }
 
-        .organ-card.affected {
-            opacity: 1;
-            border-color: var(--danger);
-            background: var(--danger-bg);
-            animation: pulse 2s infinite;
-        }
+        input { width: 100%; padding: 14px 20px; background: var(--bg-main); border-radius: var(--radius-md); color: var(--text-main); font-size: 15px; border: none; box-shadow: var(--neu-inset); outline: none; }
+        input:focus { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px var(--accent); }
 
-        .organ-icon { font-size: 28px; margin-bottom: 6px; }
-        .organ-name { font-size: 12px; font-weight: 800; }
+        .btn { padding: 14px 24px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 15px; cursor: pointer; background: var(--bg-main); color: var(--text-main); box-shadow: var(--neu-shadow); transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:active { box-shadow: var(--neu-inset); }
+        .btn-accent { color: var(--accent); }
+        .btn-danger { color: var(--danger); width: 100%; margin-top: 16px; }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
+        .premium-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-main); border-radius: var(--radius-md); box-shadow: var(--neu-shadow); margin-top: 12px; max-height: 250px; overflow-y: auto; display: none; z-index: 100; padding: 8px; }
+        .premium-dropdown.active { display: block; }
+        .dropdown-item { padding: 12px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; font-weight: 600; display: flex; justify-content: space-between; color: var(--text-main); }
+        .dropdown-item:hover { background: rgba(49, 130, 206, 0.1); color: var(--accent); }
 
-        /* ── Severity Gauge Badge ─────────────────────────────────────────── */
-        .severity-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-weight: 900;
-            font-size: 13px;
-        }
+        .result-item { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(113, 128, 150, 0.2); font-weight: 600; }
+        .result-item:last-child { border-bottom: none; }
 
-        /* ── Footer ───────────────────────────────────────────────────────── */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 24px;
-            border-top: 1px solid var(--card-border);
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+        .severity-gauge { width: 140px; height: 70px; border-radius: 140px 140px 0 0; background: conic-gradient(from 180deg at 50% 100%, #38a169 0deg, #dd6b20 90deg, #e53e3e 180deg); position: relative; margin: 0 auto 20px; box-shadow: var(--neu-shadow); }
+        .severity-gauge::before { content: ''; position: absolute; bottom: 0; left: 15px; right: 15px; top: 15px; background: var(--bg-main); border-radius: 100px 100px 0 0; box-shadow: var(--neu-inset); }
+        .severity-needle { position: absolute; bottom: -5px; left: 50%; width: 4px; height: 60px; background: var(--text-main); transform-origin: bottom center; border-radius: 4px; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        .severity-needle::after { content: ''; position: absolute; bottom: 0; left: -4px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
 
-        footer a {
-            color: var(--accent);
-            font-weight: 700;
-            text-decoration: none;
-        }
-    </style>
+        .organ-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+        .organ-card { background: var(--bg-main); padding: 12px; border-radius: 12px; text-align: center; box-shadow: var(--neu-shadow); font-weight: 700; font-size: 13px; border: 2px solid transparent; }
+</style>
 </head>
 <body>
 

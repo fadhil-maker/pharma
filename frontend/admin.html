@@ -9,89 +9,89 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #090d16;
-            --card-bg: rgba(21, 30, 49, 0.75);
-            --card-border: rgba(56, 189, 248, 0.15);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --cyan-neon: #38bdf8;
-            --cyan-glow: rgba(56, 189, 248, 0.4);
-            --purple-neon: #c084fc;
+            --bg-main: #e0e5ec;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --accent: #3182ce;
+            --shadow-light: rgba(255, 255, 255, 0.7);
+            --shadow-dark: rgba(163, 177, 198, 0.6);
+            --neu-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            --neu-inset: inset 6px 6px 10px var(--shadow-dark), -6px -6px 10px var(--shadow-light);
+            --radius-lg: 24px;
+            --radius-md: 16px;
         }
-
+        [data-theme="dark"] {
+            --bg-main: #1a202c; --text-main: #f7fafc; --text-muted: #a0aec0; --accent: #63b3ed;
+            --shadow-light: rgba(255, 255, 255, 0.03); --shadow-dark: rgba(0, 0, 0, 0.6);
+            --neu-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            --neu-inset: inset 6px 6px 10px var(--shadow-dark), -6px -6px 10px var(--shadow-light);
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg-main); background-image: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(192, 132, 252, 0.05) 0%, transparent 40%); color: var(--text-primary); min-height: 100vh; padding: 28px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; padding: 28px 20px; transition: 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; position: relative; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 900; background: linear-gradient(135deg, #38bdf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--neu-shadow); background: var(--bg-main); position: relative; }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); display: flex; align-items: center; gap: 10px; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 32px; }
-        .stat-card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: 20px; padding: 22px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.2s, border-color 0.2s; }
-        .stat-card:hover { transform: translateY(-3px); border-color: rgba(56, 189, 248, 0.4); }
-        .stat-label { font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 900; color: #fff; margin-top: 6px; text-shadow: 0 0 20px var(--cyan-glow); }
+        .nav-actions { display: flex; align-items: center; gap: 14px; }
+        .hamburger { display: none; font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-main); padding: 8px; box-shadow: var(--neu-shadow); border-radius: 12px; }
         
-        .card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: 20px; padding: 28px; margin-bottom: 32px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .card-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--cyan-neon); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
-        @media(max-width:768px){ .form-grid { grid-template-columns: 1fr; } }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .stat-card { background: var(--bg-main); border-radius: var(--radius-lg); padding: 24px; text-align: center; box-shadow: var(--neu-shadow); }
+        .stat-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-val { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 900; color: var(--text-main); margin-top: 6px; }
         
-        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select, textarea { width: 100%; padding: 12px 16px; background: #0b1324; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; color: #fff; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-        input:focus, select:focus, textarea:focus { border-color: var(--cyan-neon); box-shadow: 0 0 12px var(--cyan-glow); }
+        .card { background: var(--bg-main); border-radius: var(--radius-lg); padding: 32px; margin-bottom: 32px; box-shadow: var(--neu-shadow); }
+        .card-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 24px; color: var(--accent); }
         
-        .organ-checkboxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
-        .organ-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; text-transform: none; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: 8px; }
-        .organ-label input { width: auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px; }
+        
+        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 14px; background: var(--bg-main); border: none; border-radius: var(--radius-md); color: var(--text-main); font-size: 14px; box-shadow: var(--neu-inset); outline: none; }
+        
+        .btn { padding: 14px 24px; border-radius: var(--radius-md); border: none; font-weight: 800; cursor: pointer; background: var(--bg-main); color: var(--text-main); box-shadow: var(--neu-shadow); transition: all 0.2s; }
+        .btn:active { box-shadow: var(--neu-inset); }
+        .btn-cyan { color: var(--accent); }
+        .btn-danger { color: #e53e3e; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; display: block; overflow-x: auto; white-space: nowrap; }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid rgba(163, 177, 198, 0.2); }
+        th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
 
-        .btn { padding: 12px 22px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; }
-        .btn-cyan { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #090d16; font-weight: 900; box-shadow: 0 4px 15px var(--cyan-glow); }
-        .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--cyan-glow); }
-        .btn-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
-        .btn-danger:hover { background: #ef4444; color: #fff; }
-        .btn-ghost { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); color: #e2e8f0; }
-        .btn-ghost:hover { background: rgba(56, 189, 248, 0.15); border-color: var(--cyan-neon); }
-
-        .controls-bar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 20px; padding: 18px; background: #0b1324; border-radius: 16px; border: 1px solid rgba(56, 189, 248, 0.15); }
-        .controls-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; }
-        .controls-group select, .controls-group input { width: auto; padding: 8px 14px; font-size: 13px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(148, 163, 184, 0.1); font-size: 13.5px; }
-        th { font-weight: 800; color: #94a3b8; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-
-        /* Severity Pills */
-        .sev-pill { padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px; display: inline-block; }
-        .sev-low { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .sev-med { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .sev-high { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
-        .sev-critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-
-        /* Pagination & Quick Jump bar */
-        .pagination-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.15); }
-        .page-controls { display: flex; align-items: center; gap: 10px; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal-overlay.show { display: flex; }
-        .modal-card { background: #151e31; border: 1px solid var(--card-border); border-radius: 24px; padding: 36px; max-width: 460px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
-    </style>
+        .modal-card { background: var(--bg-main); border-radius: var(--radius-lg); padding: 36px; max-width: 500px; width: 90%; box-shadow: var(--neu-shadow); }
+
+        /* Role-Based Hide Class */
+        .superadmin-only { display: inline-flex; }
+
+        @media(max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .nav-actions { display: none; position: absolute; top: 80px; right: 20px; background: var(--bg-main); flex-direction: column; padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--neu-shadow); z-index: 100; }
+            .nav-actions.open { display: flex; }
+            .hamburger { display: block; }
+            .stat-card { padding: 16px; }
+            .card { padding: 20px; }
+        }
+</style>
 </head>
 <body>
 
 <div class="container">
 
     <!-- Header -->
+    
     <div class="header">
-        <div class="logo">💊 Pharma Master Admin Console</div>
-        <div style="display:flex; align-items:center; gap:14px;">
-            <span style="font-size:13px; color:#94a3b8;">Logged in as: <b id="adminName" style="color:#fff;">admin</b></span>
-            <button class="btn btn-cyan" onclick="openAdminModal()">👤 + Create Admin</button>
-            <button class="btn btn-ghost" onclick="openManageAdminsModal()">⚙️ Manage Admins</button>
-            <button class="btn btn-ghost" onclick="logout()">Logout ➔</button>
+        <div class="logo">⛑️ Admin Console</div>
+        <button class="hamburger" onclick="document.getElementById('navActions').classList.toggle('open')">☰</button>
+        <div class="nav-actions" id="navActions">
+            <span style="font-size:13px; color:var(--text-muted); padding-right:10px;">User: <b id="adminName" style="color:var(--accent);">admin</b> (<span id="adminRoleBadge">Superadmin</span>)</span>
+            <button class="btn btn-cyan superadmin-only" id="btnCreateAdmin" onclick="openAdminModal()">👤 + Create Admin</button>
+            <button class="btn" onclick="openManageAdminsModal()">⚙️ Manage Admins</button>
+            <button class="btn btn-danger" onclick="logout()">Logout ➔</button>
         </div>
     </div>
+    
 
     <!-- Medical Liability Disclaimer Banner -->
     <div style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 16px;">
@@ -274,6 +274,13 @@
             <div style="margin-bottom:20px;">
                 <label>Password</label>
                 <input type="password" id="newAdminPass" placeholder="••••••••" required>
+                </div>
+                <div style="margin-top: 16px;">
+                    <label>Role</label>
+                    <select id="newAdminRole">
+                        <option value="Staff">Staff (View & Edit Own Only)</option>
+                        <option value="Superadmin">Superadmin (Full Access)</option>
+                    </select>
             </div>
             <div style="display:flex; justify-content:flex-end; gap:10px;">
                 <button type="button" class="btn btn-ghost" onclick="closeAdminModal()">Cancel</button>
@@ -493,25 +500,55 @@ async function deleteRule(id) {
     } catch(e) { alert('Failed to delete rule.'); }
 }
 
+        
+        // Check Role on Load
+        let currentUser = localStorage.getItem('adminUser');
+        let allAdmins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
+        
+        // Ensure default admin is Superadmin
+        if(allAdmins.length === 0) {
+            allAdmins.push({ username: 'admin', password: 'password', role: 'Superadmin' });
+            localStorage.setItem('pharma_admins', JSON.stringify(allAdmins));
+        }
+
+        let myAccount = allAdmins.find(a => a.username === currentUser);
+        if(!myAccount) {
+            // Failsafe
+            myAccount = { role: 'Superadmin' };
+        }
+        
+        document.getElementById('adminRoleBadge').textContent = myAccount.role;
+        
+        // Hide Superadmin features if Staff
+        if(myAccount.role !== 'Superadmin') {
+            document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'none');
+        }
+
         function openManageAdminsModal() {
             const container = document.getElementById('adminsListContainer');
             let admins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
             
-            if (admins.length === 0) {
-                container.innerHTML = '<p style="font-size:13px; color:#94a3b8;">No additional admins found.</p>';
-            } else {
-                container.innerHTML = admins.map(a => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0b1324; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; margin-bottom: 8px;">
-                        <span style="font-weight: 700; color: #fff;">${a.username}</span>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 11px;" onclick="openEditAdminModal('${a.username}', '${a.password}')">Edit</button>
-                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px;" onclick="deleteAdmin('${a.username}')">Delete</button>
-                        </div>
-                    </div>
-                `).join('');
+            // RBAC Filter
+            if(myAccount.role !== 'Superadmin') {
+                admins = admins.filter(a => a.username === currentUser);
             }
+
+            container.innerHTML = admins.map(a => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-main); border-radius: 12px; margin-bottom: 12px; box-shadow: var(--neu-inset);">
+                    <div>
+                        <div style="font-weight: 800; color: var(--text-main);">${a.username}</div>
+                        <div style="font-size: 11px; color: var(--accent); text-transform: uppercase;">${a.role || 'Superadmin'}</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn" style="padding: 8px 16px; font-size: 12px;" onclick="openEditAdminModal('${a.username}', '${a.password}')">Edit</button>
+                        ${myAccount.role === 'Superadmin' && a.username !== currentUser ? `<button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAdmin('${a.username}')">Delete</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
             document.getElementById('manageAdminsModal').classList.add('show');
         }
+
 
         function closeManageAdminsModal() {
             document.getElementById('manageAdminsModal').classList.remove('show');

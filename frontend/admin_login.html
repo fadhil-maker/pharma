@@ -8,18 +8,30 @@
     <title>Admin Login — Clinical Pharmacy Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-main: #e0e5ec;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --accent: #3182ce;
+            --shadow-light: rgba(255, 255, 255, 0.7);
+            --shadow-dark: rgba(163, 177, 198, 0.6);
+            --neu-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            --neu-inset: inset 6px 6px 10px var(--shadow-dark), -6px -6px 10px var(--shadow-light);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
-        .login-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); backdrop-filter: blur(16px); border-radius: 20px; padding: 40px; max-width: 420px; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: #38bdf8; text-align: center; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1; }
-        input { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
-        input:focus { border-color: #38bdf8; }
-        .btn { width: 100%; padding: 14px; background: #38bdf8; color: #0f172a; font-weight: 800; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 10px; }
-        .error-msg { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
-    </style>
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .login-card { background: var(--bg-main); border-radius: var(--radius-lg); padding: 40px; width: 100%; max-width: 400px; box-shadow: var(--neu-shadow); text-align: center; }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 32px; }
+        
+        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; text-align: left; }
+        input { width: 100%; padding: 14px; margin-bottom: 24px; background: var(--bg-main); border: none; border-radius: var(--radius-md); color: var(--text-main); font-size: 14px; box-shadow: var(--neu-inset); outline: none; transition: 0.2s; }
+        input:focus { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px var(--accent); }
+        
+        .btn { width: 100%; padding: 14px; border-radius: var(--radius-md); border: none; font-weight: 800; cursor: pointer; background: var(--bg-main); color: var(--accent); box-shadow: var(--neu-shadow); transition: all 0.2s; font-size: 15px; }
+        .btn:active { box-shadow: var(--neu-inset); }
+</style>
 </head>
 <body>
 
@@ -47,7 +59,7 @@
             <svg width="40" height="40" viewBox="280 180 220 220" xmlns="http://www.w3.org/2000/svg">
               <path d="M 320 200 L 460 200 L 340 320 L 460 320 A 20 20 0 0 1 480 340 L 480 360 A 20 20 0 0 1 460 380 L 320 380 L 440 260 L 320 260 A 20 20 0 0 1 300 240 L 300 220 A 20 20 0 0 1 320 200 Z" fill="none" stroke="#0ea5e9" stroke-width="24px" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; color: #f8fafc; letter-spacing: 1px;">Zuloo</span>
+            <span style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; color: var(--text-main); letter-spacing: 1px;">Zuloo</span>
         </a>
     </footer>
 
