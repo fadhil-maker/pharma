@@ -33,6 +33,7 @@
             --radius-md: 12px;
         }
         [data-theme="dark"] {
+            --torso-blend: screen;
             --bg-page: #020617; --bg-main: #0f172a; --card-bg: #1e293b;
             --text-main: #f8fafc; --text-muted: #94a3b8; --border-light: #334155;
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.5);
@@ -57,7 +58,7 @@
         .mac-dots span { width: 12px; height: 12px; border-radius: 50%; }
         .mac-search { background: var(--bg-page); padding: 4px 120px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
         
-        .pill-toggle-container { cursor: pointer; padding: 4px 8px; border-radius: 12px; background: var(--bg-page); display: flex; align-items: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .pill-toggle-container { cursor: pointer; padding: 4px; padding-right: 12px; gap: 8px; border-radius: 12px; background: var(--bg-page); display: flex; align-items: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         
         .app-content { padding: 40px; }
         
@@ -163,7 +164,7 @@
             </div>
             <!-- Toggle Pill -->
             <div class="pill-toggle-container" onclick="toggleTheme()" title="Toggle Theme">
-                <span class="pill-icon">💊</span>
+                <img src="assets/pill.png" alt="Toggle" style="height:24px; border-radius:12px; object-fit:cover;">
             </div>
         </div>
 
@@ -195,7 +196,11 @@
                         <div class="section-title">PREMIUM CAMERA & FILE UPLOAD DROPZONE</div>
                         <div class="scanner-dropzone">
                             <div class="scanner-icons">
-                                <span>📦</span> <span>📸</span> <span>📁</span>
+                                
+        <img src="assets/box.png" alt="Medicine Box" style="height:60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">
+        <img src="assets/camera.png" alt="Camera" style="height:60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">
+        <img src="assets/folder.png" alt="Folder" style="height:60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">
+    
                             </div>
                             <div class="scanner-text">Scan Medicine Box or Upload Prescription.<br><span style="font-weight:500; opacity:0.7;">(Drag & drop or Click)</span></div>
                             
@@ -279,10 +284,7 @@
                         <div class="card card-center" style="padding: 0; overflow: hidden; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(14,165,233,0.05) 100%);">
                             <div class="anatomical-container">
                                 <!-- Human Torso SVG Wireframe -->
-                                <svg viewBox="0 0 200 300" class="torso-svg">
-                                    <path d="M70,30 Q100,10 130,30 Q150,50 160,90 Q170,150 150,220 Q130,280 100,290 Q70,280 50,220 Q30,150 40,90 Q50,50 70,30 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                                    <path d="M40,90 Q100,110 160,90 M30,150 Q100,170 170,150 M50,220 Q100,240 150,220 M100,10 L100,290 M70,30 L70,280 M130,30 L130,280" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
-                                </svg>
+                                <img src="assets/torso.png" alt="3D Organ Map" style="height:100%; width:100%; object-fit:contain; mix-blend-mode: var(--torso-blend, multiply); opacity: 0.9;">
                                 
                                 <div id="organThreats" class="threat-layer">
                                     <!-- Heart -->
