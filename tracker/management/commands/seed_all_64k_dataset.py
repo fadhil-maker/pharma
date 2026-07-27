@@ -140,7 +140,11 @@ class Command(BaseCommand):
             Interaction.objects.all().delete()
             from django.db import connection
             with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM sqlite_sequence WHERE name='tracker_interaction';")
+                if connection.vendor == 'sqlite':
+                    cursor.execute("DELETE FROM sqlite_sequence WHERE name='tracker_interaction';")
+                elif connection.vendor == 'postgresql':
+                    # Truncate and restart sequence for PostgreSQL
+                    cursor.execute("TRUNCATE TABLE tracker_interaction RESTART IDENTITY CASCADE;")
             
             chunk_size = 5000
             for k in range(0, len(interactions_to_create), chunk_size):
