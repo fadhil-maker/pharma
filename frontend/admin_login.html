@@ -61,7 +61,7 @@ async function handleLogin(e) {
         
         if (res.ok) {
             localStorage.setItem('adminUser', data.username);
-            window.location.href = 'admin_dashboard.html';
+            window.location.href = 'admin.html';
         } else {
             errEl.textContent = data.error || 'Login failed.';
             errEl.style.display = 'block';
