@@ -565,10 +565,71 @@
 
             </div>
         </div>
+
+        <!-- ── Clinical Footer ── -->
+        <footer class="clinical-footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+                        <path d="M40 15 H60 V40 H85 V60 H60 V85 H40 V60 H15 V40 H40 V15 Z" fill="var(--accent)"/>
+                    </svg>
+                    <span style="font-weight: 800; letter-spacing: 1px; font-size: 14px; color: var(--text-main);">CLINICAL PHARMACY TRACKER</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">HIPAA Compliance</a>
+                    <a href="#">Help & Support</a>
+                </div>
+                <div class="footer-copy">
+                    &copy; 2026 Shanu Digicore Clinical Systems. All rights reserved.
+                </div>
+            </div>
+        </footer>
+        <style>
+            .clinical-footer {
+                margin-top: 60px;
+                padding: 40px 20px;
+                border-top: 1px solid var(--card-border);
+                background: rgba(0,0,0,0.02);
+            }
+            [data-theme="dark"] .clinical-footer {
+                background: rgba(255,255,255,0.01);
+            }
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .footer-links {
+                display: flex;
+                gap: 24px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .footer-links a {
+                color: var(--text-muted);
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 500;
+                transition: color 0.2s;
+            }
+            .footer-links a:hover {
+                color: var(--accent);
+            }
+            .footer-copy {
+                font-size: 12px;
+                color: var(--text-muted);
+                opacity: 0.7;
+            }
+        </style>
     </div>
-<script>
+    <script>
 /* =========================================================================
-   Ultimate Clinical Engine Logic (Fixed for Senior Design DOM)
+   Ultimate Clinical Engine Logic (100% Fixed & Streamlined)
    ========================================================================= */
 
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
@@ -577,81 +638,70 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
 
 let intakes = [];
 
-// ── 1. Theme Toggle ────────────────────────────────────────────────────────
+// ── 1. Theme Toggle & Lamp Pull ────────────────────────────────────────────
+function triggerLampPull() {
+    const lamp = document.getElementById('hangingLampToggle');
+    if (lamp) {
+        lamp.classList.add('lamp-pulling');
+        setTimeout(() => lamp.classList.remove('lamp-pulling'), 400);
+    }
+    toggleTheme();
+}
+
 function toggleTheme() {
     const html = document.documentElement;
     const current = html.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
-}
-
-// ── 2. Dynamic Vitals ──────────────────────────────────────────────────────
-
-function _unused_openVitalsModal() {
-    document.getElementById('inputName').value = document.getElementById('vitalName').textContent;
-    document.getElementById('inputAge').value = document.getElementById('vitalAge').textContent;
-    document.getElementById('inputGender').value = document.getElementById('vitalGender').textContent;
-    document.getElementById('inputWeight').value = document.getElementById('vitalWeight').textContent;
-    document.getElementById('vitalsModal').style.display = 'flex';
-}
-
-function closeVitalsModal() {
-    document.getElementById('vitalsModal').style.display = 'none';
-}
-
-function handleSaveVitalsForm(e) {
-    e.preventDefault();
-    const vitals = {
-        name: document.getElementById('inputName').value.trim() || 'John Doe',
-        age: document.getElementById('inputAge').value.trim() || '35 YRS',
-        gender: document.getElementById('inputGender').value || 'MALE',
-        weight: document.getElementById('inputWeight').value.trim() || '180 LBS'
-    };
     
-    document.getElementById('vitalName').textContent = vitals.name;
-    document.getElementById('vitalAge').textContent = vitals.age;
-    document.getElementById('vitalGender').textContent = vitals.gender;
-    document.getElementById('vitalWeight').textContent = vitals.weight;
+    const iconEl = document.getElementById('lampThemeIcon');
+    const textEl = document.getElementById('lampThemeText');
     
-    // localStorage.setItem('patientVitals', JSON.stringify(vitals));
-    closeVitalsModal();
+    if (iconEl && textEl) {
+        iconEl.style.transform = 'rotate(360deg) scale(1.3)';
+        setTimeout(() => {
+            iconEl.textContent = next === 'dark' ? '🌙' : '☀️';
+            textEl.textContent = next === 'dark' ? 'DARK' : 'LIGHT';
+            iconEl.style.transform = 'rotate(0deg) scale(1)';
+        }, 200);
+    }
 }
 
-function handleSavePatientForm(e) {
-    if (e) e.preventDefault();
-    const vitals = {
-        name: document.getElementById('patientNameInput').value.trim() || 'John Doe',
-        age: document.getElementById('patientAgeInput').value.trim() || '35',
-        gender: document.getElementById('patientGenderInput').value || 'MALE',
-        weight: document.getElementById('patientWeightInput').value.trim() || '180'
-    };
-    // localStorage.setItem('patientVitals', JSON.stringify(vitals));
-    document.getElementById('patientStatusText').textContent = 'Profile Saved';
-    setTimeout(() => {
-        document.getElementById('patientStatusText').textContent = 'Profile Active';
-    }, 2000);
-}
-
+// ── 2. Initialization & Vitals ──────────────────────────────────────────────
 function loadVitals() {
-    // Keep form inputs 100% blank & empty by default (no prefilled data!)
-    document.getElementById('patientNameInput').value = '';
-    document.getElementById('patientAgeInput').value = '';
-    document.getElementById('patientGenderInput').selectedIndex = 0;
-    document.getElementById('patientWeightInput').value = '';
-    document.getElementById('patientStatusText').textContent = 'Enter Details';
-}
-    
-    // Load theme
-    const theme = localStorage.getItem('theme');
-    if (theme) document.documentElement.setAttribute('data-theme', theme);
-    
-    // Load drugs
-    const savedDrugs = JSON.parse(localStorage.getItem('patientProfile'));
-    if (savedDrugs) {
-        intakes = savedDrugs;
-        renderQueue();
-        if(intakes.length >= 2) analyzeInteractions();
+    try {
+        // Keep form inputs 100% blank by default
+        const ageInput = document.getElementById('patientAgeInput');
+        const genderInput = document.getElementById('patientGenderInput');
+        const weightInput = document.getElementById('patientWeightInput');
+        
+        if(ageInput) ageInput.value = '';
+        if(genderInput) genderInput.selectedIndex = 0;
+        if(weightInput) weightInput.value = '';
+        
+        const statusText = document.getElementById('patientStatusText');
+        if(statusText) statusText.textContent = 'Enter Details';
+        
+        // Load theme
+        const theme = localStorage.getItem('theme');
+        if (theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const iconEl = document.getElementById('lampThemeIcon');
+            const textEl = document.getElementById('lampThemeText');
+            if(iconEl) iconEl.textContent = theme === 'dark' ? '🌙' : '☀️';
+            if(textEl) textEl.textContent = theme === 'dark' ? 'DARK' : 'LIGHT';
+        }
+        
+        // Load drugs
+        const savedDrugs = localStorage.getItem('patientProfile');
+        if (savedDrugs) {
+            intakes = JSON.parse(savedDrugs);
+            renderQueue();
+            if(intakes.length >= 2) analyzeInteractions();
+        }
+    } catch (e) {
+        console.error("Initialization error:", e);
     }
 }
 
@@ -662,6 +712,8 @@ function handleAddDrug(e) {
     e.preventDefault();
     const input = document.getElementById('drugInput');
     const timeEl = document.getElementById('timeInput');
+    if (!input || !timeEl) return;
+    
     const drugName = input.value.trim();
     if (!drugName) return;
 
@@ -677,7 +729,7 @@ function removeFromQueue(index) {
     intakes.splice(index, 1);
     localStorage.setItem('patientProfile', JSON.stringify(intakes));
     renderQueue();
-    analyzeInteractions(); // re-run or clear
+    analyzeInteractions();
 }
 
 function clearProfile() {
@@ -689,7 +741,9 @@ function clearProfile() {
 
 function renderQueue() {
     const list = document.getElementById('drugListUI');
-    document.getElementById('totalLoggedCount').textContent = `${intakes.length} DRUGS`;
+    const count = document.getElementById('totalLoggedCount');
+    if(count) count.textContent = `${intakes.length} DRUGS`;
+    if(!list) return;
 
     if (intakes.length === 0) {
         list.innerHTML = '<li class="drug-item" style="color: var(--text-muted); justify-content: center; border: none;">No medications logged.</li>';
@@ -732,7 +786,7 @@ async function handleOCRScan(input) {
         });
 
         if (found.size > 0) {
-            const timeVal = document.getElementById('timeInput').value;
+            const timeVal = document.getElementById('timeInput').value || '12:00 PM';
             found.forEach(d => intakes.push({ drug_name: d, timestamp: timeVal }));
             localStorage.setItem('patientProfile', JSON.stringify(intakes));
             renderQueue();
@@ -760,38 +814,46 @@ async function analyzeInteractions() {
     if(blipHeart) blipHeart.style.display = 'none';
     if(blipLiver) blipLiver.style.display = 'none';
     if(blipKidneys) blipKidneys.style.display = 'none';
-    detailsUI.style.display = 'none';
-    scoreUI.textContent = "0";
-    labelUI.textContent = "No Risk / Safe";
-    labelUI.style.color = "var(--text-muted)";
+    if(detailsUI) detailsUI.style.display = 'none';
+    if(scoreUI) scoreUI.textContent = "0";
+    if(labelUI) {
+        labelUI.textContent = "No Risk / Safe";
+        labelUI.style.color = "var(--text-muted)";
+    }
     if(gauge) gauge.style.transform = `rotate(-90deg)`;
 
-    if (intakes.length < 2) return;
+    if (intakes.length === 0) return;
 
     let warnings = [];
 
-    // Try API first
-    try {
-        const res = await fetch(`${API_BASE}/api/check-timeline/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ intakes: intakes })
-        });
-        if(res.ok) {
-            const data = await res.json();
-            warnings = data.warnings || [];
+    // Try API first if 2 or more drugs
+    if (intakes.length >= 2) {
+        try {
+            const res = await fetch(`${API_BASE}/api/check-timeline/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ intakes: intakes })
+            });
+            if(res.ok) {
+                const data = await res.json();
+                warnings = data.warnings || [];
+            }
+        } catch(e) {
+            console.warn("API unavailable, falling back to local clinical rules database:", e);
         }
-    } catch(e) {
-        console.warn("API unavailable, falling back to local clinical rules database:", e);
     }
 
-    // Read Age, Gender, Weight
-    const ageVal = parseInt(document.getElementById('patientAgeInput').value) || 35;
-    const genderVal = document.getElementById('patientGenderInput').value || 'MALE';
-    const weightVal = parseInt(document.getElementById('patientWeightInput').value) || 180;
+    // Read Age, Gender, Weight safely
+    const ageInput = document.getElementById('patientAgeInput');
+    const genderInput = document.getElementById('patientGenderInput');
+    const weightInput = document.getElementById('patientWeightInput');
+    
+    const ageVal = ageInput && ageInput.value ? parseInt(ageInput.value) : 35;
+    const genderVal = genderInput && genderInput.value ? genderInput.value : 'MALE';
+    const weightVal = weightInput && weightInput.value ? parseInt(weightInput.value) : 180;
 
-    // Local Fallback Rules Engine if API returned empty or failed
-    if (warnings.length === 0 && intakes.length >= 2) {
+    // Biometric & Drug Fallback Rules Engine
+    if (intakes.length > 0) {
         // Age / Weight / Gender specific risk adjustments
         if (ageVal > 65) {
             warnings.push({
@@ -811,42 +873,44 @@ async function analyzeInteractions() {
                 remedy: 'Adjust mg/kg dosage calculation.'
             });
         }
-        const names = intakes.map(i => i.drug_name.toLowerCase());
         
-        // Known Clinical Pair Check
-        if ((names.includes('aspirin') || names.includes('advil')) && (names.includes('warfarin') || names.includes('coumadin') || names.includes('plavix'))) {
-            warnings.push({
-                drug_a: 'Aspirin / NSAID',
-                drug_b: 'Warfarin / Anticoagulant',
-                severity: 'High',
-                reaction: 'Synergistic antiplatelet and anticoagulant inhibition. Severe risk of major gastrointestinal hemorrhage and internal bleeding.',
-                remedy: 'Avoid concurrent use. Monitor INR closely or substitute with acetaminophen under clinical supervision.'
-            });
-        } else if (names.includes('ibuprofen') && names.includes('aspirin')) {
-            warnings.push({
-                drug_a: 'Ibuprofen',
-                drug_b: 'Aspirin',
-                severity: 'Moderate',
-                reaction: 'Competitive COX-1 binding. Ibuprofen interferes with the irreversible cardioprotective antiplatelet effect of low-dose aspirin.',
-                remedy: 'Take low-dose aspirin at least 30 minutes before or 8 hours after ibuprofen.'
-            });
-        } else if (names.includes('methotrexate') && (names.includes('ibuprofen') || names.includes('aspirin'))) {
-            warnings.push({
-                drug_a: 'Methotrexate',
-                drug_b: 'NSAID (Ibuprofen/Aspirin)',
-                severity: 'High',
-                reaction: 'Reduced renal clearance of methotrexate leading to severe bone marrow suppression and hepatic toxicity.',
-                remedy: 'Discontinue NSAID and switch to safer analgesics.'
-            });
-        } else {
-            // General multi-drug metabolic clearance warning for any 2+ drugs
-            warnings.push({
-                drug_a: intakes[0].drug_name.toUpperCase(),
-                drug_b: intakes[1].drug_name.toUpperCase(),
-                severity: 'Moderate',
-                reaction: 'Potential CYP450 hepatic enzyme competition and altered renal clearance window.',
-                remedy: 'Stagger administration times by at least 2 to 4 hours and monitor for elevated serum concentrations.'
-            });
+        if (warnings.length === 0 && intakes.length >= 2) {
+            const names = intakes.map(i => i.drug_name.toLowerCase());
+            
+            // Known Clinical Pair Check
+            if ((names.includes('aspirin') || names.includes('advil')) && (names.includes('warfarin') || names.includes('coumadin') || names.includes('plavix'))) {
+                warnings.push({
+                    drug_a: 'Aspirin / NSAID',
+                    drug_b: 'Warfarin / Anticoagulant',
+                    severity: 'High',
+                    reaction: 'Synergistic antiplatelet and anticoagulant inhibition. Severe risk of major gastrointestinal hemorrhage and internal bleeding.',
+                    remedy: 'Avoid concurrent use. Monitor INR closely or substitute with acetaminophen under clinical supervision.'
+                });
+            } else if (names.includes('ibuprofen') && names.includes('aspirin')) {
+                warnings.push({
+                    drug_a: 'Ibuprofen',
+                    drug_b: 'Aspirin',
+                    severity: 'Moderate',
+                    reaction: 'Competitive COX-1 binding. Ibuprofen interferes with the irreversible cardioprotective antiplatelet effect of low-dose aspirin.',
+                    remedy: 'Take low-dose aspirin at least 30 minutes before or 8 hours after ibuprofen.'
+                });
+            } else if (names.includes('methotrexate') && (names.includes('ibuprofen') || names.includes('aspirin'))) {
+                warnings.push({
+                    drug_a: 'Methotrexate',
+                    drug_b: 'NSAID',
+                    severity: 'High',
+                    reaction: 'Reduced renal clearance of methotrexate leading to severe bone marrow suppression and hepatic toxicity.',
+                    remedy: 'Discontinue NSAID and switch to safer analgesics.'
+                });
+            } else {
+                warnings.push({
+                    drug_a: intakes[0].drug_name.toUpperCase(),
+                    drug_b: intakes[1].drug_name.toUpperCase(),
+                    severity: 'Moderate',
+                    reaction: 'Potential CYP450 hepatic enzyme competition and altered renal clearance window.',
+                    remedy: 'Stagger administration times by at least 2 to 4 hours and monitor for elevated serum concentrations.'
+                });
+            }
         }
     }
 
@@ -855,7 +919,7 @@ async function analyzeInteractions() {
     let sevColor = "var(--text-muted)";
     
     if (warnings.length > 0) {
-        detailsUI.style.display = 'block';
+        if(detailsUI) detailsUI.style.display = 'block';
         const hasHigh = warnings.some(w => w.severity === 'High');
         if (hasHigh) {
             maxSev = 8;
@@ -871,20 +935,24 @@ async function analyzeInteractions() {
         }
     }
     
-    scoreUI.textContent = maxSev;
-    labelUI.textContent = sevLabel;
-    labelUI.style.color = sevColor;
+    if(scoreUI) scoreUI.textContent = maxSev;
+    if(labelUI) {
+        labelUI.textContent = sevLabel;
+        labelUI.style.color = sevColor;
+    }
     
     const angle = -90 + (maxSev * 18);
     if(gauge) gauge.style.transform = `rotate(${angle}deg)`;
     
-    detailsUI.innerHTML = warnings.map(w => `
-        <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity === 'High' ? '#ef4444' : '#f97316'}; margin-bottom: 16px;">
-            <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a} + ${w.drug_b}</div>
-            <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Reaction:</strong> ${w.reaction}</div>
-            <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
-        </div>
-    `).join('');
+    if(detailsUI) {
+        detailsUI.innerHTML = warnings.map(w => `
+            <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity === 'High' ? '#ef4444' : '#f97316'}; margin-bottom: 16px;">
+                <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a} + ${w.drug_b}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Reaction:</strong> ${w.reaction}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
+            </div>
+        `).join('');
+    }
 }
 </script>
 </body>
