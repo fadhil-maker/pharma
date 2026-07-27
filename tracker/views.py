@@ -89,19 +89,37 @@ def add_admin(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_interactions(request):
-    """List rules in database with server-side pagination & search."""
+    """List rules in database with server-side pagination, search, sorting & filtering."""
     search_q = request.GET.get('search', '').strip().lower()
+    sort_by = request.GET.get('sort_by', 'id').strip().lower()
+    order = request.GET.get('order', 'asc').strip().lower()
+    min_severity = request.GET.get('min_severity', '').strip()
     page = int(request.GET.get('page', 1))
     limit = int(request.GET.get('limit', 10))
     
-    qs = Interaction.objects.select_related('reaction').all().order_by('id')
+    qs = Interaction.objects.select_related('reaction').all()
+    
     if search_q:
         qs = qs.filter(
             models.Q(drug_a__icontains=search_q) | 
             models.Q(drug_b__icontains=search_q) | 
             models.Q(reaction__name__icontains=search_q)
         )
-    
+        
+    if min_severity and min_severity.isdigit():
+        qs = qs.filter(severity_slider__gte=int(min_severity))
+
+    sort_field = 'id'
+    if sort_by == 'severity':
+        sort_field = 'severity_slider'
+    elif sort_by == 'drug_a':
+        sort_field = 'drug_a'
+
+    if order == 'desc':
+        sort_field = '-' + sort_field
+
+    qs = qs.order_by(sort_field, 'id')
+
     total_count = qs.count()
     start = (page - 1) * limit
     end = start + limit
