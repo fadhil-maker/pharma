@@ -39,7 +39,7 @@
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.5);
         }
         
-        body { background: var(--bg-page); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
+        body { background: var(--bg-page); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; display: block; }
         
         /* The App Window */
         .app-window {
@@ -60,7 +60,7 @@
         
         .pill-toggle-container { cursor: pointer; padding: 4px; padding-right: 12px; gap: 8px; border-radius: 12px; background: var(--bg-page); display: flex; align-items: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         
-        .app-content { padding: 40px; }
+        .app-content { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
         
         /* Brand Logo */
         .app-header { margin-bottom: 40px; }
@@ -150,24 +150,13 @@
 
 
     <!-- ── Perfect Mockup Layout ────────────────────────────────────────── -->
-    <div class="app-window">
+    
         
         <!-- Fake macOS Browser Header -->
-        <div class="mac-header">
-            <div class="mac-dots">
-                <span style="background:#ff5f56;"></span>
-                <span style="background:#ffbd2e;"></span>
-                <span style="background:#27c93f;"></span>
-            </div>
-            <div class="mac-search" style="position: absolute; left: 50%; transform: translateX(-50%);">
-                <span style="font-size:12px; opacity:0.5;">🔒 pharma.zuloo.app</span>
-            </div>
-            </div>
-
         <div class="app-content" style="position: relative;">
 
             <!-- 3D Hanging Pill Theme Toggle -->
-            <div class="pill-toggle-container" onclick="toggleTheme()" title="Toggle Theme" style="position: absolute; top: -10px; right: 40px; cursor: pointer; z-index: 100; transition: transform 0.3s ease; animation: swing 6s infinite ease-in-out; transform-origin: top center;">
+            <div class="pill-toggle-container" onclick="toggleTheme()" title="Toggle Theme" style="position: fixed; top: -5px; right: 40px; cursor: pointer; z-index: 1000; transition: transform 0.3s ease; animation: swing 6s infinite ease-in-out; transform-origin: top center;">
                 <img src="assets/pill.png" alt="Toggle Theme" style="height: 100px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));">
             </div>
             
@@ -330,7 +319,6 @@
                 </div>
             </div>
         </div>
-    </div>
     <script>
 /* =========================================================================
    Single-Page Clinical Engine Logic
