@@ -3,322 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Pharma Clinical Tracker is an advanced, high-performance master database for tracking 64,000+ FDA-approved drug interactions. Designed for rapid clinical insights and pharmaceutical UI demonstrations.">
-    <meta name="keywords" content="Pharma, Drug Interactions, Clinical Tracker, Pharmaceutical Database, FDA Drugs, Medical UI, Health Tech">
-    <meta name="author" content="Zuloo">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph for #1 Social Ranking -->
-    <meta property="og:title" content="Pharma Clinical Tracker — Enterprise Pharmaceutical Portal">
-    <meta property="og:description" content="Instantly cross-reference 64,825 real FDA drug pairs to detect severe interactions and clinical remedies.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://pharma.shanudigicore.com">
-    <meta property="og:site_name" content="Pharma Tracker by Zuloo">
-    <title>Pharma Clinical Tracker — Single-Page Open-Source Portal</title>
+    <title>Pharma Clinical Tracker — Enterprise Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-page: #dbeafe; /* Light blue background outside the window */
-            --bg-main: #f8fafc; /* Window background */
-            --card-bg: #ffffff;
+            --bg-page: #f0f4f8; 
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 1);
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --accent: #0284c7;
-            --accent-hover: #0369a1;
-            --border-light: #e2e8f0;
-            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
-            --radius-lg: 20px;
+            --accent: #0ea5e9;
+            --accent-hover: #0284c7;
+            --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+            --shadow-inner: inset 0 2px 4px rgba(255, 255, 255, 0.8);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
             --radius-md: 12px;
         }
+
         [data-theme="dark"] {
             --torso-blend: screen;
-            --bg-page: #020617; --bg-main: #0f172a; --card-bg: #1e293b;
-            --text-main: #f8fafc; --text-muted: #94a3b8; --border-light: #334155;
-            --shadow-soft: 0 10px 30px rgba(0,0,0,0.5);
+            --bg-page: #0f172a; 
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            --shadow-inner: inset 0 2px 4px rgba(255, 255, 255, 0.05);
         }
         
-        body { background: var(--bg-page); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; margin: 0; display: block; overflow-x: hidden; }
+        * { box-sizing: border-box; }
         
-        /* The App Window */
-        .app-window {
-            background: var(--bg-main);
-            width: 100%; max-width: 1100px;
+        body { 
+            background: var(--bg-page); 
+            color: var(--text-main); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; padding: 0; 
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Core Layout ── */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        /* ── Header & Logo ── */
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            display: flex; align-items: center; gap: 16px;
+        }
+        
+        .brand-text { 
+            display: flex; flex-direction: column; line-height: 1; 
+            font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 900; 
+            letter-spacing: 0.5px;
+        }
+
+        /* 3D Theme Pill */
+        .theme-pill-wrapper {
+            position: fixed;
+            top: -10px;
+            right: 40px;
+            z-index: 1000;
+            cursor: pointer;
+            animation: swing 8s infinite ease-in-out;
+            transform-origin: top center;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-pill-wrapper:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+        }
+        @keyframes swing {
+            0% { transform: rotate(4deg); }
+            50% { transform: rotate(-4deg); }
+            100% { transform: rotate(4deg); }
+        }
+
+        /* ── Patient Vitals Header ── */
+        .patient-vitals {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            overflow: hidden;
-            border: 1px solid var(--border-light);
+            padding: 20px 32px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-soft), var(--shadow-inner);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .vital-group { display: flex; gap: 32px; }
+        .vital-item { display: flex; flex-direction: column; gap: 4px; }
+        .vital-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .vital-value { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .vital-status { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #10b981; }
+        .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* ── Main Grid ── */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .patient-vitals { flex-direction: column; align-items: flex-start; gap: 24px; }
+            .vital-group { flex-wrap: wrap; }
         }
 
-        .mac-header {
-            background: var(--card-bg); height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--border-light); position: relative;
+        .col-stack { display: flex; flex-direction: column; gap: 40px; }
+
+        /* ── Premium Cards ── */
+        .premium-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-soft), var(--shadow-inner);
+            position: relative;
         }
-        .mac-dots { display: flex; gap: 8px; }
-        .mac-dots span { width: 12px; height: 12px; border-radius: 50%; }
-        .mac-search { background: var(--bg-page); padding: 4px 120px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
         
-        .pill-toggle-container { cursor: pointer; padding: 4px; padding-right: 12px; gap: 8px; border-radius: 12px; background: var(--bg-page); display: flex; align-items: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        
-        .app-content { padding: 40px 5%; max-width: 1600px; margin: 0 auto; }
-        
-        /* Brand Logo */
-        .app-header { margin-bottom: 40px; }
-        .brand-logo-large { display: flex; align-items: center; gap: 16px; }
-        .brand-text { display: flex; flex-direction: column; line-height: 1.1; font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 900; color: var(--text-main); letter-spacing: 0.5px; }
-        .brand-text span:first-child { color: var(--accent); }
-
-        /* Dashboard Grid */
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start; }
-        .left-column, .right-column { display: flex; flex-direction: column; gap: 32px; }
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } .app-content { padding: 20px; } .mac-search { display: none; } }
-
-        /* Section Titles */
-        .section-title { font-size: 13px; font-weight: 800; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Cards & Dropzone */
-        .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-light); }
-        .card-center { text-align: center; }
-
-        .scanner-dropzone {
-            background: linear-gradient(135deg, rgba(2,132,199,0.05) 0%, rgba(2,132,199,0.1) 100%);
-            border: 2px dashed rgba(2,132,199,0.3);
-            border-radius: var(--radius-lg); padding: 40px 20px; text-align: center;
+        .card-header {
+            font-size: 13px; font-weight: 800; color: var(--text-muted); 
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 24px;
+            display: flex; align-items: center; gap: 8px;
         }
-        .scanner-icons { display: flex; justify-content: center; gap: 16px; font-size: 40px; margin-bottom: 20px; }
-        .scanner-text { font-size: 15px; font-weight: 700; color: var(--text-main); line-height: 1.5; }
-        .scanner-btn-group { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
-        .scanner-btn { padding: 12px 24px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; font-weight: 700; font-size: 14px; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .scanner-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-        /* Logger Form */
-        .logger-row { display: grid; grid-template-columns: 1fr 120px 120px; gap: 12px; align-items: end; }
-        .input-col { display: flex; flex-direction: column; position: relative; }
-        @media (max-width: 600px) { .logger-row { grid-template-columns: 1fr; } }
+        /* ── Drug Logger Form ── */
+        .logger-row {
+            display: grid; grid-template-columns: 1fr 140px 140px; gap: 16px; align-items: end; margin-bottom: 32px;
+        }
+        @media (max-width: 768px) { .logger-row { grid-template-columns: 1fr; } }
         
-        label { font-size: 11px; font-weight: 800; margin-bottom: 6px; color: var(--text-muted); }
-        input, select { width: 100%; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); outline: none; }
-        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-        .btn-add { padding: 12px 16px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; height: 43px; display: flex; align-items: center; justify-content: center; }
-        .btn-add:hover { background: var(--accent-hover); }
+        .input-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
+        .input-group label { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+        .input-group input, .input-group select {
+            width: 100%; padding: 14px 20px;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: var(--radius-md);
+            font-family: inherit; font-size: 15px; font-weight: 600; color: var(--text-main);
+            outline: none; transition: all 0.2s;
+        }
+        [data-theme="dark"] .input-group input, [data-theme="dark"] .input-group select {
+            background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);
+        }
+        .input-group input:focus, .input-group select:focus {
+            background: var(--card-bg); border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(14,165,233,0.15);
+        }
+        
+        .btn-premium {
+            padding: 14px 24px; height: 50px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: #fff; border: none; border-radius: var(--radius-md);
+            font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+            cursor: pointer; box-shadow: 0 10px 20px -5px rgba(14,165,233,0.4);
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(14,165,233,0.5); }
 
-        .list-divider { height: 1px; background: var(--border-light); margin: 24px 0 12px; }
+        /* Drug List */
         .drug-list { list-style: none; padding: 0; margin: 0; }
-        .drug-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-light); font-weight: 600; font-size: 14px; }
-        .drug-item:last-child { border-bottom: none; }
-        .drug-item-time { color: var(--text-muted); font-weight: 500; border-left: 1px solid var(--border-light); padding-left: 12px; margin-left: 12px; }
-        .drug-item-remove { cursor: pointer; color: var(--text-muted); }
-        .drug-item-remove:hover { color: #ef4444; }
+        .drug-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600;
+        }
+        [data-theme="dark"] .drug-item { border-color: rgba(255,255,255,0.05); }
+        .drug-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .drug-item-time { color: var(--text-muted); font-size: 14px; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; margin-left: auto; margin-right: 24px; }
+        .drug-item-remove { cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
+        .drug-item-remove:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
 
-        .list-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 11px; font-weight: 800; color: var(--text-muted); }
-        .clear-btn { cursor: pointer; } .clear-btn:hover { color: #ef4444; }
-
-        /* Gauge */
-        .gauge-title { font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 24px; }
-        .severity-gauge { width: 160px; height: 80px; border-radius: 160px 160px 0 0; background: conic-gradient(from 180deg at 50% 100%, #10b981 0deg, #f59e0b 90deg, #ef4444 180deg); position: relative; margin: 0 auto 20px; }
-        .severity-gauge::before { content: ''; position: absolute; bottom: 0; left: 20px; right: 20px; top: 20px; background: var(--card-bg); border-radius: 120px 120px 0 0; }
-        .severity-needle { position: absolute; bottom: -6px; left: 50%; width: 6px; height: 70px; background: var(--text-main); transform-origin: bottom center; border-radius: 6px; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .severity-needle::after { content: ''; position: absolute; bottom: 0; left: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--text-main); }
-        .severity-score { font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
-        .severity-label { font-size: 13px; font-weight: 700; color: var(--text-muted); }
-        .interaction-details { margin-top: 24px; text-align: left; display: none; }
-
-        /* Anatomical Map */
-        .anatomical-container { position: relative; width: 100%; height: 300px; display: flex; justify-content: center; align-items: center; }
-        .torso-svg { height: 100%; width: auto; color: var(--text-main); opacity: 0.2; }
-        .threat-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .organ-blip { position: absolute; display: none; }
-        .blip-glow { width: 16px; height: 16px; border-radius: 50%; }
-        .bg-red { background: #ef4444; box-shadow: 0 0 20px #ef4444; }
-        .bg-orange { background: #f97316; box-shadow: 0 0 20px #f97316; }
-        .bg-yellow { background: #eab308; box-shadow: 0 0 20px #eab308; }
-        .text-red { color: #ef4444; } .text-orange { color: #f97316; } .text-yellow { color: #eab308; }
-        .blip-badge { position: absolute; top: -10px; background: var(--card-bg); border: 1px solid var(--border-light); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-soft); line-height: 1.3; }
-        .badge-right { left: 24px; text-align: left; }
-        .badge-left { right: 24px; text-align: right; }
-        
-        .blip-heart { top: 30%; left: 55%; }
-        .blip-liver { top: 48%; left: 38%; }
-        .blip-kidneys { top: 62%; left: 50%; }
-
-        .premium-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-soft); border: 1px solid var(--border-light); margin-top: 8px; max-height: 200px; overflow-y: auto; display: none; z-index: 100; padding: 8px; }
+        .premium-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-soft); border: 1px solid var(--card-border); margin-top: 8px; max-height: 200px; overflow-y: auto; display: none; z-index: 100; padding: 8px; }
         .dropdown-item { padding: 10px 12px; cursor: pointer; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; }
-        .dropdown-item:hover { background: rgba(2,132,199,0.05); color: var(--accent); }
+        .dropdown-item:hover { background: rgba(14,165,233,0.05); color: var(--accent); }
+
+        /* ── Scanner Dropzone ── */
+        .premium-dropzone {
+            background: linear-gradient(135deg, rgba(14,165,233,0.03) 0%, rgba(14,165,233,0.08) 100%);
+            border: 2px dashed rgba(14,165,233,0.3);
+            border-radius: var(--radius-lg); padding: 40px; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .premium-dropzone:hover { border-color: var(--accent); background: linear-gradient(135deg, rgba(14,165,233,0.05) 0%, rgba(14,165,233,0.12) 100%); }
+        .asset-group { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; }
+        .asset-group img { height: 70px; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .premium-dropzone:hover .asset-group img { transform: translateY(-10px) scale(1.05); }
+        
+        .dropzone-text { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .dropzone-sub { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        
+        .btn-group { display: flex; justify-content: center; gap: 16px; margin-top: 32px; }
+        .btn-secondary {
+            padding: 12px 24px; background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: var(--radius-md); font-weight: 700; color: var(--text-main); cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 8px 16px rgba(14,165,233,0.15); transform: translateY(-2px); }
+
+        /* ── Gauge & Analysis ── */
+        .gauge-container { text-align: center; padding: 20px 0; }
+        .severity-gauge {
+            width: 200px; height: 100px; margin: 0 auto 24px; position: relative;
+            background: conic-gradient(from 180deg at 50% 100%, #10b981 0deg, #f59e0b 90deg, #ef4444 180deg);
+            border-radius: 200px 200px 0 0;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .severity-gauge::before {
+            content: ''; position: absolute; bottom: 0; left: 24px; right: 24px; top: 24px;
+            background: var(--card-bg); border-radius: 150px 150px 0 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+        .severity-needle {
+            position: absolute; bottom: -8px; left: 50%; width: 6px; height: 85px;
+            background: var(--text-main); border-radius: 6px;
+            transform-origin: bottom center; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .severity-needle::after {
+            content: ''; position: absolute; bottom: 2px; left: -5px; width: 16px; height: 16px;
+            border-radius: 50%; background: var(--card-bg); border: 4px solid var(--text-main);
+        }
+        
+        .severity-score { font-family: 'Outfit', sans-serif; font-size: 64px; font-weight: 900; line-height: 1; color: var(--text-main); }
+        .severity-label { font-size: 15px; font-weight: 800; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .interaction-details { margin-top: 32px; text-align: left; display: none; }
+
+        /* ── 3D Anatomy ── */
+        .anatomy-viewport {
+            position: relative; width: 100%; height: 350px;
+            border-radius: var(--radius-lg); overflow: hidden;
+            background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(14,165,233,0.05) 100%);
+            display: flex; justify-content: center; align-items: center;
+        }
+        [data-theme="dark"] .anatomy-viewport { background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(14,165,233,0.1) 100%); }
+        
+        .anatomy-viewport img { height: 110%; object-fit: contain; mix-blend-mode: var(--torso-blend, multiply); opacity: 0.85; }
+        
+        .threat-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .organ-blip { position: absolute; display: none; z-index: 10; }
+        .blip-glow { width: 16px; height: 16px; border-radius: 50%; }
+        
+        .bg-red { background: #ef4444; box-shadow: 0 0 25px 5px rgba(239,68,68,0.6); animation: pulse-red 2s infinite; }
+        .bg-orange { background: #f97316; box-shadow: 0 0 25px 5px rgba(249,115,22,0.6); animation: pulse-orange 2s infinite; }
+        .bg-yellow { background: #eab308; box-shadow: 0 0 25px 5px rgba(234,179,8,0.6); animation: pulse-yellow 2s infinite; }
+        
+        @keyframes pulse-red { 0% { box-shadow: 0 0 15px #ef4444; } 50% { box-shadow: 0 0 35px #ef4444; } 100% { box-shadow: 0 0 15px #ef4444; } }
+        @keyframes pulse-orange { 0% { box-shadow: 0 0 15px #f97316; } 50% { box-shadow: 0 0 35px #f97316; } 100% { box-shadow: 0 0 15px #f97316; } }
+        @keyframes pulse-yellow { 0% { box-shadow: 0 0 15px #eab308; } 50% { box-shadow: 0 0 35px #eab308; } 100% { box-shadow: 0 0 15px #eab308; } }
+        
+        .blip-badge {
+            position: absolute; top: -12px; background: var(--card-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border); padding: 6px 12px; border-radius: 8px;
+            font-size: 11px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-soft);
+            line-height: 1.4; letter-spacing: 0.5px;
+        }
+        .badge-right { left: 28px; text-align: left; }
+        .badge-left { right: 28px; text-align: right; }
+        
+        .blip-heart { top: 32%; left: 53%; }
+        .blip-liver { top: 48%; left: 40%; }
+        .blip-kidneys { top: 62%; left: 50%; }
     </style>
 </head>
 <body>
 
+    <!-- 3D Hanging Pill Theme Toggle -->
+    <div class="theme-pill-wrapper" onclick="toggleTheme()" title="Toggle Theme">
+        <img src="assets/pill.png" alt="Toggle Theme" style="height: 110px; filter: drop-shadow(0 20px 20px rgba(0,0,0,0.2));">
+    </div>
 
-    <!-- ── Perfect Mockup Layout ────────────────────────────────────────── -->
-    
+    <div class="app-container">
         
-        <!-- Fake macOS Browser Header -->
-        <div class="app-content" style="position: relative;">
-
-            <!-- 3D Hanging Pill Theme Toggle -->
-            <div class="pill-toggle-container" onclick="toggleTheme()" title="Toggle Theme" style="position: fixed; top: -5px; right: 40px; cursor: pointer; z-index: 1000; transition: transform 0.3s ease; animation: swing 6s infinite ease-in-out; transform-origin: top center;">
-                <img src="assets/pill.png" alt="Toggle Theme" style="height: 100px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));">
-            </div>
-            
-            <style>
-                @keyframes swing {
-                    0% { transform: rotate(3deg); }
-                    50% { transform: rotate(-3deg); }
-                    100% { transform: rotate(3deg); }
-                }
-                .pill-toggle-container:hover { transform: scale(1.05) rotate(0deg) !important; }
-            </style>
-    
-            <!-- Brand Header -->
-            <div class="app-header">
-                
-                <div class="brand-logo-large" style="display: flex; align-items: center; gap: 12px; position: relative; z-index: 10;">
-                    <div class="brand-icon">
-                        <!-- Custom Heartbeat Medical Cross SVG -->
-                        <svg width="56" height="56" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Cross Outline -->
-                            <path d="M40 15 H60 V40 H85 V60 H60 V85 H40 V60 H15 V40 H40 V15 Z" stroke="#0f172a" stroke-width="6" stroke-linejoin="round"/>
-                            <!-- Heartbeat Line -->
-                            <path d="M0 50 H25 L35 30 L50 80 L65 50 H100" stroke="#0ea5e9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <!-- Tech Dots -->
-                            <circle cx="85" cy="40" r="3" fill="#0ea5e9"/>
-                            <circle cx="85" cy="60" r="3" fill="#0ea5e9"/>
-                            <circle cx="60" cy="85" r="3" fill="#0ea5e9"/>
-                        </svg>
-                    </div>
-                    <div class="brand-text" style="display: flex; flex-direction: column; line-height: 1; font-family: 'Outfit', sans-serif; font-size: 19px; font-weight: 900; color: #0f172a; letter-spacing: 0.5px;">
-                        <span style="color: #0f172a;">CLINICAL</span>
-                        <span style="color: #0ea5e9;">PHARMACY</span>
-                        <span style="color: #0f172a;">TRACKER</span>
-                    </div>
+        <!-- ── Header & Logo ── -->
+        <header class="header-section">
+            <div class="brand-logo">
+                <svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M40 15 H60 V40 H85 V60 H60 V85 H40 V60 H15 V40 H40 V15 Z" stroke="var(--text-main)" stroke-width="6" stroke-linejoin="round"/>
+                    <path d="M0 50 H25 L35 30 L50 80 L65 50 H100" stroke="#0ea5e9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="85" cy="40" r="3" fill="#0ea5e9"/>
+                    <circle cx="85" cy="60" r="3" fill="#0ea5e9"/>
+                    <circle cx="60" cy="85" r="3" fill="#0ea5e9"/>
+                </svg>
+                <div class="brand-text">
+                    <span style="color: var(--text-main);">CLINICAL</span>
+                    <span style="color: var(--accent);">PHARMACY</span>
+                    <span style="color: var(--text-main);">TRACKER</span>
                 </div>
             </div>
+        </header>
 
-            <div class="dashboard-grid">
-                
-                <!-- ── LEFT COLUMN ──────────────────────────────────────────────── -->
-                <div class="left-column">
-                    
-                    <!-- Scanner Dropzone Section -->
-                    <div class="section-container">
-                        <div class="section-title">PREMIUM CAMERA & FILE UPLOAD DROPZONE</div>
-                        <div class="scanner-dropzone">
-                            <div class="scanner-icons">
-                                
-        <img src="assets/box.png" alt="Medicine Box" style="height:60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">
-        <img src="assets/camera.png" alt="Camera" style="height:60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">
-        <img src="assets/folder.png" alt="Folder" style="height:60px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">
-    
-                            </div>
-                            <div class="scanner-text">Scan Medicine Box or Upload Prescription.<br><span style="font-weight:500; opacity:0.7;">(Drag & drop or Click)</span></div>
-                            
-                            <div class="scanner-btn-group">
-                                <button class="scanner-btn" onclick="document.getElementById('ocrFile').click()">[+] Take Photo</button>
-                                <button class="scanner-btn" onclick="document.getElementById('ocrFile').click()">[ ] Upload File</button>
-                            </div>
-                            <input type="file" id="ocrFile" accept="image/*" style="display:none" onchange="handleOCRScan(this)">
-                        </div>
-                    </div>
-
-                    <!-- Simple Drug Logger Section -->
-                    <div class="section-container">
-                        <div class="section-title">SIMPLE DRUG LOGGER</div>
-                        <div class="card">
-                            <form onsubmit="handleAddDrug(event)">
-                                <div class="logger-row">
-                                    <div class="input-col">
-                                        <label>Drug Name</label>
-                                        <input type="text" id="drugInput" placeholder="Aspirin" required autocomplete="off">
-                                        <div id="drugSuggestions" class="premium-dropdown"></div>
-                                    </div>
-                                    <div class="input-col">
-                                        <label>Timestamp</label>
-                                        <div class="select-wrapper">
-                                            <select id="timeInput">
-                                                <option>10:30 AM</option>
-                                                <option>12:00 PM</option>
-                                                <option>02:15 PM</option>
-                                                <option>06:45 PM</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="input-col" style="justify-content: flex-end;">
-                                        <button type="submit" class="btn btn-cyan btn-add">[+] Add Drug</button>
-                                    </div>
-                                </div>
-                            </form>
-                            
-                            <div class="list-divider"></div>
-                            
-                            <ul class="drug-list" id="drugListUI">
-                                <!-- JS will populate this -->
-                                <li class="drug-item" style="color: var(--text-muted); justify-content: center; border: none;">No drugs logged yet.</li>
-                            </ul>
-                            
-                            <div class="list-footer">
-                                <div id="totalLoggedCount">0 DRUGS</div>
-                                <span class="clear-btn" onclick="clearProfile()">Clear List [X]</span>
-                            </div>
-                        </div>
-                    </div>
-
+        <!-- ── Patient Vitals Header ── -->
+        <div class="patient-vitals">
+            <div class="vital-group">
+                <div class="vital-item">
+                    <span class="vital-label">Patient Name</span>
+                    <span class="vital-value">Johnathon Doe</span>
                 </div>
-
-                <!-- ── RIGHT COLUMN ─────────────────────────────────────────────── -->
-                <div class="right-column">
-                    
-                    <!-- Live Results Section -->
-                    <div class="section-container">
-                        <div class="section-title">LIVE RESULTS & ANALYSIS</div>
-                        <div class="card card-center">
-                            <div class="gauge-title">SEVERITY WARNING GAUGE (1-10)</div>
-                            
-                            <div class="severity-gauge">
-                                <div class="severity-needle" id="gaugeNeedle" style="transform: rotate(-90deg);"></div>
-                            </div>
-                            
-                            <div class="severity-score" id="severityScore">0</div>
-                            <div class="severity-label" id="severityLabel">No Risk / Safe</div>
-                            
-                            <div id="interactionDetails" class="interaction-details">
-                                <!-- Dynamically populated by JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Anatomical Map Section -->
-                    <div class="section-container">
-                        <div class="section-title">3D ANATOMICAL ORGAN THREAT MAP</div>
-                        <div class="card card-center" style="padding: 0; overflow: hidden; background: linear-gradient(180deg, var(--card-bg) 0%, rgba(14,165,233,0.05) 100%);">
-                            <div class="anatomical-container">
-                                <!-- Human Torso SVG Wireframe -->
-                                <img src="assets/torso.png" alt="3D Organ Map" style="height:100%; width:100%; object-fit:contain; mix-blend-mode: var(--torso-blend, multiply); opacity: 0.9;">
-                                
-                                <div id="organThreats" class="threat-layer">
-                                    <!-- Heart -->
-                                    <div class="organ-blip blip-heart" id="blipHeart">
-                                        <div class="blip-glow bg-red"></div>
-                                        <div class="blip-badge badge-right">Heart<br><span class="text-red">High</span></div>
-                                    </div>
-                                    <!-- Liver -->
-                                    <div class="organ-blip blip-liver" id="blipLiver">
-                                        <div class="blip-glow bg-orange"></div>
-                                        <div class="blip-badge badge-left">Liver<br><span class="text-orange">Significant</span></div>
-                                    </div>
-                                    <!-- Kidneys -->
-                                    <div class="organ-blip blip-kidneys" id="blipKidneys">
-                                        <div class="blip-glow bg-yellow"></div>
-                                        <div class="blip-badge badge-left">Kidneys<br><span class="text-yellow">Moderate</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                <div class="vital-item">
+                    <span class="vital-label">Age</span>
+                    <span class="vital-value">42 YRS</span>
                 </div>
+                <div class="vital-item">
+                    <span class="vital-label">Weight</span>
+                    <span class="vital-value">185 LBS</span>
+                </div>
+            </div>
+            <div class="vital-status">
+                <div class="status-dot"></div>
+                LIVE BIOMETRIC SYNC
             </div>
         </div>
-</div>
+
+        <!-- ── Main Dashboard Grid ── -->
+        <div class="dashboard-grid">
+            
+            <!-- LEFT COLUMN (Input Zone) -->
+            <div class="col-stack">
+                
+                <!-- Simple Drug Logger -->
+                <div class="premium-card">
+                    <div class="card-header">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Simple Drug Logger
+                    </div>
+                    
+                    <form onsubmit="handleAddDrug(event)">
+                        <div class="logger-row">
+                            <div class="input-group">
+                                <label>DRUG NAME</label>
+                                <input type="text" id="drugInput" placeholder="e.g. Aspirin" required autocomplete="off">
+                                <div id="drugSuggestions" class="premium-dropdown"></div>
+                            </div>
+                            <div class="input-group">
+                                <label>TIMESTAMP</label>
+                                <select id="timeInput">
+                                    <option>08:00 AM</option>
+                                    <option>12:30 PM</option>
+                                    <option>06:00 PM</option>
+                                    <option>10:00 PM</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-premium">[+] Add</button>
+                        </div>
+                    </form>
+                    
+                    <ul class="drug-list" id="drugListUI">
+                        <!-- Populated by JS -->
+                        <li class="drug-item" style="color: var(--text-muted); justify-content: center; border: none;">No medications logged.</li>
+                    </ul>
+                    
+                    <div style="display:flex; justify-content: space-between; margin-top: 24px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 16px;">
+                        <span style="font-size:12px; font-weight:800; color:var(--text-muted);" id="totalLoggedCount">0 DRUGS</span>
+                        <span style="font-size:12px; font-weight:800; color:var(--text-muted); cursor:pointer;" onclick="clearProfile()">CLEAR LIST [X]</span>
+                    </div>
+                </div>
+
+                <!-- Premium Scanner Dropzone -->
+                <div class="premium-card">
+                    <div class="card-header">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Optical Prescription Scanner
+                    </div>
+                    
+                    <div class="premium-dropzone">
+                        <div class="asset-group">
+                            <img src="assets/box.png" alt="Box">
+                            <img src="assets/camera.png" alt="Camera" style="z-index: 2; transform: scale(1.1);">
+                            <img src="assets/folder.png" alt="Folder">
+                        </div>
+                        <div class="dropzone-text">Scan Medicine Box or Upload Prescription</div>
+                        <div class="dropzone-sub">Drag & drop or select an action below</div>
+                        
+                        <div class="btn-group">
+                            <button class="btn-secondary" onclick="document.getElementById('ocrFile').click()">[+] Take Photo</button>
+                            <button class="btn-secondary" onclick="document.getElementById('ocrFile').click()">[ ] Browse Files</button>
+                        </div>
+                        <input type="file" id="ocrFile" accept="image/*" style="display:none" onchange="handleOCRScan(this)">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (Analysis Zone) -->
+            <div class="col-stack">
+                
+                <!-- Live Results Gauge -->
+                <div class="premium-card">
+                    <div class="card-header" style="justify-content: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        Live Severity Analysis (1-10)
+                    </div>
+                    
+                    <div class="gauge-container">
+                        <div class="severity-gauge">
+                            <div class="severity-needle" id="gaugeNeedle" style="transform: rotate(-90deg);"></div>
+                        </div>
+                        
+                        <div class="severity-score" id="severityScore">0</div>
+                        <div class="severity-label" id="severityLabel">No Risk / Safe</div>
+                    </div>
+                    
+                    <div id="interactionDetails" class="interaction-details">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- 3D Anatomical Threat Map -->
+                <div class="premium-card" style="padding: 24px;">
+                    <div class="card-header" style="justify-content: center; margin-bottom: 16px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        3D Anatomical Threat Map
+                    </div>
+                    
+                    <div class="anatomy-viewport">
+                        <img src="assets/torso.png" alt="3D Organ Map">
+                        
+                        <div id="organThreats" class="threat-layer">
+                            <div class="organ-blip blip-heart" id="blipHeart">
+                                <div class="blip-glow bg-red"></div>
+                                <div class="blip-badge badge-right">Heart<br><span style="color:#ef4444">High</span></div>
+                            </div>
+                            <div class="organ-blip blip-liver" id="blipLiver">
+                                <div class="blip-glow bg-orange"></div>
+                                <div class="blip-badge badge-left">Liver<br><span style="color:#f97316">Significant</span></div>
+                            </div>
+                            <div class="organ-blip blip-kidneys" id="blipKidneys">
+                                <div class="blip-glow bg-yellow"></div>
+                                <div class="blip-badge badge-left">Kidneys<br><span style="color:#eab308">Moderate</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 <script>
 /* =========================================================================
    Single-Page Clinical Engine Logic
