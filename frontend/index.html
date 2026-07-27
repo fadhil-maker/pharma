@@ -414,6 +414,42 @@
                     <div class="card-header" style="justify-content: space-between;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Patient Biometric Parameters</span>
+                        </div>
+                    </div>
+
+                    <div class="patient-vertical-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                            <!-- 1. Age -->
+                            <div class="input-group">
+                                <label>AGE (YEARS)</label>
+                                <input type="number" id="patientAgeInput" placeholder="e.g. 35" min="1" max="120" onchange="analyzeInteractions()">
+                            </div>
+
+                            <!-- 2. Gender -->
+                            <div class="input-group">
+                                <label>GENDER</label>
+                                <select id="patientGenderInput" onchange="analyzeInteractions()">
+                                    <option value="" disabled selected>Select Gender</option>
+                                    <option value="MALE">Male</option>
+                                    <option value="FEMALE">Female</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- 3. Weight -->
+                            <div class="input-group">
+                                <label>WEIGHT (LBS)</label>
+                                <input type="number" id="patientWeightInput" placeholder="e.g. 180" min="1" max="500" onchange="analyzeInteractions()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card">
+                    <div class="card-header" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <span>Patient Demographics & Vitals</span>
                         </div>
                         <div class="vital-status">
@@ -795,8 +831,32 @@ async function analyzeInteractions() {
         console.warn("API unavailable, falling back to local clinical rules database:", e);
     }
 
+    // Read Age, Gender, Weight
+    const ageVal = parseInt(document.getElementById('patientAgeInput').value) || 35;
+    const genderVal = document.getElementById('patientGenderInput').value || 'MALE';
+    const weightVal = parseInt(document.getElementById('patientWeightInput').value) || 180;
+
     // Local Fallback Rules Engine if API returned empty or failed
     if (warnings.length === 0 && intakes.length >= 2) {
+        // Age / Weight / Gender specific risk adjustments
+        if (ageVal > 65) {
+            warnings.push({
+                drug_a: 'GERIATRIC RISK WARNING',
+                drug_b: 'Age ' + ageVal + ' Yrs',
+                severity: 'High',
+                reaction: 'Elevated risk of impaired hepatic/renal clearance in patients over 65. Drug half-life extended.',
+                remedy: 'Reduce standard dosage by 25-50% and monitor renal clearance.'
+            });
+        }
+        if (weightVal < 110) {
+            warnings.push({
+                drug_a: 'LOW BODY WEIGHT WARNING',
+                drug_b: weightVal + ' lbs',
+                severity: 'Moderate',
+                reaction: 'Volume of distribution reduced for lipophilic medications due to low body weight.',
+                remedy: 'Adjust mg/kg dosage calculation.'
+            });
+        }
         const names = intakes.map(i => i.drug_name.toLowerCase());
         
         // Known Clinical Pair Check
