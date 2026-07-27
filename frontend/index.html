@@ -297,29 +297,90 @@
 </head>
 <body>
 
-        <!-- Sleek Enterprise Theme Switcher -->
-    <div class="theme-switch-container" onclick="toggleTheme()" title="Toggle Theme" style="position: absolute; top: 32px; right: 5%; z-index: 1000; cursor: pointer;">
-        <div class="theme-switch-glass">
-            <span id="themeIcon">☀️</span>
-            <span id="themeLabel" style="font-size: 13px; font-weight: 700; color: var(--text-main);">Light</span>
+        <!-- ── Interactive Hanging Light-Pull Theme Switcher ── -->
+    <div id="hangingLampToggle" class="hanging-lamp-container" onclick="triggerLampPull()" title="Pull to toggle Light/Dark Mode">
+        <!-- Hanging Silver Cord -->
+        <div class="lamp-cord"></div>
+        
+        <!-- Hanging Pendant Bulb -->
+        <div class="lamp-bulb">
+            <span id="lampThemeIcon" class="bulb-icon">☀️</span>
+            <span id="lampThemeText" class="bulb-label">LIGHT</span>
         </div>
     </div>
+
     <style>
-        .theme-switch-glass {
+        .hanging-lamp-container {
+            position: fixed;
+            top: 0;
+            right: 60px;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: top center;
+            animation: pendulumSway 6s infinite ease-in-out;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .lamp-cord {
+            width: 2px;
+            height: 55px;
+            background: linear-gradient(180deg, rgba(14,165,233,0.8) 0%, rgba(100,116,139,0.5) 100%);
+            box-shadow: 0 0 5px rgba(14,165,233,0.3);
+        }
+
+        .lamp-bulb {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid var(--card-border);
             padding: 8px 16px;
-            border-radius: 30px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: var(--shadow-soft);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.8);
             transition: all 0.3s ease;
         }
-        .theme-switch-glass:hover {
-            transform: translateY(-2px);
+
+        .lamp-bulb:hover {
+            transform: scale(1.08);
             border-color: var(--accent);
+            box-shadow: 0 15px 30px rgba(14,165,233,0.25);
+        }
+
+        .bulb-icon {
+            font-size: 16px;
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.26, 1.55);
+        }
+
+        .bulb-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        /* Swaying Pendulum Animation */
+        @keyframes pendulumSway {
+            0% { transform: rotate(2.5deg); }
+            50% { transform: rotate(-2.5deg); }
+            100% { transform: rotate(2.5deg); }
+        }
+
+        /* Pull Cord Spring Animation */
+        .lamp-pulling {
+            animation: pullSpring 0.4s cubic-bezier(0.68, -0.55, 0.26, 1.55) !important;
+        }
+
+        @keyframes pullSpring {
+            0% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(22px) scaleY(1.15); }
+            100% { transform: translateY(0) scaleY(1); }
         }
     </style>
 
