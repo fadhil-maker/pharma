@@ -564,15 +564,13 @@ function handleSavePatientForm(e) {
 function loadVitals() {
     const vitals = JSON.parse(localStorage.getItem('patientVitals'));
     if (vitals) {
-        document.getElementById('patientNameInput').value = vitals.name || 'John Doe';
-        document.getElementById('patientAgeInput').value = vitals.age || '35';
-        document.getElementById('patientGenderInput').value = vitals.gender || 'MALE';
-        document.getElementById('patientWeightInput').value = vitals.weight || '180';
+        if(vitals.name) document.getElementById('patientNameInput').value = vitals.name;
+        if(vitals.age) document.getElementById('patientAgeInput').value = vitals.age;
+        if(vitals.gender) document.getElementById('patientGenderInput').value = vitals.gender;
+        if(vitals.weight) document.getElementById('patientWeightInput').value = vitals.weight;
+        document.getElementById('patientStatusText').textContent = 'Profile Loaded';
     } else {
-        document.getElementById('patientNameInput').value = 'John Doe';
-        document.getElementById('patientAgeInput').value = '35';
-        document.getElementById('patientGenderInput').value = 'MALE';
-        document.getElementById('patientWeightInput').value = '180';
+        document.getElementById('patientStatusText').textContent = 'Enter Details';
     }
     
     // Load theme
