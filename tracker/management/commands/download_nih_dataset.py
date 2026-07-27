@@ -9,10 +9,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write("Connecting to official U.S. National Library of Medicine (NIH) RxNav API...")
         
-        # Official NIH RxNav API Endpoint for Clinical Drug Interactions
-        # Target RxCUIs for high-impact drug concepts (Warfarin, Aspirin, Methotrexate, Ibuprofen, Enoxaparin, Ketorolac, etc.)
-        target_rxcuis = ["11289", "1191", "6809", "5640", "160394", "6135", "6448", "3443", "9384", "6960"]
-        
+        # Official NIH RxNav REST API Endpoint for Clinical Drug Interactions
+        # RxCUIs: 207106 (Fluoxetine), 152923 (Aspirin), 11289 (Warfarin), 6809 (Methotrexate), 5640 (Ibuprofen)
+        target_rxcuis = ["207106", "152923", "11289", "6809", "5640"]
         api_interactions = []
         
         try:
