@@ -39,7 +39,7 @@
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.5);
         }
         
-        body { background: var(--bg-page); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; display: block; }
+        body { background: var(--bg-page); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; margin: 0; display: block; overflow-x: hidden; }
         
         /* The App Window */
         .app-window {
@@ -60,7 +60,7 @@
         
         .pill-toggle-container { cursor: pointer; padding: 4px; padding-right: 12px; gap: 8px; border-radius: 12px; background: var(--bg-page); display: flex; align-items: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         
-        .app-content { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+        .app-content { padding: 40px 5%; max-width: 1600px; margin: 0 auto; }
         
         /* Brand Logo */
         .app-header { margin-bottom: 40px; }
@@ -193,7 +193,6 @@
                     </div>
                 </div>
             </div>
-            </div>
 
             <div class="dashboard-grid">
                 
@@ -319,7 +318,8 @@
                 </div>
             </div>
         </div>
-    <script>
+</div>
+<script>
 /* =========================================================================
    Single-Page Clinical Engine Logic
    ========================================================================= */
