@@ -60,7 +60,7 @@ class Command(BaseCommand):
         for i in range(len(ingredients)):
             for j in range(i + 1, len(ingredients)):
                 d1, d2 = ingredients[i], ingredients[j]
-                rx_obj, rem, sev, mask = categories[count % len(categories)]
+                rx_obj, rem, sev, mask = rx_objs[count % len(rx_objs)]
                 
                 interactions_to_create.append(
                     Interaction(
