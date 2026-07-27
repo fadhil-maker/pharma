@@ -313,7 +313,7 @@
         .hanging-lamp-container {
             position: fixed;
             top: 0;
-            right: 60px;
+            right: 25px;
             z-index: 1000;
             cursor: pointer;
             display: flex;
@@ -624,7 +624,7 @@ function handleSaveVitalsForm(e) {
     document.getElementById('vitalGender').textContent = vitals.gender;
     document.getElementById('vitalWeight').textContent = vitals.weight;
     
-    localStorage.setItem('patientVitals', JSON.stringify(vitals));
+    // localStorage.setItem('patientVitals', JSON.stringify(vitals));
     closeVitalsModal();
 }
 
@@ -636,7 +636,7 @@ function handleSavePatientForm(e) {
         gender: document.getElementById('patientGenderInput').value || 'MALE',
         weight: document.getElementById('patientWeightInput').value.trim() || '180'
     };
-    localStorage.setItem('patientVitals', JSON.stringify(vitals));
+    // localStorage.setItem('patientVitals', JSON.stringify(vitals));
     document.getElementById('patientStatusText').textContent = 'Profile Saved';
     setTimeout(() => {
         document.getElementById('patientStatusText').textContent = 'Profile Active';
@@ -644,16 +644,13 @@ function handleSavePatientForm(e) {
 }
 
 function loadVitals() {
-    const vitals = JSON.parse(localStorage.getItem('patientVitals'));
-    if (vitals) {
-        if(vitals.name) document.getElementById('patientNameInput').value = vitals.name;
-        if(vitals.age) document.getElementById('patientAgeInput').value = vitals.age;
-        if(vitals.gender) document.getElementById('patientGenderInput').value = vitals.gender;
-        if(vitals.weight) document.getElementById('patientWeightInput').value = vitals.weight;
-        document.getElementById('patientStatusText').textContent = 'Profile Loaded';
-    } else {
-        document.getElementById('patientStatusText').textContent = 'Enter Details';
-    }
+    // Keep form inputs 100% blank & empty by default (no prefilled data!)
+    document.getElementById('patientNameInput').value = '';
+    document.getElementById('patientAgeInput').value = '';
+    document.getElementById('patientGenderInput').selectedIndex = 0;
+    document.getElementById('patientWeightInput').value = '';
+    document.getElementById('patientStatusText').textContent = 'Enter Details';
+}
     
     // Load theme
     const theme = localStorage.getItem('theme');
