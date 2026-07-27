@@ -106,6 +106,13 @@ class Command(BaseCommand):
         interactions_to_create = []
         count = 0
         target_count = 64825
+        
+        # Build a lookup dictionary for exact matches
+        exact_match_rules = {}
+        for idx, (da, db, sev, text, rem, mask) in enumerate(clinical_rules_template):
+            # Both directions
+            exact_match_rules[f"{da}_{db}"] = idx
+            exact_match_rules[f"{db}_{da}"] = idx
 
         stop = False
         for i in range(len(drugs)):
@@ -117,20 +124,27 @@ class Command(BaseCommand):
                 
                 d1, d2 = drugs[i], drugs[j]
                 
-                # Pick rule template dynamically based on index to distribute severities 1 to 10 accurately
-                template = clinical_rules_template[count % len(clinical_rules_template)]
+                # Check if this exact pair has a strict clinical rule
+                pair_key = f"{d1}_{d2}"
+                if pair_key in exact_match_rules:
+                    rule_idx = exact_match_rules[pair_key]
+                else:
+                    # Otherwise distribute the rules to the remaining 64,000 concept pairs
+                    rule_idx = count % len(clinical_rules_template)
+                
+                template = clinical_rules_template[rule_idx]
                 _, _, sev, text, rem, mask = template
-                rx_obj = rx_objs[count % len(rx_objs)][0]
+                rx_obj = rx_objs[rule_idx][0]
                 
                 interactions_to_create.append(
                     Interaction(
                         drug_a=d1,
                         drug_b=d2,
                         reaction=rx_obj,
-                        severity_slider=sev, # Exact Clinical Severity 1 to 10
+                        severity_slider=sev, 
                         remedy=rem,
                         organ_bitmask=mask,
-                        custom_factors={'max_age': 6} if d2 == 'codeine' else {}
+                        custom_factors={'max_age': 6} if 'codeine' in (d1, d2) else {}
                     )
                 )
                 count += 1
