@@ -128,14 +128,25 @@ class Command(BaseCommand):
                 pair_key = f"{d1}_{d2}"
                 if pair_key in exact_match_rules:
                     rule_idx = exact_match_rules[pair_key]
+                    template = clinical_rules_template[rule_idx]
+                    sev = template[2]
+                    rx_obj = rx_objs[rule_idx][0]
+                    rem = template[4]
+                    mask = template[5]
                 else:
-                    # Otherwise distribute the rules to the remaining 64,000 concept pairs
-                    rule_idx = count % len(clinical_rules_template)
-                
-                template = clinical_rules_template[rule_idx]
-                _, _, sev, text, rem, mask = template
-                rx_obj = rx_objs[rule_idx][0]
-                
+                    # If both are REAL drugs but we didn't define a severe rule for them, they must be safe.
+                    if not d1.startswith('concept_') and not d2.startswith('concept_'):
+                        sev = 1
+                        rx_obj, _ = ReactionDefinition.objects.get_or_create(name="Routine clinical monitoring recommended. No severe conflict established.")
+                        rem = "Standard dosing."
+                        mask = 0
+                    else:
+                        # Dummy 'concept' drugs get a cyclic mix of severities (1-10) for UI dashboard testing
+                        sev = (count % 10) + 1
+                        rx_obj, _ = ReactionDefinition.objects.get_or_create(name=f"Theoretical unclassified interaction profile for generic concept pair.")
+                        rem = "Monitor patient closely during initial administration."
+                        mask = count % 1024
+
                 interactions_to_create.append(
                     Interaction(
                         drug_a=d1,
