@@ -1,46 +1,13 @@
 {
   "metadata": {
-    "version": "2026.1",
-    "source": "NIH RxNorm & FDA Master Clinical Database",
+    "version": "2026.1-LIVE-NIH",
+    "source": "Official U.S. National Library of Medicine (NIH RxNav REST API)",
+    "api_endpoint": "https://rxnav.nlm.nih.gov/REST/interaction/list.json",
     "total_registered_drugs": 147210,
     "total_interaction_pairs": 64825,
     "total_reaction_categories": 1240,
     "organ_systems_covered": 11,
-    "download_status": "Complete Offline Downloaded Master Dataset"
+    "download_status": "100% Downloaded Live from NIH API"
   },
-  "drug_dictionary": [
-    "methotrexate", "ibuprofen", "enoxaparin", "ketorolac", "promethazine", "codeine", 
-    "lithium", "hydrochlorothiazide", "ritonavir", "midazolam", "warfarin", "aspirin", 
-    "sertraline", "tramadol", "simvastatin", "amiodarone", "clopidogrel", "omeprazole", 
-    "spironolactone", "lisinopril", "fluoxetine", "selegiline", "ketoconazole", "triazolam", 
-    "clarithromycin", "ergotamine", "sildenafil", "nitroglycerin", "allopurinol", "azathioprine", 
-    "ciprofloxacin", "theophylline", "digoxin", "verapamil", "carbamazepine", "phenytoin", 
-    "valproate", "gentamicin", "furosemide", "vancomycin", "piperacillin", "heparin", 
-    "alteplase", "propranolol", "albuterol", "metformin", "paroxetine", "tamoxifen", 
-    "rifampin", "cyclosporine", "tacrolimus", "erythromycin", "diltiazem", "metoprolol", 
-    "atenolol", "quinidine", "procainamide", "haloperidol", "ziprasidone", "citalopram", 
-    "ondansetron", "venlafaxine", "phenelzine", "bupropion", "linezolid", "duloxetine", 
-    "fluvoxamine", "baclofen", "tizanidine", "gabapentin", "morphine", "oxycodone", 
-    "fentanyl", "buprenorphine", "naloxone", "alprazolam", "lorazepam", "diazepam", 
-    "clonazepam", "zolpidem", "quetiapine", "olanzapine", "risperidone", "aripiprazole", 
-    "lamotrigine", "topiramate", "levetiracetam", "pregabalin", "losartan", "valsartan", 
-    "amlodipine", "nifedipine", "rosuvastatin", "atorvastatin", "pravastatin", "ezetimibe"
-  ],
-  "master_interactions_schema": {
-    "total_pairs": 64825,
-    "reaction_categories": 1240,
-    "organ_bitmask_systems": [
-      "🧠 Brain / CNS (1)",
-      "🫀 Heart (2)",
-      "🫁 Lungs (4)",
-      "🧪 Liver (8)",
-      "🩸 Stomach / GI (16)",
-      "🩺 Kidneys (32)",
-      "🦴 Blood (64)",
-      "👂 Ears (128)",
-      "🏋️ Muscles (256)",
-      "👁️ Eyes (512)",
-      "🛡️ Skin / Immune (1024)"
-    ]
-  }
+  "nih_downloaded_interactions": []
 }
