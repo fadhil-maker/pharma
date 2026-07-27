@@ -281,3 +281,26 @@ def check_timeline(request):
         'warnings': warnings,
         'intakes_processed': len(intakes)
     }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_drugs(request):
+    """
+    Searches the massive interaction database for unique drug names matching the query.
+    """
+    query = request.GET.get('q', '').strip().lower()
+    
+    if len(query) < 2:
+        return Response([])
+
+    # Fast indexed search on drug_a and drug_b
+    matches_a = Interaction.objects.filter(drug_a__icontains=query).values_list('drug_a', flat=True)
+    matches_b = Interaction.objects.filter(drug_b__icontains=query).values_list('drug_b', flat=True)
+    
+    # Combine and deduplicate
+    unique_drugs = set(matches_a).union(set(matches_b))
+    
+    # Convert to Title Case for UI presentation and return top 20 matches
+    formatted_drugs = sorted([d.title() for d in unique_drugs if query in d.lower()])[:20]
+    
+    return Response(formatted_drugs, status=status.HTTP_200_OK)

@@ -11,5 +11,6 @@ urlpatterns = [
     path('admin/interactions/create/', views.create_interaction, name='create_interaction'),
     path('admin/interactions/delete/', views.delete_interaction, name='delete_interaction'),
     
+        path('search-drugs/', views.search_drugs, name='search_drugs'),
     path('check-timeline/', views.check_timeline, name='check_timeline'),
 ]

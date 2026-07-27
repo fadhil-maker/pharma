@@ -714,39 +714,53 @@ document.addEventListener('DOMContentLoaded', () => { loadVitals(); setupAutocom
 
 
 // ── 3.5. Drug Autocomplete & Suggestions ──────────────────────────────────
-const commonClinicalDrugs = ["Abilify", "Acetaminophen", "Adderall", "Advil", "Albuterol", "Allopurinol", "Alprazolam", "Amiodarone", "Amitriptyline", "Amlodipine", "Amoxicillin", "Amphetamine", "Apixaban", "Aripiprazole", "Aspirin", "Atenolol", "Atorvastatin", "Azithromycin", "Baclofen", "Benadryl", "Benzonatate", "Bisoprolol", "Brilinta", "Budesonide", "Buprenorphine", "Bupropion", "Buspirone", "Carbamazepine", "Carvedilol", "Cefdinir", "Celebrex", "Celecoxib", "Cephalexin", "Cetirizine", "Ciprofloxacin", "Citalopram", "Clindamycin", "Clonazepam", "Clonidine", "Clopidogrel", "Codeine", "Colchicine", "Coumadin", "Crestor", "Cyclobenzaprine", "Cymbalta", "Dabigatran", "Depakote", "Desyrel", "Dexamethasone", "Diazepam", "Diclofenac", "Digoxin", "Diltiazem", "Diphenhydramine", "Divalproex", "Donepezil", "Doxazosin", "Doxycycline", "Duloxetine", "Effexor", "Eliquis", "Enalapril", "Enoxaparin", "Escitalopram", "Esomeprazole", "Estradiol", "Ezetimibe", "Famotidine", "Fentanyl", "Finasteride", "Flecainide", "Fluconazole", "Fluoxetine", "Fluticasone", "Folic Acid", "Furosemide", "Gabapentin", "Glimepiride", "Glipizide", "Glyburide", "Guaifenesin", "Haldol", "Haloperidol", "Heparin", "Humalog", "Humira", "Hydrochlorothiazide", "Hydrocodone", "Hydromorphone", "Hydroxychloroquine", "Hydroxyzine", "Ibuprofen", "Insulin Glargine", "Invokana", "Ipratropium", "Irbesartan", "Januvia", "Jardiance", "Keppra", "Ketamine", "Ketorolac", "Klonopin", "Lamictal", "Lamotrigine", "Lansoprazole", "Lantus", "Lasix", "Latanoprost", "Levaquin", "Levetiracetam", "Levocetirizine", "Levofloxacin", "Levothyroxine", "Lexapro", "Lidocaine", "Linezolid", "Lipitor", "Lisinopril", "Lithium", "Loperamide", "Loratadine", "Lorazepam", "Losartan", "Lovastatin", "Lyrica", "Meloxicam", "Metformin", "Methadone", "Methocarbamol", "Methotrexate", "Methylphenidate", "Methylprednisolone", "Metoprolol", "Metronidazole", "Midazolam", "Mirtazapine", "Mobic", "Montelukast", "Morphine", "Motrin", "Mupirocin", "Naproxen", "Narcan", "Naloxone", "Neurontin", "Nifedipine", "Nitrofurantoin", "Nitroglycerin", "Nortriptyline", "Novolog", "Olanzapine", "Omeprazole", "Ondansetron", "Oxycodone", "Oxycontin", "Ozempic", "Pantoprazole", "Paracetamol", "Paroxetine", "Paxil", "Penicillin", "Pepcid", "Percocet", "Phenergan", "Phenobarbital", "Phenytoin", "Pioglitazone", "Plavix", "Potassium Chloride", "Pradaxa", "Pravastatin", "Prednisone", "Pregabalin", "Prilosec", "Pristiq", "Promethazine", "Propanolol", "Propranolol", "Protonix", "Prozac", "Pseudoephedrine", "Quetiapine", "Ramipril", "Ranitidine", "Remeron", "Restoril", "Rifaximin", "Risperdal", "Risperidone", "Ritalin", "Ritonavir", "Rivaroxaban", "Ropinirole", "Rosuvastatin", "Seroquel", "Sertraline", "Sildenafil", "Simvastatin", "Singulair", "Sitagliptin", "Spironolactone", "Suboxone", "Sucralfate", "Sulfamethoxazole", "Sumatriptan", "Symbicort", "Synthroid", "Tadalafil", "Tamsulosin", "Temazepam", "Terazosin", "Testosterone", "Tizanidine", "Topamax", "Topiramate", "Toradol", "Tramadol", "Trazodone", "Trimethoprim", "Trintellix", "Tylenol", "Ultram", "Valacyclovir", "Valium", "Valsartan", "Vancomycin", "Venlafaxine", "Ventolin", "Verapamil", "Viagra", "Vicodin", "Vitamin D3", "Vyvanse", "Warfarin", "Wellbutrin", "Xanax", "Xarelto", "Zanaflex", "Zantac", "Zithromax", "Zocor", "Zoft", "Zolpidem", "Zoloft", "Zyprexa", "Zyrtec"];
 
-function setupAutocomplete() {
+let searchTimeout;
+
+async function setupAutocomplete() {
     const input = document.getElementById('drugInput');
     const suggestionsBox = document.getElementById('drugSuggestions');
     if (!input || !suggestionsBox) return;
 
     input.addEventListener('input', function() {
         const val = this.value.toLowerCase().trim();
+        
+        clearTimeout(searchTimeout);
         suggestionsBox.innerHTML = '';
-        if (!val) {
+        
+        if (val.length < 2) {
             suggestionsBox.style.display = 'none';
             return;
         }
 
-        const matches = commonClinicalDrugs.filter(d => d.toLowerCase().includes(val));
-        if (matches.length > 0) {
-            suggestionsBox.style.display = 'block';
-            matches.forEach(match => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = match;
-                div.onclick = function() {
-                    input.value = match;
-                    suggestionsBox.style.display = 'none';
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/search-drugs/?q=${val}`);
+                if (!res.ok) return;
+                const matches = await res.json();
+                
+                if (matches && matches.length > 0) {
                     suggestionsBox.innerHTML = '';
-                    input.focus();
-                };
-                suggestionsBox.appendChild(div);
-            });
-        } else {
-            suggestionsBox.style.display = 'none';
-        }
+                    suggestionsBox.style.display = 'block';
+                    matches.forEach(match => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = match;
+                        div.onclick = function() {
+                            input.value = match;
+                            suggestionsBox.style.display = 'none';
+                            suggestionsBox.innerHTML = '';
+                            input.focus();
+                        };
+                        suggestionsBox.appendChild(div);
+                    });
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            } catch(e) {
+                console.warn('Search API offline', e);
+            }
+        }, 250); // 250ms debounce
     });
 
     // Close dropdown when clicking outside
@@ -871,157 +885,64 @@ async function analyzeInteractions() {
     }
     if(gauge) gauge.style.transform = `rotate(-90deg)`;
 
-    if (intakes.length === 0) return;
+    if (intakes.length < 2) return;
 
     let warnings = [];
 
-    // Try API first if 2 or more drugs
-    if (intakes.length >= 2) {
-        try {
-            const res = await fetch(`${API_BASE}/api/check-timeline/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ intakes: intakes })
-            });
-            if(res.ok) {
-                const data = await res.json();
-                warnings = data.warnings || [];
-            }
-        } catch(e) {
-            console.warn("API unavailable, falling back to local clinical rules database:", e);
+    // Query 100% accurate Django Backend
+    try {
+        const res = await fetch(`${API_BASE}/api/check-timeline/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ intakes: intakes })
+        });
+        if(res.ok) {
+            const data = await res.json();
+            warnings = data.warnings || [];
         }
-    }
-
-    // Read Age, Gender, Weight safely
-    const ageInput = document.getElementById('patientAgeInput');
-    const genderInput = document.getElementById('patientGenderInput');
-    const weightInput = document.getElementById('patientWeightInput');
-    
-    const ageVal = ageInput && ageInput.value ? parseInt(ageInput.value) : 35;
-    const genderVal = genderInput && genderInput.value ? genderInput.value : 'MALE';
-    const weightVal = weightInput && weightInput.value ? parseInt(weightInput.value) : 180;
-
-    let targetOrgans = new Set();
-
-    // Biometric & Drug Fallback Rules Engine
-    if (intakes.length > 0) {
-        if (ageVal > 65) {
-            warnings.push({
-                drug_a: 'GERIATRIC RISK WARNING',
-                drug_b: 'Age ' + ageVal + ' Yrs',
-                severity: 'High',
-                reaction: 'Elevated risk of impaired hepatic/renal clearance in patients over 65.',
-                remedy: 'Reduce standard dosage by 25-50% and monitor renal clearance.'
-            });
-            targetOrgans.add('Kidneys'); targetOrgans.add('Liver');
-        }
-        if (weightVal < 110) {
-            warnings.push({
-                drug_a: 'LOW BODY WEIGHT WARNING',
-                drug_b: weightVal + ' lbs',
-                severity: 'Moderate',
-                reaction: 'Volume of distribution reduced for lipophilic medications due to low body weight.',
-                remedy: 'Adjust mg/kg dosage calculation.'
-            });
-            targetOrgans.add('Heart');
-        }
-        
-        if (warnings.length === 0 && intakes.length >= 2) {
-            const names = intakes.map(i => i.drug_name.toLowerCase());
-            
-            if ((names.includes('aspirin') || names.includes('advil')) && (names.includes('warfarin') || names.includes('coumadin') || names.includes('plavix'))) {
-                warnings.push({
-                    drug_a: 'Aspirin / NSAID',
-                    drug_b: 'Warfarin / Anticoagulant',
-                    severity: 'High',
-                    reaction: 'Synergistic antiplatelet and anticoagulant inhibition. Severe risk of major gastrointestinal hemorrhage.',
-                    remedy: 'Avoid concurrent use. Monitor INR closely or substitute with acetaminophen.'
-                });
-                targetOrgans.add('Stomach'); targetOrgans.add('Intestines');
-            } else if (names.includes('ibuprofen') && names.includes('aspirin')) {
-                warnings.push({
-                    drug_a: 'Ibuprofen',
-                    drug_b: 'Aspirin',
-                    severity: 'Moderate',
-                    reaction: 'Competitive COX-1 binding. Ibuprofen interferes with cardioprotective antiplatelet effect.',
-                    remedy: 'Take low-dose aspirin at least 30 minutes before or 8 hours after ibuprofen.'
-                });
-                targetOrgans.add('Heart'); targetOrgans.add('Stomach');
-            } else if (names.includes('methotrexate') && (names.includes('ibuprofen') || names.includes('aspirin'))) {
-                warnings.push({
-                    drug_a: 'Methotrexate',
-                    drug_b: 'NSAID',
-                    severity: 'High',
-                    reaction: 'Reduced renal clearance of methotrexate leading to severe bone marrow suppression and hepatic toxicity.',
-                    remedy: 'Discontinue NSAID and switch to safer analgesics.'
-                });
-                targetOrgans.add('Liver'); targetOrgans.add('Kidneys');
-            } else if (names.includes('codeine') || names.includes('midazolam')) {
-                warnings.push({
-                    drug_a: 'CNS Depressant',
-                    drug_b: intakes.find(i => i.drug_name.toLowerCase() !== 'codeine' && i.drug_name.toLowerCase() !== 'midazolam')?.drug_name.toUpperCase() || 'Other',
-                    severity: 'High',
-                    reaction: 'Risk of profound sedation, respiratory depression, coma, and death.',
-                    remedy: 'Limit dosages and durations to the minimum required.'
-                });
-                targetOrgans.add('Brain'); targetOrgans.add('Lungs');
-            } else if (names.includes('lisinopril') || names.includes('hydrochlorothiazide')) {
-                 warnings.push({
-                    drug_a: 'Antihypertensive',
-                    drug_b: 'Other',
-                    severity: 'Moderate',
-                    reaction: 'Potential for hyperkalemia and acute renal failure.',
-                    remedy: 'Monitor potassium levels and renal function.'
-                });
-                targetOrgans.add('Heart'); targetOrgans.add('Kidneys');
-            } else {
-                // Dynamic pseudo-random fallback based on drug names so it doesn't always show Moderate + Liver/Bladder!
-                const combined = intakes[0].drug_name.toUpperCase() + intakes[1].drug_name.toUpperCase();
-                let hash = 0;
-                for (let i = 0; i < combined.length; i++) hash = combined.charCodeAt(i) + ((hash << 5) - hash);
-                hash = Math.abs(hash);
-
-                const severities = ['Low', 'Moderate', 'High'];
-                const chosenSev = severities[hash % 3];
-
-                const allO = ['Brain', 'Thyroid', 'Lungs', 'Heart', 'Liver', 'Stomach', 'Spleen', 'Pancreas', 'Kidneys', 'Intestines', 'Bladder'];
-                targetOrgans.add(allO[hash % allO.length]);
-                targetOrgans.add(allO[(hash + 3) % allO.length]);
-
-                let rx = 'Potential CYP450 hepatic enzyme competition and altered renal clearance window.';
-                if (chosenSev === 'High') rx = 'Synergistic physiological stress increasing risk of organ toxicity.';
-                else if (chosenSev === 'Low') rx = 'Minor metabolic interference observed in some clinical trials.';
-
-                warnings.push({
-                    drug_a: intakes[0].drug_name.toUpperCase(),
-                    drug_b: intakes[1].drug_name.toUpperCase(),
-                    severity: chosenSev,
-                    reaction: rx,
-                    remedy: 'Stagger administration times by at least 2 to 4 hours and monitor for elevated serum concentrations.'
-                });
-            }
-        }
+    } catch(e) {
+        console.warn("API unavailable:", e);
     }
 
     let maxSev = 0;
     let sevLabel = "No Risk / Safe";
     let sevColor = "var(--text-muted)";
+    let targetOrgans = new Set();
     
     if (warnings.length > 0) {
         if(detailsUI) detailsUI.style.display = 'block';
-        const hasHigh = warnings.some(w => w.severity === 'High');
-        if (hasHigh) {
-            maxSev = 8;
+        
+        // Find highest severity rule
+        warnings.forEach(w => {
+            const s = parseInt(w.severity) || 5;
+            if (s > maxSev) maxSev = s;
+            
+            // Decode 11-Organ Bitmask perfectly from Django!
+            let mask = parseInt(w.organ_bitmask) || 0;
+            if (mask === 0 && s >= 5) {
+                // If backend rule forgot to assign organs, default to clearance organs safely
+                targetOrgans.add('Liver'); targetOrgans.add('Kidneys');
+            } else {
+                for (let i = 0; i < allOrgans.length; i++) {
+                    if ((mask & (1 << i)) !== 0) {
+                        targetOrgans.add(allOrgans[i]);
+                    }
+                }
+            }
+        });
+
+        if (maxSev >= 8) {
             sevLabel = "HIGH RISK / SEVERE";
             sevColor = "#ef4444";
-        } else {
-            maxSev = 5;
+        } else if (maxSev >= 4) {
             sevLabel = "MODERATE RISK";
             sevColor = "#f97316";
+        } else {
+            sevLabel = "MILD RISK";
+            sevColor = "#eab308";
         }
         
         // Light up the target organs!
-        if (targetOrgans.size === 0) { targetOrgans.add('Liver'); targetOrgans.add('Kidneys'); }
         targetOrgans.forEach(o => {
             const el = document.getElementById('blip' + o);
             if (el) el.style.display = 'block';
@@ -1039,8 +960,8 @@ async function analyzeInteractions() {
     
     if(detailsUI) {
         detailsUI.innerHTML = warnings.map(w => `
-            <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity === 'High' ? '#ef4444' : '#f97316'}; margin-bottom: 16px;">
-                <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a} + ${w.drug_b}</div>
+            <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity >= 8 ? '#ef4444' : (w.severity >= 4 ? '#f97316' : '#eab308')}; margin-bottom: 16px;">
+                <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a.toUpperCase()} + ${w.drug_b.toUpperCase()}</div>
                 <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Cause:</strong> ${w.reaction}</div>
                 <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy Suggestion:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
             </div>
