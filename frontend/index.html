@@ -1,123 +1,595 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharma Clinical Tracker — Clean Starter</title>
+    <title>Pharma Clinical Tracker — Single-Page Open-Source Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --border: rgba(148, 163, 184, 0.15);
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --radius: 16px;
+            /* Light Theme (Primary Default) */
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #0d9488;
+            --accent-glow: rgba(13, 148, 136, 0.15);
+            --danger: #dc2626;
+            --danger-bg: rgba(220, 38, 38, 0.08);
+            --warning: #d97706;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        [data-theme="dark"] {
+            /* Dark Theme (Hanging Toggle) */
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-border: rgba(148, 163, 184, 0.15);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
 
         body {
-            background-color: var(--bg);
+            background: var(--bg-gradient);
             color: var(--text-main);
             min-height: 100vh;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 24px;
         }
 
-        .container {
-            max-width: 800px;
+        .app-container {
+            max-width: 1000px;
             width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            border-radius: var(--radius);
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            text-align: center;
         }
 
-        .logo-badge {
-            display: inline-flex;
+        /* ── Top Header & Hanging Theme Toggle ────────────────────────────── */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Hanging Pill Theme Toggle */
+        .theme-toggle-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 999px;
-            color: var(--accent);
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--text-main);
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--accent);
+        }
+
+        /* ── Hero Section ─────────────────────────────────────────────────── */
+        .hero-card {
+            text-align: center;
             margin-bottom: 24px;
         }
 
-        h1 {
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
             font-size: 32px;
             font-weight: 800;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
         }
 
-        p {
+        .hero-subtitle {
             color: var(--text-muted);
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 32px;
+            font-size: 15px;
         }
 
-        .status-box {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            font-family: monospace;
-            font-size: 13px;
-            color: #38bdf8;
-            text-align: left;
+        /* ── Cards & Containers ────────────────────────────────────────────── */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
             margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
         }
 
-        footer {
-            margin-top: 32px;
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ── Scanner Dropzone ─────────────────────────────────────────────── */
+        .scanner-dropzone {
+            border: 2px dashed var(--accent);
+            background: var(--accent-glow);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .scanner-dropzone:hover {
+            opacity: 0.9;
+        }
+
+        .scanner-icon { font-size: 36px; margin-bottom: 8px; }
+        .scanner-text { font-weight: 700; font-size: 15px; }
+        .scanner-subtext { font-size: 12px; color: var(--text-muted); }
+
+        /* ── Form Inputs & Dynamic Dropdown ───────────────────────────────── */
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 180px 140px;
+            gap: 12px;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .input-group { grid-template-columns: 1fr; }
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; width: 100%; margin-top: 16px; font-size: 16px; padding: 16px; }
+
+        /* Premium Dropdown */
+        .premium-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .premium-dropdown.show { display: block; }
+        .premium-dropdown-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .premium-dropdown-item:hover, .premium-dropdown-item.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        /* ── Queue List ───────────────────────────────────────────────────── */
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        .queue-list { list-style: none; }
+        .queue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(148, 163, 184, 0.08);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        /* ── Results & Organ Threat Map (11 Organ Systems) ────────────────── */
+        .organ-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .organ-card {
+            background: rgba(148, 163, 184, 0.06);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: center;
+            opacity: 0.4;
+        }
+
+        .organ-card.affected {
+            opacity: 1;
+            border-color: var(--danger);
+            background: var(--danger-bg);
+            animation: pulse 2s infinite;
+        }
+
+        .organ-icon { font-size: 28px; margin-bottom: 6px; }
+        .organ-name { font-size: 12px; font-weight: 800; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* ── Severity Gauge Badge ─────────────────────────────────────────── */
+        .severity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 900;
             font-size: 13px;
+        }
+
+        /* ── Footer ───────────────────────────────────────────────────────── */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 24px;
+            border-top: 1px solid var(--card-border);
+            font-size: 14px;
             color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="logo-badge">💊 Pharma Clinical Tracker</div>
-    <h1>Ready to Build From Scratch</h1>
-    <p>The dataset, rules, and UI have been completely reset to a clean state. Your hosting IP and domain configuration are preserved and active.</p>
+<div class="app-container">
 
-    <div class="status-box" id="statusBox">
-        ⚡ API Base: https://pharma.shanudigicore.com<br>
-        📊 Database: 0 Rules (Clean Slate)<br>
-        🚀 Status: Ready for new design & requirements
+    <!-- ── 1. Top Header & Hanging Theme Toggle ───────────────────────────── -->
+    <header class="top-header">
+        <a href="#" class="brand-logo">💊 Pharma Clinical Tracker</a>
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+            <span id="themeIcon">☀️</span>
+            <span id="themeText">Light</span>
+        </button>
+    </header>
+
+    <!-- ── 2. Hero Section ────────────────────────────────────────────────── -->
+    <div class="hero-card">
+        <h1 class="hero-title">Clinical Drug Conflict & Timeline Engine</h1>
+        <p class="hero-subtitle">Sub-millisecond dynamic interaction analysis, 11-organ system threat mapping, and instant OCR prescription scanner.</p>
     </div>
 
+    <!-- ── 3. Premium Free AI Scanner Dropzone ────────────────────────────── -->
+    <div class="card">
+        <div class="card-title">📷 Premium Free Scanner</div>
+        <div class="scanner-dropzone" onclick="document.getElementById('ocrFile').click()">
+            <div class="scanner-icon">📸</div>
+            <div class="scanner-text">Snap or Drag Medicine Box / Prescription Photo</div>
+            <div class="scanner-subtext">Auto-detects drug names & adds them to your intake timeline instantly</div>
+            <input type="file" id="ocrFile" accept="image/*" style="display:none" onchange="handleOCRScan(this)">
+        </div>
+    </div>
+
+    <!-- ── 4. Unlimited Drug Intake & Timeline Logger ─────────────────────── -->
+    <div class="card">
+        <div class="card-title">💊 Medication Intake Timeline Logger</div>
+        
+        <div class="input-group">
+            <div style="position:relative;">
+                <input type="text" id="drugInput" placeholder="Type drug name (e.g., Methotrexate, Ibuprofen)..." autocomplete="off" oninput="handleAutocomplete(this.value)">
+                <div id="drugDropdown" class="premium-dropdown"></div>
+            </div>
+            <input type="datetime-local" id="intakeTime">
+            <button class="btn btn-accent" onclick="addDrugToQueue()">➕ Add Drug</button>
+        </div>
+
+        <div class="queue-header">
+            <span style="font-weight:800; font-size:14px; text-transform:uppercase; color:var(--text-muted);">📋 Queued Medications (<span id="queueCount">0</span>)</span>
+            <button style="background:none; border:none; color:var(--danger); font-weight:700; cursor:pointer; font-size:12px;" onclick="clearQueue()">🗑️ Clear All</button>
+        </div>
+
+        <ul class="queue-list" id="queueList">
+            <li style="padding:12px; color:var(--text-muted); font-size:13px; text-align:center;">No medications added yet. Add at least 2 drugs to analyze interactions.</li>
+        </ul>
+
+        <button class="btn btn-danger" onclick="runAnalysis()">🚨 Analyze Timeline & Organ Conflicts</button>
+    </div>
+
+    <!-- ── 5. Live Analysis Results & 11-Organ Threat Map ──────────────────── -->
+    <div id="resultsContainer"></div>
+
+    <!-- ── 6. Developer Attribution Footer ────────────────────────────────── -->
     <footer>
-        Developed by <a href="https://www.linkedin.com/in/fadhileh" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">Muhammed Fadhil EH</a>
+        Developed by <a href="https://www.linkedin.com/in/fadhileh" target="_blank" rel="noopener noreferrer">Muhammed Fadhil EH</a>
     </footer>
+
 </div>
 
 <script>
-    // Preserved Production Domain & Host Configuration
-    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-        ? 'http://127.0.0.1:8000' 
-        : 'https://pharma.shanudigicore.com';
+/* =========================================================================
+   Single-Page Clinical Engine Logic
+   ========================================================================= */
 
-    console.log('Pharma App Clean Starter active on:', API_BASE);
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+    ? 'http://127.0.0.1:8000' 
+    : 'https://pharma.shanudigicore.com';
+
+let intakes = [];
+
+// ── 1. Theme Toggle ────────────────────────────────────────────────────────
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    document.getElementById('themeIcon').textContent = next === 'dark' ? '🌙' : '☀️';
+    document.getElementById('themeText').textContent = next === 'dark' ? 'Dark' : 'Light';
+}
+
+// Set default timestamp
+document.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('intakeTime').value = now.toISOString().slice(0, 16);
+});
+
+// ── 2. Autocomplete Drug Search with IUPAC filter ─────────────────────────
+const COMMON_DRUGS = ["methotrexate", "ibuprofen", "enoxaparin", "ketorolac", "promethazine", "codeine", "lithium", "hydrochlorothiazide", "ritonavir", "midazolam", "warfarin", "aspirin", "advil", "tylenol", "panadol", "lofenox", "plavix", "coumadin", "prozac", "zoloft", "lexapro", "lipitor", "crestor", "viagra", "cialis", "paracetamol", "amoxicillin", "ciprofloxacin", "metformin", "lisinopril", "metoprolol", "furosemide", "omeprazole", "tramadol", "cetirizine", "prednisone"];
+
+function handleAutocomplete(query) {
+    const q = query.trim().toLowerCase();
+    const dropdown = document.getElementById('drugDropdown');
+    dropdown.innerHTML = '';
+    
+    if (q.length < 2) {
+        dropdown.classList.remove('show');
+        return;
+    }
+
+    const matches = COMMON_DRUGS.filter(d => d.includes(q) && d.length <= 35 && !/[(),\[\]]/.test(d)).slice(0, 8);
+    
+    if (matches.length > 0) {
+        matches.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'premium-dropdown-item';
+            item.textContent = m;
+            item.onclick = () => {
+                document.getElementById('drugInput').value = m;
+                dropdown.classList.remove('show');
+            };
+            dropdown.appendChild(item);
+        });
+        dropdown.classList.add('show');
+    } else {
+        dropdown.classList.remove('show');
+    }
+}
+
+// ── 3. Queue Management ────────────────────────────────────────────────────
+function addDrugToQueue() {
+    const input = document.getElementById('drugInput');
+    const timeEl = document.getElementById('intakeTime');
+    const drugName = input.value.trim();
+    if (!drugName) return;
+
+    intakes.push({
+        drug_name: drugName,
+        timestamp: timeEl.value
+    });
+
+    input.value = '';
+    document.getElementById('drugDropdown').classList.remove('show');
+    renderQueue();
+}
+
+function removeFromQueue(index) {
+    intakes.splice(index, 1);
+    renderQueue();
+}
+
+function clearQueue() {
+    intakes = [];
+    renderQueue();
+    document.getElementById('resultsContainer').innerHTML = '';
+}
+
+function renderQueue() {
+    const list = document.getElementById('queueList');
+    document.getElementById('queueCount').textContent = intakes.length;
+
+    if (intakes.length === 0) {
+        list.innerHTML = '<li style="padding:12px; color:var(--text-muted); font-size:13px; text-align:center;">No medications added yet. Add at least 2 drugs to analyze interactions.</li>';
+        return;
+    }
+
+    list.innerHTML = intakes.map((item, i) => `
+        <li class="queue-item">
+            <span>💊 ${item.drug_name} <span style="font-size:12px; opacity:0.7;">(⏱ ${item.timestamp.replace('T', ' ')})</span></span>
+            <button style="background:none; border:none; color:var(--danger); font-weight:800; cursor:pointer;" onclick="removeFromQueue(${i})">✕</button>
+        </li>
+    `).join('');
+}
+
+// ── 4. OCR Scanner Integration ─────────────────────────────────────────────
+async function handleOCRScan(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("language", "eng");
+    formData.append("apikey", "helloworld");
+
+    try {
+        const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: formData });
+        const result = await res.json();
+        const extractedText = result.ParsedResults[0].ParsedText || '';
+        
+        let cleanText = extractedText.toLowerCase().replace(/\([+\-±rsdl,]+\)-?/g, ' ').replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e');
+        const tokens = cleanText.replace(/[^a-z0-9\s]/g, ' ').trim().split(/\s+/);
+        
+        let found = new Set();
+        tokens.forEach(t => {
+            if (COMMON_DRUGS.includes(t) && found.size < 10) found.add(t);
+        });
+
+        if (found.size > 0) {
+            const timeVal = document.getElementById('intakeTime').value;
+            found.forEach(d => intakes.push({ drug_name: d, timestamp: timeVal }));
+            renderQueue();
+            alert(`✅ Added ${found.size} drugs from scan!`);
+        } else {
+            alert('⚠️ Scan complete, but no recognized drug names found. Try typing manually.');
+        }
+    } catch(e) {
+        alert('OCR Processing failed. Please type manually.');
+    }
+}
+
+// ── 5. Run Clinical Analysis & 11-Organ Threat Map ─────────────────────────
+async function runAnalysis() {
+    if (intakes.length < 2) {
+        alert('Please add at least 2 drugs to the list before analyzing.');
+        return;
+    }
+
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '<div class="card" style="text-align:center;">⏳ Evaluating metabolic clearance windows & organ threats...</div>';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/check-timeline/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ intakes: intakes })
+        });
+        const data = await res.json();
+        renderResults(data.warnings || []);
+    } catch(e) {
+        container.innerHTML = '<div class="card" style="color:var(--danger); text-align:center;">⚠️ Server connection error. Please check server backend.</div>';
+    }
+}
+
+function renderResults(warnings) {
+    const container = document.getElementById('resultsContainer');
+
+    if (warnings.length === 0) {
+        container.innerHTML = `
+            <div class="card" style="border-color:#10b981; background:rgba(16, 185, 129, 0.08);">
+                <h3 style="color:#10b981;">✅ No Interactions Detected (Safe Combination)</h3>
+                <p style="margin-top:8px; font-size:14px;">No metabolic conflicts found for the submitted medications. The combination appears safe based on current clinical rules.</p>
+            </div>`;
+        return;
+    }
+
+    const organsList = [
+        { bit: 1, icon: '🧠', name: 'Brain / CNS' },
+        { bit: 2, icon: '🫀', name: 'Heart' },
+        { bit: 4, icon: '🫁', name: 'Lungs' },
+        { bit: 8, icon: '🧪', name: 'Liver' },
+        { bit: 16, icon: '🩸', name: 'Stomach / GI' },
+        { bit: 32, icon: '🩺', name: 'Kidneys' },
+        { bit: 64, icon: '🦴', name: 'Blood' },
+        { bit: 128, icon: '👂', name: 'Ears' },
+        { bit: 256, icon: '🏋️', name: 'Muscles' },
+        { bit: 512, icon: '👁️', name: 'Eyes' },
+        { bit: 1024, icon: '🛡️', name: 'Skin / Immune' }
+    ];
+
+    container.innerHTML = warnings.map(w => {
+        const mask = w.organ_bitmask || 16; // default GI/Blood if unspecified
+        const organCards = organsList.map(o => `
+            <div class="organ-card ${(mask & o.bit) !== 0 ? 'affected' : ''}">
+                <div class="organ-icon">${o.icon}</div>
+                <div class="organ-name">${o.name}</div>
+            </div>
+        `).join('');
+
+        return `
+            <div class="card" style="border-color:var(--danger);">
+                <div class="card-title" style="color:var(--danger);">
+                    <span>🚨 Conflict Detected: ${w.drug_a} + ${w.drug_b}</span>
+                    <span class="severity-badge" style="background:var(--danger); color:#fff;">Severity: ${w.severity}/10</span>
+                </div>
+
+                <p style="font-weight:700; font-size:15px; margin-bottom:8px;">🧬 Clinical Reaction:</p>
+                <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${w.reaction}</p>
+
+                <p style="font-weight:700; font-size:15px; margin-bottom:8px;">💡 Actionable Patient Remedy:</p>
+                <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">${w.remedy || 'Consult your pharmacist or physician before taking together.'}</p>
+
+                <p style="font-weight:800; font-size:14px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">🫀 11-Organ Anatomical Threat Map</p>
+                <div class="organ-grid">${organCards}</div>
+            </div>
+        `;
+    }).join('');
+}
 </script>
 
 </body>

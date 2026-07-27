@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — Clinical Pharmacy Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .login-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); backdrop-filter: blur(16px); border-radius: 20px; padding: 40px; max-width: 420px; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: #38bdf8; text-align: center; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1; }
+        input { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
+        input:focus { border-color: #38bdf8; }
+        .btn { width: 100%; padding: 14px; background: #38bdf8; color: #0f172a; font-weight: 800; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 10px; }
+        .error-msg { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="logo">🛡️ Admin Console Login</div>
+    <div class="subtitle">Clinical Pharmacy System Administration</div>
+    
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label for="username">Admin Username</label>
+            <input type="text" id="username" placeholder="e.g. admin" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn">Login to Admin Console ➔</button>
+    </form>
+</div>
+
+<script>
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+    ? 'http://127.0.0.1:8000' 
+    : 'https://pharma.shanudigicore.com';
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const errEl = document.getElementById('errorMsg');
+
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/login/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+            localStorage.setItem('adminUser', data.username);
+            window.location.href = 'admin_dashboard.html';
+        } else {
+            errEl.textContent = data.error || 'Login failed.';
+            errEl.style.display = 'block';
+        }
+    } catch(err) {
+        errEl.textContent = 'Server connection error.';
+        errEl.style.display = 'block';
+    }
+}
+</script>
+
+</body>
+</html>
