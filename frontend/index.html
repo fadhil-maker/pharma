@@ -1073,8 +1073,11 @@ document.addEventListener('DOMContentLoaded', () => {
             barFill.style.width = '100%';
             
             // Smart Extraction Logic: Cross-reference OCR against 147,000 drug dictionary
-            let matchedText = '';
-            const normalizedOCR = extractedText.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').trim();
+            let foundDrugs = new Set();
+            
+            // Clean up special chemical prefixes like (+)-, (±)- so OCR can match raw generic names
+            let cleanText = extractedText.toLowerCase().replace(/\([+\-±rsdl,]+\)-?/g, ' ');
+            const normalizedOCR = cleanText.replace(/[^a-z0-9\s]/g, ' ').trim();
             const tokens = normalizedOCR.split(/\s+/);
             
             // Build single words and bi-grams from the OCR text
@@ -1090,22 +1093,42 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof COMMON_DRUGS !== 'undefined') {
                 for (let term of searchTerms) {
                     if (COMMON_DRUGS.includes(term)) {
-                        matchedText = term;
-                        break;
+                        let isSubpart = false;
+                        for (let existing of foundDrugs) {
+                            if (existing.includes(term)) {
+                                isSubpart = true;
+                                break;
+                            }
+                        }
+                        if (!isSubpart && foundDrugs.size < 10) { // Safety cap at 10 drugs per scan
+                            foundDrugs.add(term);
+                        }
                     }
                 }
             }
             
-            // Fallback to the longest word found if no dictionary match
-            if (!matchedText && searchTerms.length > 0) {
-                matchedText = searchTerms[0];
-            }
-            
-            if (!matchedText) matchedText = extractedText.substring(0, 30).trim(); // Last resort fallback
+            if (foundDrugs.size > 0) {
+                const timeInput = document.getElementById('intakeTime');
+                let timestamp = '';
+                if (timeInput && timeInput.value) {
+                    timestamp = timeInput.value;
+                } else {
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    timestamp = now.toISOString().slice(0, 16);
+                }
 
-            document.getElementById('drugSearch').value = matchedText;
-            fetchFDASuggestions(matchedText);
-            showScanSuccess("Prescription OCR Successful");
+                foundDrugs.forEach(drug => {
+                    intakes.push({ drug_name: drug, timestamp: timestamp });
+                });
+                
+                renderQueue();
+                document.getElementById('drugSearch').value = '';
+                showScanSuccess(`Added ${foundDrugs.size} drugs from prescription!`);
+            } else {
+                ocrWarning.style.display = 'flex';
+                statusText.textContent = `No recognizable drugs found in image.`;
+            }
         }
     } catch (err) {
         console.error('OCR error:', err);
