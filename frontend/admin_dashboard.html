@@ -40,6 +40,9 @@
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(148, 163, 184, 0.15); font-size: 13px; }
         th { font-weight: 800; color: #94a3b8; text-transform: uppercase; font-size: 11px; }
 
+        /* Pagination bar */
+        .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.15); }
+
         /* Modal styling for Add Admin popup */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal-overlay.show { display: flex; }
@@ -138,10 +141,10 @@
         </form>
     </div>
 
-    <!-- Master Rules Data Table with Search Filter -->
+    <!-- Master Rules Data Table with 10-Per-Page Pagination -->
     <div class="card">
         <div class="card-title">
-            <span>📋 Live Database Interaction Rules</span>
+            <span>📋 Live Database Interaction Rules (Showing 10 per page)</span>
             <input type="text" id="ruleSearch" placeholder="🔍 Search rules by drug name..." oninput="filterRules(this.value)" style="width:260px; font-weight:normal;">
         </div>
         <table>
@@ -158,6 +161,13 @@
                 <tr><td colspan="5" style="color:#94a3b8; text-align:center;">Loading custom database rules...</td></tr>
             </tbody>
         </table>
+
+        <!-- 10-Item Pagination Controls -->
+        <div class="pagination-bar">
+            <button class="btn btn-ghost" id="btnPrev" onclick="changePage(-1)">◄ Previous 10</button>
+            <span style="font-size:13px; color:#cbd5e1;" id="pageIndicator">Page 1 of 1</span>
+            <button class="btn btn-ghost" id="btnNext" onclick="changePage(1)">Next 10 ►</button>
+        </div>
     </div>
 
 </div>
@@ -192,6 +202,9 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
     : 'https://pharma.shanudigicore.com';
 
 let allRules = [];
+let filteredRulesList = [];
+let currentPage = 1;
+const itemsPerPage = 10;
 
 document.addEventListener('DOMContentLoaded', () => {
     const adminUser = localStorage.getItem('adminUser');
@@ -216,8 +229,10 @@ async function loadDashboardData() {
         const resRules = await fetch(`${API_BASE}/api/admin/interactions/`);
         const dataRules = await resRules.json();
         allRules = dataRules.interactions || [];
+        filteredRulesList = [...allRules];
         document.getElementById('ruleCount').textContent = allRules.length;
-        renderRulesTable(allRules);
+        currentPage = 1;
+        renderPaginatedRules();
 
         const resAdmins = await fetch(`${API_BASE}/api/admin/list/`);
         const dataAdmins = await resAdmins.json();
@@ -230,20 +245,39 @@ async function loadDashboardData() {
 function filterRules(query) {
     const q = query.toLowerCase().trim();
     if (!q) {
-        renderRulesTable(allRules);
-        return;
+        filteredRulesList = [...allRules];
+    } else {
+        filteredRulesList = allRules.filter(r => r.drug_a.toLowerCase().includes(q) || r.drug_b.toLowerCase().includes(q) || r.reaction.toLowerCase().includes(q));
     }
-    const filtered = allRules.filter(r => r.drug_a.toLowerCase().includes(q) || r.drug_b.toLowerCase().includes(q) || r.reaction.toLowerCase().includes(q));
-    renderRulesTable(filtered);
+    currentPage = 1;
+    renderPaginatedRules();
 }
 
-function renderRulesTable(rules) {
+function changePage(delta) {
+    const totalPages = Math.ceil(filteredRulesList.length / itemsPerPage) || 1;
+    currentPage += delta;
+    if (currentPage < 1) currentPage = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    renderPaginatedRules();
+}
+
+function renderPaginatedRules() {
     const tbody = document.getElementById('rulesTable');
-    if (rules.length === 0) {
+    const totalItems = filteredRulesList.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+    if (totalItems === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="color:#94a3b8; text-align:center;">No matching database rules found.</td></tr>';
+        document.getElementById('pageIndicator').textContent = 'Page 0 of 0';
+        document.getElementById('btnPrev').disabled = true;
+        document.getElementById('btnNext').disabled = true;
         return;
     }
-    tbody.innerHTML = rules.map(r => `
+
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const pageRules = filteredRulesList.slice(startIdx, startIdx + itemsPerPage);
+
+    tbody.innerHTML = pageRules.map(r => `
         <tr>
             <td>#${r.id}</td>
             <td><b>${r.drug_a}</b> + <b>${r.drug_b}</b></td>
@@ -255,6 +289,10 @@ function renderRulesTable(rules) {
             <td><button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteRule(${r.id})">Delete</button></td>
         </tr>
     `).join('');
+
+    document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages} (${totalItems} total rules)`;
+    document.getElementById('btnPrev').disabled = (currentPage === 1);
+    document.getElementById('btnNext').disabled = (currentPage === totalPages);
 }
 
 async function handleAddAdmin(e) {
