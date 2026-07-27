@@ -24,6 +24,7 @@
         }
 
         [data-theme="dark"] {
+            --pill-blend: screen;
             --torso-blend: screen;
             --bg-page: #0f172a; 
             --card-bg: rgba(30, 41, 59, 0.85);
@@ -291,7 +292,7 @@
 
     <!-- 3D Hanging Pill Theme Toggle -->
     <div class="theme-pill-wrapper" onclick="toggleTheme()" title="Toggle Theme">
-        <img src="assets/pill.png" alt="Toggle Theme" style="height: 110px; filter: drop-shadow(0 20px 20px rgba(0,0,0,0.2));">
+        <img src="assets/pill.png" alt="Toggle Theme" style="height: 110px; mix-blend-mode: var(--pill-blend, multiply); filter: drop-shadow(0 20px 20px rgba(0,0,0,0.2));">
     </div>
 
     <div class="app-container">
@@ -319,15 +320,19 @@
             <div class="vital-group">
                 <div class="vital-item">
                     <span class="vital-label">Patient Name</span>
-                    <span class="vital-value">Johnathon Doe</span>
+                    <span class="vital-value editable-vital" id="vitalName" contenteditable="true" onblur="saveVitals()">John Doe</span>
                 </div>
                 <div class="vital-item">
                     <span class="vital-label">Age</span>
-                    <span class="vital-value">42 YRS</span>
+                    <span class="vital-value editable-vital" id="vitalAge" contenteditable="true" onblur="saveVitals()">35 YRS</span>
+                </div>
+                <div class="vital-item">
+                    <span class="vital-label">Gender</span>
+                    <span class="vital-value editable-vital" id="vitalGender" contenteditable="true" onblur="saveVitals()">MALE</span>
                 </div>
                 <div class="vital-item">
                     <span class="vital-label">Weight</span>
-                    <span class="vital-value">185 LBS</span>
+                    <span class="vital-value editable-vital" id="vitalWeight" contenteditable="true" onblur="saveVitals()">180 LBS</span>
                 </div>
             </div>
             <div class="vital-status">
@@ -335,6 +340,11 @@
                 LIVE BIOMETRIC SYNC
             </div>
         </div>
+        <style>
+            .editable-vital { border-bottom: 1px dashed rgba(0,0,0,0.2); cursor: text; outline: none; transition: 0.2s; min-width: 60px; display: inline-block; }
+            .editable-vital:focus { border-bottom-color: var(--accent); color: var(--accent); }
+            [data-theme="dark"] .editable-vital { border-bottom-color: rgba(255,255,255,0.2); }
+        </style>
 
         <!-- ── Main Dashboard Grid ── -->
         <div class="dashboard-grid">
@@ -462,7 +472,7 @@
     </div>
 <script>
 /* =========================================================================
-   Single-Page Clinical Engine Logic
+   Ultimate Clinical Engine Logic (Fixed for Senior Design DOM)
    ========================================================================= */
 
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
@@ -477,90 +487,88 @@ function toggleTheme() {
     const current = html.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    document.getElementById('themeIcon').textContent = next === 'dark' ? '🌙' : '☀️';
-    document.getElementById('themeText').textContent = next === 'dark' ? 'Dark' : 'Light';
+    localStorage.setItem('theme', next);
 }
 
-// Set default timestamp
-document.addEventListener('DOMContentLoaded', () => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('intakeTime').value = now.toISOString().slice(0, 16);
-});
+// ── 2. Dynamic Vitals ──────────────────────────────────────────────────────
+function saveVitals() {
+    const vitals = {
+        name: document.getElementById('vitalName').textContent,
+        age: document.getElementById('vitalAge').textContent,
+        gender: document.getElementById('vitalGender').textContent,
+        weight: document.getElementById('vitalWeight').textContent
+    };
+    localStorage.setItem('patientVitals', JSON.stringify(vitals));
+}
 
-// ── 2. Autocomplete Drug Search with IUPAC filter ─────────────────────────
-const COMMON_DRUGS = ["methotrexate", "ibuprofen", "enoxaparin", "ketorolac", "promethazine", "codeine", "lithium", "hydrochlorothiazide", "ritonavir", "midazolam", "warfarin", "aspirin", "advil", "tylenol", "panadol", "lofenox", "plavix", "coumadin", "prozac", "zoloft", "lexapro", "lipitor", "crestor", "viagra", "cialis", "paracetamol", "amoxicillin", "ciprofloxacin", "metformin", "lisinopril", "metoprolol", "furosemide", "omeprazole", "tramadol", "cetirizine", "prednisone"];
-
-function handleAutocomplete(query) {
-    const q = query.trim().toLowerCase();
-    const dropdown = document.getElementById('drugDropdown');
-    dropdown.innerHTML = '';
-    
-    if (q.length < 2) {
-        dropdown.classList.remove('show');
-        return;
+function loadVitals() {
+    const vitals = JSON.parse(localStorage.getItem('patientVitals'));
+    if (vitals) {
+        document.getElementById('vitalName').textContent = vitals.name;
+        document.getElementById('vitalAge').textContent = vitals.age;
+        document.getElementById('vitalGender').textContent = vitals.gender;
+        document.getElementById('vitalWeight').textContent = vitals.weight;
     }
-
-    const matches = COMMON_DRUGS.filter(d => d.includes(q) && d.length <= 35 && !/[(),\[\]]/.test(d)).slice(0, 8);
     
-    if (matches.length > 0) {
-        matches.forEach(m => {
-            const item = document.createElement('div');
-            item.className = 'premium-dropdown-item';
-            item.textContent = m;
-            item.onclick = () => {
-                document.getElementById('drugInput').value = m;
-                dropdown.classList.remove('show');
-            };
-            dropdown.appendChild(item);
-        });
-        dropdown.classList.add('show');
-    } else {
-        dropdown.classList.remove('show');
+    // Load theme
+    const theme = localStorage.getItem('theme');
+    if (theme) document.documentElement.setAttribute('data-theme', theme);
+    
+    // Load drugs
+    const savedDrugs = JSON.parse(localStorage.getItem('patientProfile'));
+    if (savedDrugs) {
+        intakes = savedDrugs;
+        renderQueue();
+        if(intakes.length >= 2) analyzeInteractions();
     }
 }
 
-// ── 3. Queue Management ────────────────────────────────────────────────────
-function addDrugToQueue() {
+document.addEventListener('DOMContentLoaded', loadVitals);
+
+// ── 3. Queue Management & Rendering ─────────────────────────────────────────
+function handleAddDrug(e) {
+    e.preventDefault();
     const input = document.getElementById('drugInput');
-    const timeEl = document.getElementById('intakeTime');
+    const timeEl = document.getElementById('timeInput');
     const drugName = input.value.trim();
     if (!drugName) return;
 
-    intakes.push({
-        drug_name: drugName,
-        timestamp: timeEl.value
-    });
-
+    intakes.push({ drug_name: drugName, timestamp: timeEl.value });
+    localStorage.setItem('patientProfile', JSON.stringify(intakes));
+    
     input.value = '';
-    document.getElementById('drugDropdown').classList.remove('show');
     renderQueue();
+    if(intakes.length >= 2) analyzeInteractions();
 }
 
 function removeFromQueue(index) {
     intakes.splice(index, 1);
+    localStorage.setItem('patientProfile', JSON.stringify(intakes));
     renderQueue();
+    analyzeInteractions(); // re-run or clear
 }
 
-function clearQueue() {
+function clearProfile() {
     intakes = [];
+    localStorage.setItem('patientProfile', JSON.stringify(intakes));
     renderQueue();
-    document.getElementById('resultsContainer').innerHTML = '';
+    analyzeInteractions();
 }
 
 function renderQueue() {
-    const list = document.getElementById('queueList');
-    document.getElementById('queueCount').textContent = intakes.length;
+    const list = document.getElementById('drugListUI');
+    document.getElementById('totalLoggedCount').textContent = `${intakes.length} DRUGS`;
 
     if (intakes.length === 0) {
-        list.innerHTML = '<li style="padding:12px; color:var(--text-muted); font-size:13px; text-align:center;">No medications added yet. Add at least 2 drugs to analyze interactions.</li>';
+        list.innerHTML = '<li class="drug-item" style="color: var(--text-muted); justify-content: center; border: none;">No medications logged.</li>';
         return;
     }
 
     list.innerHTML = intakes.map((item, i) => `
-        <li class="queue-item">
-            <span>💊 ${item.drug_name} <span style="font-size:12px; opacity:0.7;">(⏱ ${item.timestamp.replace('T', ' ')})</span></span>
-            <button style="background:none; border:none; color:var(--danger); font-weight:800; cursor:pointer;" onclick="removeFromQueue(${i})">✕</button>
+        <li class="drug-item">
+            <span>${i + 1}. ${item.drug_name}</span>
+            <span class="drug-item-time">${item.timestamp}</span>
+            <span class="drug-item-remove" onclick="removeFromQueue(${i})">[X]</span>
         </li>
     `).join('');
 }
@@ -575,41 +583,58 @@ async function handleOCRScan(input) {
     formData.append("language", "eng");
     formData.append("apikey", "helloworld");
 
+    alert('Scanning prescription...');
     try {
         const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: formData });
         const result = await res.json();
-        const extractedText = result.ParsedResults[0].ParsedText || '';
+        const extractedText = result.ParsedResults[0]?.ParsedText || '';
         
         let cleanText = extractedText.toLowerCase().replace(/\([+\-±rsdl,]+\)-?/g, ' ').replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e');
         const tokens = cleanText.replace(/[^a-z0-9\s]/g, ' ').trim().split(/\s+/);
         
+        const COMMON_DRUGS = ["methotrexate", "ibuprofen", "enoxaparin", "ketorolac", "promethazine", "codeine", "lithium", "hydrochlorothiazide", "ritonavir", "midazolam", "warfarin", "aspirin", "advil", "tylenol", "lipitor", "crestor", "viagra", "paracetamol", "amoxicillin", "ciprofloxacin", "metformin", "lisinopril"];
+        
         let found = new Set();
         tokens.forEach(t => {
-            if (COMMON_DRUGS.includes(t) && found.size < 10) found.add(t);
+            if (COMMON_DRUGS.includes(t) && found.size < 5) found.add(t);
         });
 
         if (found.size > 0) {
-            const timeVal = document.getElementById('intakeTime').value;
+            const timeVal = document.getElementById('timeInput').value;
             found.forEach(d => intakes.push({ drug_name: d, timestamp: timeVal }));
+            localStorage.setItem('patientProfile', JSON.stringify(intakes));
             renderQueue();
             alert(`✅ Added ${found.size} drugs from scan!`);
+            if(intakes.length >= 2) analyzeInteractions();
         } else {
-            alert('⚠️ Scan complete, but no recognized drug names found. Try typing manually.');
+            alert('⚠️ Scan complete, but no recognized drug names found.');
         }
     } catch(e) {
-        alert('OCR Processing failed. Please type manually.');
+        alert('OCR Processing failed.');
     }
 }
 
-// ── 5. Run Clinical Analysis & 11-Organ Threat Map ─────────────────────────
-async function runAnalysis() {
-    if (intakes.length < 2) {
-        alert('Please add at least 2 drugs to the list before analyzing.');
-        return;
-    }
+// ── 5. Run Clinical Analysis & Update UI ──────────────────────────────────
+async function analyzeInteractions() {
+    const detailsUI = document.getElementById('interactionDetails');
+    const gauge = document.getElementById('gaugeNeedle');
+    const scoreUI = document.getElementById('severityScore');
+    const labelUI = document.getElementById('severityLabel');
+    const blipHeart = document.getElementById('blipHeart');
+    const blipLiver = document.getElementById('blipLiver');
+    const blipKidneys = document.getElementById('blipKidneys');
 
-    const container = document.getElementById('resultsContainer');
-    container.innerHTML = '<div class="card" style="text-align:center;">⏳ Evaluating metabolic clearance windows & organ threats...</div>';
+    // Reset UI
+    if(blipHeart) blipHeart.style.display = 'none';
+    if(blipLiver) blipLiver.style.display = 'none';
+    if(blipKidneys) blipKidneys.style.display = 'none';
+    detailsUI.style.display = 'none';
+    scoreUI.textContent = "0";
+    labelUI.textContent = "No Risk / Safe";
+    labelUI.style.color = "var(--text-muted)";
+    if(gauge) gauge.style.transform = `rotate(-90deg)`;
+
+    if (intakes.length < 2) return;
 
     try {
         const res = await fetch(`${API_BASE}/api/check-timeline/`, {
@@ -618,75 +643,47 @@ async function runAnalysis() {
             body: JSON.stringify({ intakes: intakes })
         });
         const data = await res.json();
-        renderResults(data.warnings || []);
-    } catch(e) {
-        container.innerHTML = '<div class="card" style="color:var(--danger); text-align:center;">⚠️ Server connection error. Please check server backend.</div>';
-    }
-}
+        const warnings = data.warnings || [];
 
-function renderResults(warnings) {
-    const container = document.getElementById('resultsContainer');
-
-    if (warnings.length === 0) {
-        container.innerHTML = `
-            <div class="card" style="border-color:#10b981; background:rgba(16, 185, 129, 0.08);">
-                <h3 style="color:#10b981;">✅ No Interactions Detected (Safe Combination)</h3>
-                <p style="margin-top:8px; font-size:14px;">No metabolic conflicts found for the submitted medications. The combination appears safe based on current clinical rules.</p>
-            </div>`;
-        return;
-    }
-
-    const organsList = [
-        { bit: 1, icon: '🧠', name: 'Brain / CNS' },
-        { bit: 2, icon: '🫀', name: 'Heart' },
-        { bit: 4, icon: '🫁', name: 'Lungs' },
-        { bit: 8, icon: '🧪', name: 'Liver' },
-        { bit: 16, icon: '🩸', name: 'Stomach / GI' },
-        { bit: 32, icon: '🩺', name: 'Kidneys' },
-        { bit: 64, icon: '🦴', name: 'Blood' },
-        { bit: 128, icon: '👂', name: 'Ears' },
-        { bit: 256, icon: '🏋️', name: 'Muscles' },
-        { bit: 512, icon: '👁️', name: 'Eyes' },
-        { bit: 1024, icon: '🛡️', name: 'Skin / Immune' }
-    ];
-
-    container.innerHTML = warnings.map(w => {
-        const mask = w.organ_bitmask || 16; // default GI/Blood if unspecified
-        const organCards = organsList.map(o => `
-            <div class="organ-card ${(mask & o.bit) !== 0 ? 'affected' : ''}">
-                <div class="organ-icon">${o.icon}</div>
-                <div class="organ-name">${o.name}</div>
+        let maxSev = 0;
+        let sevLabel = "No Risk / Safe";
+        let sevColor = "var(--text-muted)";
+        
+        if (warnings.length > 0) {
+            detailsUI.style.display = 'block';
+            if(warnings.some(w => w.severity === 'High')) {
+                maxSev = 8;
+                sevLabel = "HIGH RISK / FATAL";
+                sevColor = "#ef4444";
+                if(blipHeart) blipHeart.style.display = 'block';
+                if(blipLiver) blipLiver.style.display = 'block';
+            } else {
+                maxSev = 5;
+                sevLabel = "MODERATE RISK";
+                sevColor = "#f97316";
+                if(blipKidneys) blipKidneys.style.display = 'block';
+            }
+        }
+        
+        scoreUI.textContent = maxSev;
+        labelUI.textContent = sevLabel;
+        labelUI.style.color = sevColor;
+        
+        const angle = -90 + (maxSev * 18);
+        if(gauge) gauge.style.transform = `rotate(${angle}deg)`;
+        
+        detailsUI.innerHTML = warnings.map(w => `
+            <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity === 'High' ? '#ef4444' : '#f97316'}; margin-bottom: 16px;">
+                <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a} + ${w.drug_b}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Reaction:</strong> ${w.reaction}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
             </div>
         `).join('');
 
-        return `
-            <div class="card" style="border-color:var(--danger);">
-                <div class="card-title" style="color:var(--danger);">
-                    <span>🚨 Conflict Detected: ${w.drug_a} + ${w.drug_b}</span>
-                    <span class="severity-badge" style="background:var(--danger); color:#fff;">Severity: ${w.severity}/10</span>
-                </div>
-
-                <p style="font-weight:700; font-size:15px; margin-bottom:8px;">🧬 Clinical Reaction:</p>
-                <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${w.reaction}</p>
-
-                <p style="font-weight:700; font-size:15px; margin-bottom:8px;">💡 Actionable Patient Remedy:</p>
-                <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">${w.remedy || 'Consult your pharmacist or physician before taking together.'}</p>
-
-                <p style="font-weight:800; font-size:14px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">🫀 11-Organ Anatomical Threat Map</p>
-                <div class="organ-grid">${organCards}</div>
-            </div>
-        `;
-    }).join('');
+    } catch(e) {
+        console.error("API failed:", e);
+    }
 }
-
-        function removeDrug(drugName) {
-            let drugs = JSON.parse(localStorage.getItem('patientProfile')) || [];
-            drugs = drugs.filter(d => d !== drugName);
-            localStorage.setItem('patientProfile', JSON.stringify(drugs));
-            renderProfile();
-            analyzeInteractions();
-        }
-        </script>
-
+</script>
 </body>
 </html>
