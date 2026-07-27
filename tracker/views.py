@@ -107,7 +107,12 @@ def list_interactions(request):
         )
         
     if min_severity and min_severity.isdigit():
-        qs = qs.filter(severity_slider__gte=int(min_severity))
+        sev_val = int(min_severity)
+        exact_sev = request.GET.get('exact_sev', '').strip().lower()
+        if exact_sev == 'true':
+            qs = qs.filter(severity_slider=sev_val)
+        else:
+            qs = qs.filter(severity_slider__gte=sev_val)
 
     sort_field = 'id'
     if sort_by == 'severity':
@@ -115,10 +120,11 @@ def list_interactions(request):
     elif sort_by == 'drug_a':
         sort_field = 'drug_a'
 
+    sort_secondary = '-id' if order == 'desc' else 'id'
     if order == 'desc':
         sort_field = '-' + sort_field
 
-    qs = qs.order_by(sort_field, 'id')
+    qs = qs.order_by(sort_field, sort_secondary)
 
     total_count = qs.count()
     start = (page - 1) * limit

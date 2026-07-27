@@ -80,7 +80,7 @@ class Command(BaseCommand):
                 d1, d2 = drugs[i], drugs[j]
                 rx_obj = rx_objs[count % 1240]
                 rem = remedies[count % len(remedies)]
-                sev = (count % 5) + 6 # Severities 6, 7, 8, 9, 10
+                sev = (count % 10) + 1 # Severities 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
                 mask = bitmasks[count % len(bitmasks)]
                 
                 interactions_to_create.append(

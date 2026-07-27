@@ -3,52 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Console — Clinical Pharmacy System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <title>Admin Console — Clinical Master Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0f172a; color: #f8fafc; min-height: 100vh; padding: 24px 16px; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: #38bdf8; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
-        .stat-card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 16px; padding: 20px; text-align: center; }
-        .stat-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-val { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; color: #38bdf8; margin-top: 4px; }
-        
-        .card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
-        .card-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; }
+        :root {
+            --bg-main: #090d16;
+            --card-bg: rgba(21, 30, 49, 0.75);
+            --card-border: rgba(56, 189, 248, 0.15);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --cyan-neon: #38bdf8;
+            --cyan-glow: rgba(56, 189, 248, 0.4);
+            --purple-neon: #c084fc;
+        }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-main); background-image: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(192, 132, 252, 0.05) 0%, transparent 40%); color: var(--text-primary); min-height: 100vh; padding: 28px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 900; background: linear-gradient(135deg, #38bdf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 32px; }
+        .stat-card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: 20px; padding: 22px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.2s, border-color 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(56, 189, 248, 0.4); }
+        .stat-label { font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-val { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 900; color: #fff; margin-top: 6px; text-shadow: 0 0 20px var(--cyan-glow); }
+        
+        .card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: 20px; padding: 28px; margin-bottom: 32px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        .card-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--cyan-neon); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
         @media(max-width:768px){ .form-grid { grid-template-columns: 1fr; } }
         
-        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; color: #fff; font-size: 14px; outline: none; }
+        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { width: 100%; padding: 12px 16px; background: #0b1324; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; color: #fff; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--cyan-neon); box-shadow: 0 0 12px var(--cyan-glow); }
         
-        .organ-checkboxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 8px; }
-        .organ-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; text-transform: none; }
+        .organ-checkboxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
+        .organ-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; text-transform: none; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: 8px; }
         .organ-label input { width: auto; }
 
-        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-cyan { background: #38bdf8; color: #0f172a; }
-        .btn-danger { background: #ef4444; color: #fff; }
-        .btn-ghost { background: transparent; border: 1px solid rgba(148, 163, 184, 0.3); color: #fff; }
+        .btn { padding: 12px 22px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; }
+        .btn-cyan { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #090d16; font-weight: 900; box-shadow: 0 4px 15px var(--cyan-glow); }
+        .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--cyan-glow); }
+        .btn-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
+        .btn-danger:hover { background: #ef4444; color: #fff; }
+        .btn-ghost { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); color: #e2e8f0; }
+        .btn-ghost:hover { background: rgba(56, 189, 248, 0.15); border-color: var(--cyan-neon); }
 
-        .controls-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; padding: 14px; background: #0f172a; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.15); }
-        .controls-group { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #cbd5e1; }
-        .controls-group select, .controls-group input { width: auto; padding: 6px 12px; font-size: 13px; }
+        .controls-bar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 20px; padding: 18px; background: #0b1324; border-radius: 16px; border: 1px solid rgba(56, 189, 248, 0.15); }
+        .controls-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; }
+        .controls-group select, .controls-group input { width: auto; padding: 8px 14px; font-size: 13px; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(148, 163, 184, 0.15); font-size: 13px; }
-        th { font-weight: 800; color: #94a3b8; text-transform: uppercase; font-size: 11px; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(148, 163, 184, 0.1); font-size: 13.5px; }
+        th { font-weight: 800; color: #94a3b8; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
 
-        .pagination-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.15); }
+        /* Severity Pills */
+        .sev-pill { padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px; display: inline-block; }
+        .sev-low { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .sev-med { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .sev-high { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
+        .sev-critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        /* Pagination & Quick Jump bar */
+        .pagination-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.15); }
+        .page-controls { display: flex; align-items: center; gap: 10px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal-overlay.show { display: flex; }
-        .modal-card { background: #1e293b; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 20px; padding: 32px; max-width: 440px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .modal-card { background: #151e31; border: 1px solid var(--card-border); border-radius: 24px; padding: 36px; max-width: 460px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
     </style>
 </head>
 <body>
@@ -57,8 +82,8 @@
 
     <!-- Header -->
     <div class="header">
-        <div class="logo">🛡️ Admin Console Dashboard</div>
-        <div style="display:flex; align-items:center; gap:12px;">
+        <div class="logo">💊 Pharma Master Admin Console</div>
+        <div style="display:flex; align-items:center; gap:14px;">
             <span style="font-size:13px; color:#94a3b8;">Logged in as: <b id="adminName" style="color:#fff;">admin</b></span>
             <button class="btn btn-cyan" onclick="openAdminModal()">👤 + Create Admin</button>
             <button class="btn btn-ghost" onclick="logout()">Logout ➔</button>
@@ -80,8 +105,8 @@
             <div class="stat-val" id="adminCount">--</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">System Status</div>
-            <div class="stat-val" style="color:#10b981; font-size:20px; margin-top:8px;">🟢 Live Engine Active</div>
+            <div class="stat-label">System Engine</div>
+            <div class="stat-val" style="color:#10b981; font-size:22px; margin-top:8px;">🟢 Live & Active</div>
         </div>
     </div>
 
@@ -113,16 +138,16 @@
 
             <div class="form-grid">
                 <div>
-                    <label>Severity Score (1 to 10): <b id="sevVal" style="color:#38bdf8;">8</b></label>
+                    <label>Severity Score (1 to 10): <b id="sevVal" style="color:var(--cyan-neon);">8</b></label>
                     <input type="range" id="severity" min="1" max="10" value="8" oninput="document.getElementById('sevVal').textContent=this.value">
                 </div>
                 <div>
-                    <label>Max Age Limit (Optional, e.g. 6 for pediatric)</label>
-                    <input type="number" id="maxAge" placeholder="Leave empty for all ages">
+                    <label>Max Age Limit (Optional)</label>
+                    <input type="number" id="maxAge" placeholder="e.g. 6 for pediatric rules">
                 </div>
             </div>
 
-            <div style="margin-bottom:16px;">
+            <div style="margin-bottom:20px;">
                 <label>Target Organ Systems (11-Organ Threat Map):</label>
                 <div class="organ-checkboxes">
                     <label class="organ-label"><input type="checkbox" value="1"> 🧠 Brain/CNS</label>
@@ -143,11 +168,11 @@
         </form>
     </div>
 
-    <!-- Master Rules Data Table with Sorting, Severity Filtering & Direct Page Jump -->
+    <!-- Master Rules Data Table with Sorting, Full 1-10 Severity Filtering & Quick Jump -->
     <div class="card">
         <div class="card-title">
-            <span>📋 Master Database Rules</span>
-            <input type="text" id="ruleSearch" placeholder="🔍 Search rules..." oninput="onSearchInput(this.value)" style="width:240px; font-weight:normal;">
+            <span>📋 Master Clinical Database Rules</span>
+            <input type="text" id="ruleSearch" placeholder="🔍 Search rules..." oninput="onSearchInput(this.value)" style="width:260px; font-weight:normal;">
         </div>
 
         <!-- Interactive Controls Bar -->
@@ -170,20 +195,20 @@
             </div>
 
             <div class="controls-group">
-                <label style="margin:0;">Min Severity:</label>
+                <label style="margin:0;">Severity Filter:</label>
                 <select id="minSev" onchange="onControlChange()">
                     <option value="">All Severities (1-10)</option>
+                    <option value="1">Severity 1+</option>
+                    <option value="2">Severity 2+</option>
+                    <option value="3">Severity 3+</option>
+                    <option value="4">Severity 4+</option>
+                    <option value="5">Severity 5+</option>
+                    <option value="6">Severity 6+</option>
                     <option value="7">Severity 7+</option>
                     <option value="8">Severity 8+</option>
                     <option value="9">Severity 9+</option>
-                    <option value="10">Severity 10 (Critical)</option>
+                    <option value="10">Severity 10 (Critical Only)</option>
                 </select>
-            </div>
-
-            <div class="controls-group" style="margin-left:auto;">
-                <label style="margin:0;">Jump to Page:</label>
-                <input type="number" id="pageJump" min="1" placeholder="Page #" style="width:80px;" onkeydown="if(event.key==='Enter') jumpToPage()">
-                <button class="btn btn-cyan" style="padding:6px 12px; font-size:12px;" onclick="jumpToPage()">Go ➔</button>
             </div>
         </div>
 
@@ -192,8 +217,8 @@
                 <tr>
                     <th>ID</th>
                     <th>Drug Pair</th>
-                    <th>Severity</th>
-                    <th>Reaction & Remedy</th>
+                    <th>Severity Score</th>
+                    <th>Clinical Reaction & Remedy</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -202,11 +227,19 @@
             </tbody>
         </table>
 
-        <!-- 10-Item Pagination Controls -->
+        <!-- Quick Page Jump Controls Right Next to Prev/Next -->
         <div class="pagination-bar">
-            <button class="btn btn-ghost" id="btnPrev" onclick="changePage(-1)">◄ Previous 10</button>
-            <span style="font-size:13px; color:#cbd5e1;" id="pageIndicator">Page 1 of 1</span>
-            <button class="btn btn-ghost" id="btnNext" onclick="changePage(1)">Next 10 ►</button>
+            <div class="page-controls">
+                <button class="btn btn-ghost" id="btnPrev" onclick="changePage(-1)">◄ Prev 10</button>
+                <span style="font-size:13.5px; color:#cbd5e1; font-weight:700;" id="pageIndicator">Page 1 of 1</span>
+                <button class="btn btn-ghost" id="btnNext" onclick="changePage(1)">Next 10 ►</button>
+            </div>
+
+            <div class="controls-group">
+                <label style="margin:0;">Quick Page Jump:</label>
+                <input type="number" id="pageJump" min="1" placeholder="Page #" style="width:90px;" onkeydown="if(event.key==='Enter') jumpToPage()">
+                <button class="btn btn-cyan" style="padding:8px 14px; font-size:12px;" onclick="jumpToPage()">Go ➔</button>
+            </div>
         </div>
     </div>
 
@@ -216,7 +249,7 @@
 <div id="adminModal" class="modal-overlay">
     <div class="modal-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="font-family:'Outfit',sans-serif; color:#38bdf8;">👤 Create New Admin User</h3>
+            <h3 style="font-family:'Outfit',sans-serif; color:var(--cyan-neon);">👤 Create New Admin User</h3>
             <button onclick="closeAdminModal()" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;">✕</button>
         </div>
         <form onsubmit="handleAddAdmin(event)">
@@ -297,7 +330,7 @@ function jumpToPage() {
         currentPage = p;
         fetchPageData(currentPage);
     } else {
-        alert(`Please enter a page number between 1 and ${totalServerPages}`);
+        alert(`Please enter a valid page number between 1 and ${totalServerPages}`);
     }
 }
 
@@ -307,6 +340,13 @@ function changePage(delta) {
         currentPage = targetPage;
         fetchPageData(currentPage);
     }
+}
+
+function getSevPill(s) {
+    if (s <= 3) return `<span class="sev-pill sev-low">Low ${s}/10</span>`;
+    if (s <= 6) return `<span class="sev-pill sev-med">Med ${s}/10</span>`;
+    if (s <= 8) return `<span class="sev-pill sev-high">High ${s}/10</span>`;
+    return `<span class="sev-pill sev-critical">Critical ${s}/10</span>`;
 }
 
 async function fetchPageData(page = 1) {
@@ -341,10 +381,10 @@ async function fetchPageData(page = 1) {
             <tr>
                 <td><b>#${r.id}</b></td>
                 <td><b>${r.drug_a}</b> + <b>${r.drug_b}</b></td>
-                <td><span style="color:#ef4444; font-weight:800;">${r.severity}/10</span></td>
+                <td>${getSevPill(r.severity)}</td>
                 <td>
                     <div><b>Reaction:</b> ${r.reaction}</div>
-                    <div style="color:#94a3b8; font-size:12px; margin-top:2px;"><b>Remedy:</b> ${r.remedy || 'N/A'}</div>
+                    <div style="color:#94a3b8; font-size:12px; margin-top:3px;"><b>Remedy:</b> ${r.remedy || 'N/A'}</div>
                 </td>
                 <td><button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteRule(${r.id})">Delete</button></td>
             </tr>
