@@ -41,7 +41,7 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(f"FDA API query for {drug}: {e}")
 
-        self.stdout.write(f"✅ Successfully downloaded {len(api_interactions)} live drug interaction records directly from FDA API endpoint!")
+        self.stdout.write(f"Successfully downloaded {len(api_interactions)} live drug interaction records directly from FDA API endpoint!")
 
         # Save downloaded API payload to tracker/master_clinical_dataset.json
         output_payload = {

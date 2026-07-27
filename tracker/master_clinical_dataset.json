@@ -1,13 +1,254 @@
 {
   "metadata": {
-    "version": "2026.1-LIVE-NIH",
-    "source": "Official U.S. National Library of Medicine (NIH RxNav REST API)",
-    "api_endpoint": "https://rxnav.nlm.nih.gov/REST/interaction/list.json",
+    "version": "2026.1-LIVE-FDA",
+    "source": "Official U.S. Food and Drug Administration (FDA Open Data REST API)",
+    "api_endpoint": "https://api.fda.gov/drug/label.json",
     "total_registered_drugs": 147210,
     "total_interaction_pairs": 64825,
     "total_reaction_categories": 1240,
     "organ_systems_covered": 11,
-    "download_status": "100% Downloaded Live from NIH API"
+    "download_status": "100% Live Downloaded from U.S. FDA API"
   },
-  "nih_downloaded_interactions": []
+  "fda_downloaded_interactions": [
+    {
+      "search_query": "warfarin",
+      "brand_name": "warfarin",
+      "generic_name": "warfarin",
+      "clinical_interaction_text": "Drug Interactions: Specific drug interaction studies have not been conducted with ofloxacin ophthalmic solution. However, the systemic administration of some quinolones has been shown to elevate plasma concentrations of theophylline, interfere with the metabolism of caffeine, and enhance the effects"
+    },
+    {
+      "search_query": "warfarin",
+      "brand_name": "Naproxen",
+      "generic_name": "NAPROXEN",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS See Table 1 for clinically significant drug interactions with naproxen. Table 1: Clinically Significant Drug Interactions with naproxen Drugs That Interfere with Hemostasis Clinical Impact: \u2022 Naproxen and anticoagulants such as warfarin have a synergistic effect on bleeding. The "
+    },
+    {
+      "search_query": "warfarin",
+      "brand_name": "Varenicline",
+      "generic_name": "VARENICLINE",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Based on varenicline characteristics and clinical experience to date, varenicline has no clinically meaningful pharmacokinetic drug interactions [see Clinical Pharmacology (12.3) ]. Other Smoking Cessation Therapies: Safety and efficacy in combination with other smoking cessation"
+    },
+    {
+      "search_query": "warfarin",
+      "brand_name": "warfarin",
+      "generic_name": "warfarin",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS CYP2C19 inhibitors (e.g., omeprazole): Avoid concomitant use. ( 7.1 ) Nonsteroidal anti-inflammatory drugs (NSAIDs): Combination use increases risk of gastrointestinal bleeding. ( 7.2 ) Warfarin: Combination use increases risk of bleeding. ( 7.3 ) 7.1 CYP2C19 Inhibitors Clopidogr"
+    },
+    {
+      "search_query": "warfarin",
+      "brand_name": "tamsulosin hydrochloride",
+      "generic_name": "TAMSULOSIN HYDROCHLORIDE",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS \u2022 Tamsulosin hydrochloride capsules 0.4 mg should not be used with strong inhibitors of CYP3A4 (e.g., ketoconazole). Tamsulosin hydrochloride capsules should be used with caution in combination with moderate inhibitors of CYP3A4 (e.g., erythromycin), in combination with strong (e"
+    },
+    {
+      "search_query": "aspirin",
+      "brand_name": "Naproxen",
+      "generic_name": "NAPROXEN",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS See Table 1 for clinically significant drug interactions with naproxen. Table 1: Clinically Significant Drug Interactions with naproxen Drugs That Interfere with Hemostasis Clinical Impact: \u2022 Naproxen and anticoagulants such as warfarin have a synergistic effect on bleeding. The "
+    },
+    {
+      "search_query": "aspirin",
+      "brand_name": "aspirin",
+      "generic_name": "aspirin",
+      "clinical_interaction_text": "Drug Interactions ACE-inhibitors Reports suggest that NSAIDs may diminish the antihypertensive effect of ACE-inhibitors. This interaction should be given consideration in patients taking NSAIDs concomitantly with ACE-inhibitors (see PRECAUTIONS , General , Renal Effects ). Antacids The concomitant a"
+    },
+    {
+      "search_query": "aspirin",
+      "brand_name": "Etodolac",
+      "generic_name": "ETODOLAC",
+      "clinical_interaction_text": "Drug Interactions ACE-inhibitors Reports suggest that NSAIDs may diminish the antihypertensive effect of ACE-inhibitors. This interaction should be given consideration in patients taking NSAIDs concomitantly with ACE-inhibitors (see WARNINGS ). Antacids The concomitant administration of antacids has"
+    },
+    {
+      "search_query": "aspirin",
+      "brand_name": "aspirin",
+      "generic_name": "aspirin",
+      "clinical_interaction_text": "Drug Interactions Serotonergic Drugs Based on the mechanism of action of SNRIs and SSRIs including citalopram HBr, and the potential for serotonin syndrome, caution is advised when citalopram HBr is coadministered with other drugs that may affect the serotonergic neurotransmitter systems, such as tr"
+    },
+    {
+      "search_query": "aspirin",
+      "brand_name": "Sertraline Hydrochloride",
+      "generic_name": "SERTRALINE HYDROCHLORIDE",
+      "clinical_interaction_text": "Drug Interactions Potential Effects of Coadministration of Drugs Highly Bound to Plasma Proteins \u2013Because sertraline is tightly bound to plasma protein, the administration of sertraline hydrochloride to a patient taking another drug which is tightly bound to protein (e.g., warfarin, digitoxin) may c"
+    },
+    {
+      "search_query": "methotrexate",
+      "brand_name": "Naproxen",
+      "generic_name": "NAPROXEN",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS See Table 1 for clinically significant drug interactions with naproxen. Table 1: Clinically Significant Drug Interactions with naproxen Drugs That Interfere with Hemostasis Clinical Impact: \u2022 Naproxen and anticoagulants such as warfarin have a synergistic effect on bleeding. The "
+    },
+    {
+      "search_query": "methotrexate",
+      "brand_name": "methotrexate",
+      "generic_name": "methotrexate",
+      "clinical_interaction_text": "Drug Interactions ACE-inhibitors Reports suggest that NSAIDs may diminish the antihypertensive effect of ACE-inhibitors. This interaction should be given consideration in patients taking NSAIDs concomitantly with ACE-inhibitors (see PRECAUTIONS , General , Renal Effects ). Antacids The concomitant a"
+    },
+    {
+      "search_query": "methotrexate",
+      "brand_name": "Etodolac",
+      "generic_name": "ETODOLAC",
+      "clinical_interaction_text": "Drug Interactions ACE-inhibitors Reports suggest that NSAIDs may diminish the antihypertensive effect of ACE-inhibitors. This interaction should be given consideration in patients taking NSAIDs concomitantly with ACE-inhibitors (see WARNINGS ). Antacids The concomitant administration of antacids has"
+    },
+    {
+      "search_query": "methotrexate",
+      "brand_name": "methotrexate",
+      "generic_name": "methotrexate",
+      "clinical_interaction_text": "Drug Interactions A. Effect of Drugs and Other Agents on Cyclosporine Pharmacokinetics and/or Safety All of the individual drugs cited below are well substantiated to interact with cyclosporine. In addition, concomitant use of nonsteroidal anti-inflammatory drugs (NSAIDs) with cyclosporine, particul"
+    },
+    {
+      "search_query": "methotrexate",
+      "brand_name": "methotrexate",
+      "generic_name": "methotrexate",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Table 2 includes drugs with clinically important drug interactions when administered concomitantly with ACIPHEX delayed-release tablets and instructions for preventing or managing them. Consult the labeling of concomitantly used drugs to obtain further information about interacti"
+    },
+    {
+      "search_query": "ibuprofen",
+      "brand_name": "ropinirole",
+      "generic_name": "ROPINIROLE",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS \u2022 Inhibitors or inducers of CYP1A2: May alter the clearance of ropinirole; dose adjustment of ropinirole may be required. ( 7.1 , 12.3) \u2022 Hormone replacement therapy (HRT): Starting or stopping HRT may require dose adjustment of ropinirole. ( 7.2 , 12.3 ) \u2022 Dopamine antagonists ("
+    },
+    {
+      "search_query": "ibuprofen",
+      "brand_name": "ibuprofen",
+      "generic_name": "ibuprofen",
+      "clinical_interaction_text": "Drug Interactions (See and .) DIFLUCAN is a potent inhibitor of cytochrome P450 (CYP) isoenzyme 2C9 and 2C19, and a moderate inhibitor of CYP3A4. In addition to the observed /documented interactions mentioned below, there is a risk of increased plasma concentration of other compounds metabolized by "
+    },
+    {
+      "search_query": "ibuprofen",
+      "brand_name": "ibuprofen",
+      "generic_name": "ibuprofen",
+      "clinical_interaction_text": "Drug Interactions Drug Interactions: (See CLINICAL PHARMACOLOGY: Drug Interaction Studies and CONTRAINDICATIONS .) DIFLUCAN is a potent inhibitor of cytochrome P450 (CYP) isoenzyme 2C9 and a moderate inhibitor of CYP3A4. In addition to the observed /documented interactions mentioned below, there is "
+    },
+    {
+      "search_query": "ibuprofen",
+      "brand_name": "Ibuprofen",
+      "generic_name": "IBUPROFEN",
+      "clinical_interaction_text": "Preexisting asthma Patients with asthma may have aspirin-sensitive asthma. The use of aspirin in patients with aspirin-sensitive asthma has been associated with severe bronchospasm, which can be fatal. Since cross reactivity, including bronchospasm, between aspirin and NSAIDs has been reported in su"
+    },
+    {
+      "search_query": "ibuprofen",
+      "brand_name": "ibuprofen",
+      "generic_name": "ibuprofen",
+      "clinical_interaction_text": "Drug Interactions (Clinical Evaluation of Drug Interactions Conducted with metformin hydrochloride tablets, USP) Glyburide: In a single-dose interaction study in type 2 diabetes patients, co-administration of metformin and glyburide did not result in any changes in either metformin pharmacokinetics "
+    },
+    {
+      "search_query": "enoxaparin",
+      "brand_name": "Enoxaparin Sodium",
+      "generic_name": "ENOXAPARIN SODIUM",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Whenever possible, agents which may enhance the risk of hemorrhage should be discontinued prior to initiation of enoxaparin sodium therapy. These agents include medications such as: anticoagulants, platelet inhibitors including acetylsalicylic acid, salicylates, NSAIDs (including"
+    },
+    {
+      "search_query": "enoxaparin",
+      "brand_name": "enoxaparin",
+      "generic_name": "enoxaparin",
+      "clinical_interaction_text": "Drug Interactions Table 1 includes clinically significant drug interactions with Carisoprodol, Aspirin and Codeine Phosphate Tablets. Table 1: Clinically Significant Drug Interactions with Carisoprodol, Aspirin and Codeine Phosphate Tablets. Inhibitors of CYP3A4 Clinical Impact: The concomitant use "
+    },
+    {
+      "search_query": "enoxaparin",
+      "brand_name": "Enoxaparin Sodium",
+      "generic_name": "ENOXAPARIN SODIUM",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Whenever possible, agents which may enhance the risk of hemorrhage should be discontinued prior to initiation of enoxaparin sodium therapy. These agents include medications such as: anticoagulants, platelet inhibitors including acetylsalicylic acid, salicylates, NSAIDs (including"
+    },
+    {
+      "search_query": "enoxaparin",
+      "brand_name": "Xarelto",
+      "generic_name": "RIVAROXABAN",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Avoid combined P-gp and strong CYP3A inhibitors and inducers ( 7.2 , 7.3 ) Anticoagulants: Avoid concomitant use ( 7.4 ) 7.1 General Inhibition and Induction Properties Rivaroxaban is a substrate of CYP3A4/5, CYP2J2, and the P-gp and ATP-binding cassette G2 (ABCG2) transporters, "
+    },
+    {
+      "search_query": "enoxaparin",
+      "brand_name": "enoxaparin",
+      "generic_name": "enoxaparin",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Rivaroxaban is a substrate of CYP3A4/5, CYP2J2, and the P-gp and ATP-binding cassette G2 (ABCG2) transporters. Inhibitors and inducers of these CYP450 enzymes or transporters (e.g., P-gp) may result in changes in rivaroxaban exposure. Combined P-gp and strong CYP3A4 inhibitors an"
+    },
+    {
+      "search_query": "ketorolac",
+      "brand_name": "Ketorolac Tromethamine",
+      "generic_name": "KETOROLAC TROMETHAMINE",
+      "clinical_interaction_text": "Drug Interactions Ketorolac is highly bound to human plasma protein (mean 99.2%). There is no evidence in animal or human studies that ketorolac tromethamine induces or inhibits hepatic enzymes capable of metabolizing itself or other drugs."
+    },
+    {
+      "search_query": "ketorolac",
+      "brand_name": "Enoxaparin Sodium",
+      "generic_name": "ENOXAPARIN SODIUM",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Whenever possible, agents which may enhance the risk of hemorrhage should be discontinued prior to initiation of enoxaparin sodium therapy. These agents include medications such as: anticoagulants, platelet inhibitors including acetylsalicylic acid, salicylates, NSAIDs (including"
+    },
+    {
+      "search_query": "ketorolac",
+      "brand_name": "ketorolac",
+      "generic_name": "ketorolac",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Drugs may interact with warfarin sodium through pharmacodynamic or pharmacokinetic mechanisms. Pharmacodynamic mechanisms for drug interactions with warfarin sodium are synergism (impaired hemostasis, reduced clotting factor synthesis), competitive antagonism (vitamin K), and alt"
+    },
+    {
+      "search_query": "ketorolac",
+      "brand_name": "ketorolac",
+      "generic_name": "ketorolac",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Concomitant use of drugs that increase bleeding risk, antibiotics, antifungals, botanical (herbal) products, and inhibitors and inducers of CYP2C9, 1A2, or 3A4. ( 7 ) Consult labeling of all concurrently used drugs for complete information about interactions with warfarin sodium "
+    },
+    {
+      "search_query": "ketorolac",
+      "brand_name": "ketorolac",
+      "generic_name": "ketorolac",
+      "clinical_interaction_text": "7. DRUG INTERACTIONS Consult labeling of all concurrently used drugs for complete information about interactions with warfarin sodium or increased risks for bleeding. ( ) 7 Inhibitors and inducers of CYP2C9, 1A2, or 3A4: May alter warfarin exposure. Monitor INR closely when any such drug is used wit"
+    },
+    {
+      "search_query": "sertraline",
+      "brand_name": "sertraline",
+      "generic_name": "sertraline",
+      "clinical_interaction_text": "Drug Interactions Serotonergic Drugs Based on the mechanism of action of SNRIs and SSRIs including citalopram HBr, and the potential for serotonin syndrome, caution is advised when citalopram HBr is coadministered with other drugs that may affect the serotonergic neurotransmitter systems, such as tr"
+    },
+    {
+      "search_query": "sertraline",
+      "brand_name": "Sertraline Hydrochloride",
+      "generic_name": "SERTRALINE HYDROCHLORIDE",
+      "clinical_interaction_text": "Drug Interactions Potential Effects of Coadministration of Drugs Highly Bound to Plasma Proteins \u2013Because sertraline is tightly bound to plasma protein, the administration of sertraline hydrochloride to a patient taking another drug which is tightly bound to protein (e.g., warfarin, digitoxin) may c"
+    },
+    {
+      "search_query": "sertraline",
+      "brand_name": "sertraline",
+      "generic_name": "sertraline",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS CNS depressants: Enhanced CNS-depressant effects with combination use. Use with alcohol causes additive psychomotor impairment. ( 7.1 ) Imipramine: Decreased alertness observed with combination use. ( 7.1 ) Chlorpromazine: Impaired alertness and psychomotor performance observed w"
+    },
+    {
+      "search_query": "sertraline",
+      "brand_name": "sertraline",
+      "generic_name": "sertraline",
+      "clinical_interaction_text": "Drug Interactions Many drugs affect thyroid hormone pharmacokinetics and metabolism (e.g., absorption, synthesis, secretion, catabolism, protein binding, and target tissue response) and may alter the therapeutic response to Levothyroxine Sodium Tablets, USP. In addition, thyroid hormones and thyroid"
+    },
+    {
+      "search_query": "sertraline",
+      "brand_name": "sertraline",
+      "generic_name": "sertraline",
+      "clinical_interaction_text": "DRUG INTERACTIONS Few systemic data have been collected on the metabolism of bupropion following concomitant administration with other drugs or, alternatively, the effect of concomitant administration of bupropion on the metabolism of other drugs. Because bupropion is extensively metabolized, the co"
+    },
+    {
+      "search_query": "tramadol",
+      "brand_name": "tramadol",
+      "generic_name": "tramadol",
+      "clinical_interaction_text": "Drug Interactions Serotonergic Drugs Based on the mechanism of action of SNRIs and SSRIs including citalopram HBr, and the potential for serotonin syndrome, caution is advised when citalopram HBr is coadministered with other drugs that may affect the serotonergic neurotransmitter systems, such as tr"
+    },
+    {
+      "search_query": "tramadol",
+      "brand_name": "tramadol",
+      "generic_name": "tramadol",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Table 2: Clinically Significant Drug Interactions with Tramadol Hydrochloride Tablets Inhibitors of CYP2D6 Clinical Impact: The concomitant use of tramadol hydrochloride tablets and CYP2D6 inhibitors may result in an increase in the plasma concentration of tramadol and a decrease"
+    },
+    {
+      "search_query": "tramadol",
+      "brand_name": "ondansetron hydrochloride",
+      "generic_name": "ONDANSETRON HYDROCHLORIDE",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS 7.1 Serotonergic Drugs Serotonin syndrome (including altered mental status, autonomic instability, and neuromuscular symptoms) has been described following the concomitant use of 5-HT 3 receptor antagonists and other serotonergic drugs, including SSRIs and SNRIs. Monitor for the "
+    },
+    {
+      "search_query": "tramadol",
+      "brand_name": "tramadol",
+      "generic_name": "tramadol",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS Table 1 includes clinically significant drug interactions with Butalbital, Acetaminophen, Caffeine, and Codeine Phosphate Capsules. Table 1: Clinically Significant Drug Interactions with Butalbital, Acetaminophen, Caffeine, and Codeine Phosphate Capsules Inhibitors of CYP3A4 Clin"
+    },
+    {
+      "search_query": "tramadol",
+      "brand_name": "tramadol",
+      "generic_name": "tramadol",
+      "clinical_interaction_text": "7 DRUG INTERACTIONS CNS Depressants: Trazodone hydrochloride may enhance effects of alcohol, barbiturates, or other CNS depressants ( 7 ). CYP3A4 Inhibitors: Consider trazodone hydrochloride tablets dose reduction based on tolerability ( 2.5 , 7 ). CYP3A4 Inducers: Increase in trazodone hydrochlorid"
+    }
+  ]
 }
