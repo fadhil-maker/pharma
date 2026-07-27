@@ -100,6 +100,9 @@ class Command(BaseCommand):
         
         with transaction.atomic():
             Interaction.objects.all().delete()
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM sqlite_sequence WHERE name='tracker_interaction';")
             # Insert in chunks of 5000 for fast memory performance
             chunk_size = 5000
             for k in range(0, len(interactions_to_create), chunk_size):
