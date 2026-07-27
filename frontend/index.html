@@ -1077,7 +1077,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Clean up special chemical prefixes like (+)-, (±)- so OCR can match raw generic names
             let cleanText = extractedText.toLowerCase().replace(/\([+\-±rsdl,]+\)-?/g, ' ');
-            const normalizedOCR = cleanText.replace(/[^a-z0-9\s]/g, ' ').trim();
+            
+            // Defense Layer 1: Correct common low-quality camera OCR typos (e.g. 0->o, 1->i, 3->e, 4->a, 5->s, 8->b)
+            const deTypoText = cleanText.replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/5/g, 's').replace(/8/g, 'b');
+            
+            const normalizedOCR = deTypoText.replace(/[^a-z0-9\s]/g, ' ').trim();
             const tokens = normalizedOCR.split(/\s+/);
             
             // Build single words and bi-grams from the OCR text
@@ -1092,16 +1096,40 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (typeof COMMON_DRUGS !== 'undefined') {
                 for (let term of searchTerms) {
+                    let matchedDrug = null;
+                    
+                    // Exact match check
                     if (COMMON_DRUGS.includes(term)) {
+                        matchedDrug = term;
+                    } else if (term.length >= 6) {
+                        // Defense Layer 2: Fuzzy Levenshtein Match (1 character error tolerance for blurry photos)
+                        const sampleCandidates = COMMON_DRUGS.slice(0, 1500); // Check against top common drugs
+                        for (let cd of sampleCandidates) {
+                            if (Math.abs(cd.length - term.length) <= 1) {
+                                // Simple distance check
+                                let diff = 0;
+                                for (let k = 0; k < term.length; k++) {
+                                    if (term[k] !== cd[k]) diff++;
+                                    if (diff > 1) break;
+                                }
+                                if (diff <= 1) {
+                                    matchedDrug = cd;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (matchedDrug) {
                         let isSubpart = false;
                         for (let existing of foundDrugs) {
-                            if (existing.includes(term)) {
+                            if (existing.includes(matchedDrug)) {
                                 isSubpart = true;
                                 break;
                             }
                         }
                         if (!isSubpart && foundDrugs.size < 10) { // Safety cap at 10 drugs per scan
-                            foundDrugs.add(term);
+                            foundDrugs.add(matchedDrug);
                         }
                     }
                 }
