@@ -159,31 +159,51 @@
                 <span style="background:#ffbd2e;"></span>
                 <span style="background:#27c93f;"></span>
             </div>
-            <div class="mac-search">
+            <div class="mac-search" style="position: absolute; left: 50%; transform: translateX(-50%);">
                 <span style="font-size:12px; opacity:0.5;">🔒 pharma.zuloo.app</span>
             </div>
-            <!-- Toggle Pill -->
-            <div class="pill-toggle-container" onclick="toggleTheme()" title="Toggle Theme">
-                <img src="assets/pill.png" alt="Toggle" style="height:24px; border-radius:12px; object-fit:cover;">
             </div>
-        </div>
 
-        <div class="app-content">
+        <div class="app-content" style="position: relative;">
+
+            <!-- 3D Hanging Pill Theme Toggle -->
+            <div class="pill-toggle-container" onclick="toggleTheme()" title="Toggle Theme" style="position: absolute; top: -10px; right: 40px; cursor: pointer; z-index: 100; transition: transform 0.3s ease; animation: swing 6s infinite ease-in-out; transform-origin: top center;">
+                <img src="assets/pill.png" alt="Toggle Theme" style="height: 100px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));">
+            </div>
+            
+            <style>
+                @keyframes swing {
+                    0% { transform: rotate(3deg); }
+                    50% { transform: rotate(-3deg); }
+                    100% { transform: rotate(3deg); }
+                }
+                .pill-toggle-container:hover { transform: scale(1.05) rotate(0deg) !important; }
+            </style>
+    
             <!-- Brand Header -->
             <div class="app-header">
-                <div class="brand-logo-large">
+                
+                <div class="brand-logo-large" style="display: flex; align-items: center; gap: 12px; position: relative; z-index: 10;">
                     <div class="brand-icon">
-                        <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M50 10 V90 M10 50 H90" stroke="#0ea5e9" stroke-width="12" stroke-linecap="round"/>
-                            <path d="M20 50 L35 50 L45 20 L60 80 L70 50 L80 50" stroke="#1a202c" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+                        <!-- Custom Heartbeat Medical Cross SVG -->
+                        <svg width="56" height="56" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Cross Outline -->
+                            <path d="M40 15 H60 V40 H85 V60 H60 V85 H40 V60 H15 V40 H40 V15 Z" stroke="#0f172a" stroke-width="6" stroke-linejoin="round"/>
+                            <!-- Heartbeat Line -->
+                            <path d="M0 50 H25 L35 30 L50 80 L65 50 H100" stroke="#0ea5e9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Tech Dots -->
+                            <circle cx="85" cy="40" r="3" fill="#0ea5e9"/>
+                            <circle cx="85" cy="60" r="3" fill="#0ea5e9"/>
+                            <circle cx="60" cy="85" r="3" fill="#0ea5e9"/>
                         </svg>
                     </div>
-                    <div class="brand-text">
-                        <span>CLINICAL</span>
-                        <span>PHARMACY</span>
-                        <span>TRACKER</span>
+                    <div class="brand-text" style="display: flex; flex-direction: column; line-height: 1; font-family: 'Outfit', sans-serif; font-size: 19px; font-weight: 900; color: #0f172a; letter-spacing: 0.5px;">
+                        <span style="color: #0f172a;">CLINICAL</span>
+                        <span style="color: #0ea5e9;">PHARMACY</span>
+                        <span style="color: #0f172a;">TRACKER</span>
                     </div>
                 </div>
+            </div>
             </div>
 
             <div class="dashboard-grid">
