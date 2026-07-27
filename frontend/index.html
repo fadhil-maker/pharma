@@ -421,13 +421,13 @@
                     <div class="patient-vertical-form">
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
                             <!-- 1. Age -->
-                            <div class="input-group">
+                            <div class="input-group" style="position: relative;">
                                 <label>AGE (YEARS)</label>
                                 <input type="number" id="patientAgeInput" placeholder="e.g. 35" min="1" max="120" onchange="analyzeInteractions()">
                             </div>
 
                             <!-- 2. Gender -->
-                            <div class="input-group">
+                            <div class="input-group" style="position: relative;">
                                 <label>GENDER</label>
                                 <select id="patientGenderInput" onchange="analyzeInteractions()">
                                     <option value="" disabled selected>Select Gender</option>
@@ -438,7 +438,7 @@
                             </div>
 
                             <!-- 3. Weight -->
-                            <div class="input-group">
+                            <div class="input-group" style="position: relative;">
                                 <label>WEIGHT (LBS)</label>
                                 <input type="number" id="patientWeightInput" placeholder="e.g. 180" min="1" max="500" onchange="analyzeInteractions()">
                             </div>
@@ -457,12 +457,12 @@
                     
                     <form onsubmit="handleAddDrug(event)">
                         <div class="logger-row">
-                            <div class="input-group">
+                            <div class="input-group" style="position: relative;">
                                 <label>DRUG NAME</label>
                                 <input type="text" id="drugInput" placeholder="e.g. Aspirin" required autocomplete="off">
                                 <div id="drugSuggestions" class="premium-dropdown"></div>
                             </div>
-                            <div class="input-group">
+                            <div class="input-group" style="position: relative;">
                                 <label>TIMESTAMP</label>
                                 <select id="timeInput">
                                     <option>08:00 AM</option>
@@ -705,7 +705,66 @@ function loadVitals() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadVitals);
+document.addEventListener('DOMContentLoaded', () => { loadVitals(); setupAutocomplete(); });
+
+
+// ── 3.5. Drug Autocomplete & Suggestions ──────────────────────────────────
+const commonClinicalDrugs = [
+    "Aspirin", "Advil", "Amoxicillin", "Atorvastatin", "Azithromycin", 
+    "Codeine", "Coumadin", "Ciprofloxacin", "Crestor",
+    "Enoxaparin", 
+    "Hydrochlorothiazide", 
+    "Ibuprofen", 
+    "Ketorolac", 
+    "Lisinopril", "Lithium", "Lipitor",
+    "Metformin", "Methotrexate", "Midazolam", 
+    "Paracetamol", "Plavix", "Promethazine", 
+    "Ritonavir", 
+    "Tylenol", 
+    "Viagra", 
+    "Warfarin"
+];
+
+function setupAutocomplete() {
+    const input = document.getElementById('drugInput');
+    const suggestionsBox = document.getElementById('drugSuggestions');
+    if (!input || !suggestionsBox) return;
+
+    input.addEventListener('input', function() {
+        const val = this.value.toLowerCase().trim();
+        suggestionsBox.innerHTML = '';
+        if (!val) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        const matches = commonClinicalDrugs.filter(d => d.toLowerCase().includes(val));
+        if (matches.length > 0) {
+            suggestionsBox.style.display = 'block';
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = match;
+                div.onclick = function() {
+                    input.value = match;
+                    suggestionsBox.style.display = 'none';
+                    suggestionsBox.innerHTML = '';
+                    input.focus();
+                };
+                suggestionsBox.appendChild(div);
+            });
+        } else {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target !== input && e.target !== suggestionsBox) {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+}
 
 // ── 3. Queue Management & Rendering ─────────────────────────────────────────
 function handleAddDrug(e) {
