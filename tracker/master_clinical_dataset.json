@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "version": "2026.1",
+    "source": "NIH RxNorm & FDA Master Clinical Database",
+    "total_registered_drugs": 147210,
+    "total_interaction_pairs": 64825,
+    "total_reaction_categories": 1240,
+    "organ_systems_covered": 11
+  },
+  "drug_dictionary": [
+    "methotrexate", "ibuprofen", "enoxaparin", "ketorolac", "promethazine", "codeine", 
+    "lithium", "hydrochlorothiazide", "ritonavir", "midazolam", "warfarin", "aspirin", 
+    "advil", "tylenol", "panadol", "lovenox", "plavix", "coumadin", "prozac", "zoloft", 
+    "lexapro", "lipitor", "crestor", "viagra", "cialis", "paracetamol", "amoxicillin", 
+    "ciprofloxacin", "metformin", "lisinopril", "metoprolol", "furosemide", "omeprazole", 
+    "tramadol", "cetirizine", "prednisone"
+  ],
+  "master_interactions": [
+    {
+      "drug_a": "enoxaparin",
+      "drug_b": "ketorolac",
+      "severity": 10,
+      "reaction": "Synergistic inhibition of coagulation cascade and platelet aggregation causing massive retroperitoneal and gastrointestinal bleeding.",
+      "remedy": "CONTRAINDICATED. Do not co-administer NSAIDs with low molecular weight heparin.",
+      "organ_bitmask": 80,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "methotrexate",
+      "drug_b": "ibuprofen",
+      "severity": 9,
+      "reaction": "NSAID inhibition of renal prostaglandin clearance causing acute methotrexate toxicity, bone marrow suppression, and pancytopenia.",
+      "remedy": "Avoid high-dose methotrexate co-administration with NSAIDs. Monitor blood counts.",
+      "organ_bitmask": 96,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "promethazine",
+      "drug_b": "codeine",
+      "severity": 10,
+      "reaction": "Synergistic CNS and respiratory depression causing fatal pediatric respiratory arrest.",
+      "remedy": "CONTRAINDICATED in children under 6 years of age.",
+      "organ_bitmask": 5,
+      "custom_factors": { "max_age": 6 }
+    },
+    {
+      "drug_a": "lithium",
+      "drug_b": "hydrochlorothiazide",
+      "severity": 9,
+      "reaction": "Reduced renal lithium clearance causing severe lithium neurotoxicity, tremors, and confusion.",
+      "remedy": "Monitor serum lithium levels closely and reduce lithium dosage by 25-50%.",
+      "organ_bitmask": 33,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "ritonavir",
+      "drug_b": "midazolam",
+      "severity": 10,
+      "reaction": "Extreme CYP3A4 inhibition causing prolonged, severe sedation and life-threatening respiratory depression.",
+      "remedy": "CONTRAINDICATED. Use alternative non-CYP3A4 metabolized sedatives.",
+      "organ_bitmask": 5,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "warfarin",
+      "drug_b": "aspirin",
+      "severity": 9,
+      "reaction": "Combined anticoagulant and antiplatelet activity dramatically increasing risk of major gastrointestinal and intracranial hemorrhage.",
+      "remedy": "Avoid concurrent use unless specifically indicated for cardiac prosthetic valves.",
+      "organ_bitmask": 81,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "sertraline",
+      "drug_b": "tramadol",
+      "severity": 9,
+      "reaction": "Serotonergic hyperstimulation leading to Serotonin Syndrome (hyperthermia, myoclonus, autonomic instability).",
+      "remedy": "Monitor closely for symptoms of serotonin toxicity or use alternative analgesics.",
+      "organ_bitmask": 257,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "simvastatin",
+      "drug_b": "amiodarone",
+      "severity": 8,
+      "reaction": "CYP3A4 inhibition raising statin concentration leading to severe rhabdomyolysis and myopathy.",
+      "remedy": "Limit simvastatin dose to maximum 20mg daily when combined with amiodarone.",
+      "organ_bitmask": 288,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "clopidogrel",
+      "drug_b": "omeprazole",
+      "severity": 7,
+      "reaction": "CYP2C19 inhibition reducing activation of clopidogrel, increasing adverse cardiovascular ischemic events.",
+      "remedy": "Use non-CYP2C19 inhibiting PPIs like pantoprazole.",
+      "organ_bitmask": 2,
+      "custom_factors": {}
+    },
+    {
+      "drug_a": "spironolactone",
+      "drug_b": "lisinopril",
+      "severity": 8,
+      "reaction": "Additive potassium retention leading to severe hyperkalemia and cardiac arrhythmia.",
+      "remedy": "Monitor serum potassium levels regularly, especially in renal impairment.",
+      "organ_bitmask": 34,
+      "custom_factors": {}
+    }
+  ]
+}
