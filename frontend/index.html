@@ -290,9 +290,19 @@
         .badge-right { left: 28px; text-align: left; }
         .badge-left { right: 28px; text-align: right; }
         
+        
+        .blip-brain { top: 12%; left: 50%; }
+        .blip-thyroid { top: 20%; left: 50%; }
+        .blip-lungs { top: 28%; left: 50%; }
         .blip-heart { top: 32%; left: 53%; }
         .blip-liver { top: 48%; left: 40%; }
+        .blip-stomach { top: 50%; left: 58%; }
+        .blip-spleen { top: 52%; left: 65%; }
+        .blip-pancreas { top: 55%; left: 50%; }
         .blip-kidneys { top: 62%; left: 50%; }
+        .blip-intestines { top: 72%; left: 50%; }
+        .blip-bladder { top: 85%; left: 50%; }
+    
     </style>
 </head>
 <body>
@@ -547,20 +557,20 @@
                         <img src="assets/torso.png" alt="3D Organ Map">
                         
                         <div id="organThreats" class="threat-layer">
-                            <div class="organ-blip blip-heart" id="blipHeart">
-                                <div class="blip-glow bg-red"></div>
-                                <div class="blip-badge badge-right">Heart<br><span style="color:#ef4444">High</span></div>
-                            </div>
-                            <div class="organ-blip blip-liver" id="blipLiver">
-                                <div class="blip-glow bg-orange"></div>
-                                <div class="blip-badge badge-left">Liver<br><span style="color:#f97316">Significant</span></div>
-                            </div>
-                            <div class="organ-blip blip-kidneys" id="blipKidneys">
-                                <div class="blip-glow bg-yellow"></div>
-                                <div class="blip-badge badge-left">Kidneys<br><span style="color:#eab308">Moderate</span></div>
-                            </div>
+                            <div class="organ-blip blip-brain" id="blipBrain"><div class="blip-glow bg-red"></div><div class="blip-badge badge-right">Brain<br><span style="color:#ef4444">CNS Threat</span></div></div>
+                            <div class="organ-blip blip-thyroid" id="blipThyroid"><div class="blip-glow bg-yellow"></div><div class="blip-badge badge-left">Thyroid<br><span style="color:#eab308">Endocrine</span></div></div>
+                            <div class="organ-blip blip-lungs" id="blipLungs"><div class="blip-glow bg-orange"></div><div class="blip-badge badge-right">Lungs<br><span style="color:#f97316">Pulmonary</span></div></div>
+                            <div class="organ-blip blip-heart" id="blipHeart"><div class="blip-glow bg-red"></div><div class="blip-badge badge-left">Heart<br><span style="color:#ef4444">Cardiac</span></div></div>
+                            <div class="organ-blip blip-liver" id="blipLiver"><div class="blip-glow bg-orange"></div><div class="blip-badge badge-right">Liver<br><span style="color:#f97316">Hepatic</span></div></div>
+                            <div class="organ-blip blip-stomach" id="blipStomach"><div class="blip-glow bg-red"></div><div class="blip-badge badge-left">Stomach<br><span style="color:#ef4444">Gastric</span></div></div>
+                            <div class="organ-blip blip-spleen" id="blipSpleen"><div class="blip-glow bg-yellow"></div><div class="blip-badge badge-right">Spleen<br><span style="color:#eab308">Immune</span></div></div>
+                            <div class="organ-blip blip-pancreas" id="blipPancreas"><div class="blip-glow bg-orange"></div><div class="blip-badge badge-left">Pancreas<br><span style="color:#f97316">Endocrine</span></div></div>
+                            <div class="organ-blip blip-kidneys" id="blipKidneys"><div class="blip-glow bg-yellow"></div><div class="blip-badge badge-right">Kidneys<br><span style="color:#eab308">Renal</span></div></div>
+                            <div class="organ-blip blip-intestines" id="blipIntestines"><div class="blip-glow bg-orange"></div><div class="blip-badge badge-left">Intestines<br><span style="color:#f97316">GI Tract</span></div></div>
+                            <div class="organ-blip blip-bladder" id="blipBladder"><div class="blip-glow bg-yellow"></div><div class="blip-badge badge-right">Bladder<br><span style="color:#eab308">Urinary</span></div></div>
                         </div>
                     </div>
+                </div>
                 </div>
 
             </div>
@@ -573,7 +583,7 @@
                     <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
                         <path d="M40 15 H60 V40 H85 V60 H60 V85 H40 V60 H15 V40 H40 V15 Z" fill="var(--accent)"/>
                     </svg>
-                    <span style="font-weight: 800; letter-spacing: 1px; font-size: 14px; color: var(--text-main);">CLINICAL PHARMACY TRACKER</span>
+                    <span style="font-weight: 800; letter-spacing: 1px; font-size: 14px; color: var(--text-main);">ZULOO CLINICAL TRACKER</span>
                 </div>
                 <div class="footer-links">
                     <a href="#">Privacy Policy</a>
@@ -582,7 +592,7 @@
                     <a href="#">Help & Support</a>
                 </div>
                 <div class="footer-copy">
-                    &copy; 2026 Shanu Digicore Clinical Systems. All rights reserved.
+                    &copy; 2026 Zuloo. All rights reserved. <br><a href="https://zuloo.vercel.app" style="color: var(--accent); text-decoration: none; font-weight: bold; margin-top: 8px; display: inline-block;">Visit zuloo.vercel.app</a>
                 </div>
             </div>
         </footer>
@@ -653,7 +663,7 @@ function toggleTheme() {
     const current = html.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+    
     
     const iconEl = document.getElementById('lampThemeIcon');
     const textEl = document.getElementById('lampThemeText');
@@ -684,7 +694,7 @@ function loadVitals() {
         if(statusText) statusText.textContent = 'Enter Details';
         
         // Load theme
-        const theme = localStorage.getItem('theme');
+        const theme = 'light';
         if (theme) {
             document.documentElement.setAttribute('data-theme', theme);
             const iconEl = document.getElementById('lampThemeIcon');
@@ -694,12 +704,7 @@ function loadVitals() {
         }
         
         // Load drugs
-        const savedDrugs = localStorage.getItem('patientProfile');
-        if (savedDrugs) {
-            intakes = JSON.parse(savedDrugs);
-            renderQueue();
-            if(intakes.length >= 2) analyzeInteractions();
-        }
+        
     } catch (e) {
         console.error("Initialization error:", e);
     }
@@ -777,7 +782,7 @@ function handleAddDrug(e) {
     if (!drugName) return;
 
     intakes.push({ drug_name: drugName, timestamp: timeEl.value });
-    localStorage.setItem('patientProfile', JSON.stringify(intakes));
+    
     
     input.value = '';
     renderQueue();
@@ -786,14 +791,14 @@ function handleAddDrug(e) {
 
 function removeFromQueue(index) {
     intakes.splice(index, 1);
-    localStorage.setItem('patientProfile', JSON.stringify(intakes));
+    
     renderQueue();
     analyzeInteractions();
 }
 
 function clearProfile() {
     intakes = [];
-    localStorage.setItem('patientProfile', JSON.stringify(intakes));
+    
     renderQueue();
     analyzeInteractions();
 }
@@ -847,7 +852,7 @@ async function handleOCRScan(input) {
         if (found.size > 0) {
             const timeVal = document.getElementById('timeInput').value || '12:00 PM';
             found.forEach(d => intakes.push({ drug_name: d, timestamp: timeVal }));
-            localStorage.setItem('patientProfile', JSON.stringify(intakes));
+            
             renderQueue();
             alert(`✅ Added ${found.size} drugs from scan!`);
             if(intakes.length >= 2) analyzeInteractions();
@@ -865,14 +870,13 @@ async function analyzeInteractions() {
     const gauge = document.getElementById('gaugeNeedle');
     const scoreUI = document.getElementById('severityScore');
     const labelUI = document.getElementById('severityLabel');
-    const blipHeart = document.getElementById('blipHeart');
-    const blipLiver = document.getElementById('blipLiver');
-    const blipKidneys = document.getElementById('blipKidneys');
+    
+    const allOrgans = ['Brain', 'Thyroid', 'Lungs', 'Heart', 'Liver', 'Stomach', 'Spleen', 'Pancreas', 'Kidneys', 'Intestines', 'Bladder'];
+    allOrgans.forEach(o => {
+        const el = document.getElementById('blip' + o);
+        if (el) el.style.display = 'none';
+    });
 
-    // Reset UI
-    if(blipHeart) blipHeart.style.display = 'none';
-    if(blipLiver) blipLiver.style.display = 'none';
-    if(blipKidneys) blipKidneys.style.display = 'none';
     if(detailsUI) detailsUI.style.display = 'none';
     if(scoreUI) scoreUI.textContent = "0";
     if(labelUI) {
@@ -911,17 +915,19 @@ async function analyzeInteractions() {
     const genderVal = genderInput && genderInput.value ? genderInput.value : 'MALE';
     const weightVal = weightInput && weightInput.value ? parseInt(weightInput.value) : 180;
 
+    let targetOrgans = new Set();
+
     // Biometric & Drug Fallback Rules Engine
     if (intakes.length > 0) {
-        // Age / Weight / Gender specific risk adjustments
         if (ageVal > 65) {
             warnings.push({
                 drug_a: 'GERIATRIC RISK WARNING',
                 drug_b: 'Age ' + ageVal + ' Yrs',
                 severity: 'High',
-                reaction: 'Elevated risk of impaired hepatic/renal clearance in patients over 65. Drug half-life extended.',
+                reaction: 'Elevated risk of impaired hepatic/renal clearance in patients over 65.',
                 remedy: 'Reduce standard dosage by 25-50% and monitor renal clearance.'
             });
+            targetOrgans.add('Kidneys'); targetOrgans.add('Liver');
         }
         if (weightVal < 110) {
             warnings.push({
@@ -931,28 +937,30 @@ async function analyzeInteractions() {
                 reaction: 'Volume of distribution reduced for lipophilic medications due to low body weight.',
                 remedy: 'Adjust mg/kg dosage calculation.'
             });
+            targetOrgans.add('Heart');
         }
         
         if (warnings.length === 0 && intakes.length >= 2) {
             const names = intakes.map(i => i.drug_name.toLowerCase());
             
-            // Known Clinical Pair Check
             if ((names.includes('aspirin') || names.includes('advil')) && (names.includes('warfarin') || names.includes('coumadin') || names.includes('plavix'))) {
                 warnings.push({
                     drug_a: 'Aspirin / NSAID',
                     drug_b: 'Warfarin / Anticoagulant',
                     severity: 'High',
-                    reaction: 'Synergistic antiplatelet and anticoagulant inhibition. Severe risk of major gastrointestinal hemorrhage and internal bleeding.',
-                    remedy: 'Avoid concurrent use. Monitor INR closely or substitute with acetaminophen under clinical supervision.'
+                    reaction: 'Synergistic antiplatelet and anticoagulant inhibition. Severe risk of major gastrointestinal hemorrhage.',
+                    remedy: 'Avoid concurrent use. Monitor INR closely or substitute with acetaminophen.'
                 });
+                targetOrgans.add('Stomach'); targetOrgans.add('Intestines');
             } else if (names.includes('ibuprofen') && names.includes('aspirin')) {
                 warnings.push({
                     drug_a: 'Ibuprofen',
                     drug_b: 'Aspirin',
                     severity: 'Moderate',
-                    reaction: 'Competitive COX-1 binding. Ibuprofen interferes with the irreversible cardioprotective antiplatelet effect of low-dose aspirin.',
+                    reaction: 'Competitive COX-1 binding. Ibuprofen interferes with cardioprotective antiplatelet effect.',
                     remedy: 'Take low-dose aspirin at least 30 minutes before or 8 hours after ibuprofen.'
                 });
+                targetOrgans.add('Heart'); targetOrgans.add('Stomach');
             } else if (names.includes('methotrexate') && (names.includes('ibuprofen') || names.includes('aspirin'))) {
                 warnings.push({
                     drug_a: 'Methotrexate',
@@ -961,6 +969,25 @@ async function analyzeInteractions() {
                     reaction: 'Reduced renal clearance of methotrexate leading to severe bone marrow suppression and hepatic toxicity.',
                     remedy: 'Discontinue NSAID and switch to safer analgesics.'
                 });
+                targetOrgans.add('Liver'); targetOrgans.add('Kidneys');
+            } else if (names.includes('codeine') || names.includes('midazolam')) {
+                warnings.push({
+                    drug_a: 'CNS Depressant',
+                    drug_b: intakes.find(i => i.drug_name.toLowerCase() !== 'codeine' && i.drug_name.toLowerCase() !== 'midazolam')?.drug_name.toUpperCase() || 'Other',
+                    severity: 'High',
+                    reaction: 'Risk of profound sedation, respiratory depression, coma, and death.',
+                    remedy: 'Limit dosages and durations to the minimum required.'
+                });
+                targetOrgans.add('Brain'); targetOrgans.add('Lungs');
+            } else if (names.includes('lisinopril') || names.includes('hydrochlorothiazide')) {
+                 warnings.push({
+                    drug_a: 'Antihypertensive',
+                    drug_b: 'Other',
+                    severity: 'Moderate',
+                    reaction: 'Potential for hyperkalemia and acute renal failure.',
+                    remedy: 'Monitor potassium levels and renal function.'
+                });
+                targetOrgans.add('Heart'); targetOrgans.add('Kidneys');
             } else {
                 warnings.push({
                     drug_a: intakes[0].drug_name.toUpperCase(),
@@ -969,6 +996,7 @@ async function analyzeInteractions() {
                     reaction: 'Potential CYP450 hepatic enzyme competition and altered renal clearance window.',
                     remedy: 'Stagger administration times by at least 2 to 4 hours and monitor for elevated serum concentrations.'
                 });
+                targetOrgans.add('Liver'); targetOrgans.add('Bladder');
             }
         }
     }
@@ -984,14 +1012,18 @@ async function analyzeInteractions() {
             maxSev = 8;
             sevLabel = "HIGH RISK / SEVERE";
             sevColor = "#ef4444";
-            if(blipHeart) blipHeart.style.display = 'block';
-            if(blipLiver) blipLiver.style.display = 'block';
         } else {
             maxSev = 5;
             sevLabel = "MODERATE RISK";
             sevColor = "#f97316";
-            if(blipKidneys) blipKidneys.style.display = 'block';
         }
+        
+        // Light up the target organs!
+        if (targetOrgans.size === 0) { targetOrgans.add('Liver'); targetOrgans.add('Kidneys'); }
+        targetOrgans.forEach(o => {
+            const el = document.getElementById('blip' + o);
+            if (el) el.style.display = 'block';
+        });
     }
     
     if(scoreUI) scoreUI.textContent = maxSev;
@@ -1007,8 +1039,8 @@ async function analyzeInteractions() {
         detailsUI.innerHTML = warnings.map(w => `
             <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity === 'High' ? '#ef4444' : '#f97316'}; margin-bottom: 16px;">
                 <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a} + ${w.drug_b}</div>
-                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Reaction:</strong> ${w.reaction}</div>
-                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Cause:</strong> ${w.reaction}</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy Suggestion:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
             </div>
         `).join('');
     }
