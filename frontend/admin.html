@@ -207,6 +207,22 @@
         </div>
     </div>
 
+    <!-- Smart Fetch Card -->
+    <div class="card" style="border: 1px solid var(--accent); background: rgba(14, 165, 233, 0.03);">
+        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>🌐 Smart Fetch Official RxNorm / FDA Interactions</span>
+            <span style="font-size: 12px; font-weight: normal; color: var(--accent);">Powered by NIH RxNav & Gemini AI</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: -8px; margin-bottom: 16px;">
+            Enter any drug name below to query the official U.S. Government RxNorm database and automatically parse & inject its real-world interaction rules directly into PostgreSQL.
+        </p>
+        <div style="display: flex; gap: 12px;">
+            <input type="text" id="smartFetchInput" placeholder="e.g. Fluoxetine, Warfarin, Metformin..." style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main);">
+            <button class="btn btn-cyan" id="btnSmartFetch" onclick="handleSmartFetch()" style="padding: 12px 24px;">⚡ Fetch & Inject Rules</button>
+        </div>
+        <div id="smartFetchStatus" style="margin-top: 12px; font-size: 13px; display: none;"></div>
+    </div>
+
     <!-- Rule & Combination Builder -->
     <div class="card">
         <div class="card-title">➕ Create Custom Drug Pair & Reaction Rule</div>
@@ -734,6 +750,47 @@ async function deleteRule(id) {
             openManageAdminsModal();
         }
 
+
+        async function handleSmartFetch() {
+            const input = document.getElementById('smartFetchInput');
+            const btn = document.getElementById('btnSmartFetch');
+            const status = document.getElementById('smartFetchStatus');
+            
+            if (!input || !btn || !status) return;
+            const drugName = input.value.trim();
+            if (!drugName) return alert('Please enter a drug name to fetch.');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Querying RxNorm & Gemini AI...';
+            status.style.display = 'block';
+            status.style.color = 'var(--text-muted)';
+            status.innerHTML = 'Connecting to official NIH RxNav endpoints...';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/interactions/smart-fetch/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ drug_name: drugName })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    status.style.color = '#10b981';
+                    status.innerHTML = `✅ ${data.message}`;
+                    input.value = '';
+                    loadInteractions();
+                } else {
+                    status.style.color = '#ef4444';
+                    status.innerHTML = `❌ Error: ${data.error || data.message || 'Failed to fetch rules.'}`;
+                }
+            } catch (err) {
+                status.style.color = '#ef4444';
+                status.innerHTML = `❌ Server Connection Error: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '⚡ Fetch & Inject Rules';
+            }
+        }
 
         function toggleTheme() {
             const html = document.documentElement;
