@@ -161,6 +161,7 @@ def create_interaction(request):
     drug_b = request.data.get('drug_b', '').strip().lower()
     reaction_name = request.data.get('reaction', '').strip()
     severity = int(request.data.get('severity', 5))
+    time_window_hours = int(request.data.get('time_window_hours', 24))
     remedy = request.data.get('remedy', '').strip()
     organ_bitmask = int(request.data.get('organ_bitmask', 0))
     custom_factors = request.data.get('custom_factors', {})
@@ -176,6 +177,7 @@ def create_interaction(request):
         defaults={
             'reaction': reaction_obj,
             'severity_slider': severity,
+            'time_window_hours': time_window_hours,
             'remedy': remedy,
             'organ_bitmask': organ_bitmask,
             'custom_factors': custom_factors
@@ -253,6 +255,9 @@ def check_timeline(request):
         for j in range(i + 1, len(windows)):
             w1, w2 = windows[i], windows[j]
             n1, n2 = w1['clean_name'], w2['clean_name']
+            
+            # Calculate time difference in hours
+            time_diff_hours = abs((w1['intake_time'] - w2['intake_time']).total_seconds()) / 3600.0
 
             db_matches = Interaction.objects.select_related('reaction').filter(
                 Q(drug_a=n1, drug_b=n2) | Q(drug_a=n2, drug_b=n1)
@@ -260,6 +265,10 @@ def check_timeline(request):
 
             matched_interactions = []
             for db_rule in db_matches:
+                # Strictly enforce time_window_hours constraint
+                if time_diff_hours > db_rule.time_window_hours:
+                    continue
+                    
                 matched_interactions.append({
                     'drug_a': w1['raw_name'],
                     'drug_b': w2['raw_name'],

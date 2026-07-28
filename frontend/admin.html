@@ -239,8 +239,33 @@
                     <input type="range" id="severity" min="1" max="10" value="8" oninput="document.getElementById('sevVal').textContent=this.value">
                 </div>
                 <div>
-                    <label>Max Age Limit (Optional)</label>
-                    <input type="number" id="maxAge" placeholder="e.g. 6 for pediatric rules">
+                    <label>Time Window (Hours)</label>
+                    <input type="number" id="timeWindow" value="24" placeholder="e.g. 24">
+                </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div>
+                    <label>Min / Max Age</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="minAge" placeholder="Min">
+                        <input type="number" id="maxAge" placeholder="Max">
+                    </div>
+                </div>
+                <div>
+                    <label>Min / Max Weight (lbs)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="minWeight" placeholder="Min">
+                        <input type="number" id="maxWeight" placeholder="Max">
+                    </div>
+                </div>
+                <div>
+                    <label>Specific Gender</label>
+                    <select id="genderRule">
+                        <option value="All">All / Any</option>
+                        <option value="Male">Male Only</option>
+                        <option value="Female">Female Only</option>
+                    </select>
                 </div>
             </div>
 
@@ -481,7 +506,19 @@ async function fetchPageData(page = 1) {
             return;
         }
 
-        tbody.innerHTML = rules.map(r => `
+        tbody.innerHTML = rules.map(r => {
+            let constraints = [];
+            if(r.time_window_hours && r.time_window_hours !== 24) constraints.push(`${r.time_window_hours}hr window`);
+            if(r.custom_factors) {
+                if(r.custom_factors.min_age) constraints.push(`Min Age: ${r.custom_factors.min_age}`);
+                if(r.custom_factors.max_age) constraints.push(`Max Age: ${r.custom_factors.max_age}`);
+                if(r.custom_factors.min_weight) constraints.push(`Min Wt: ${r.custom_factors.min_weight}lbs`);
+                if(r.custom_factors.max_weight) constraints.push(`Max Wt: ${r.custom_factors.max_weight}lbs`);
+                if(r.custom_factors.gender) constraints.push(`Gender: ${r.custom_factors.gender}`);
+            }
+            const badgeHtml = constraints.length > 0 ? `<div style="margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap;">${constraints.map(c => `<span style="background: rgba(14, 165, 233, 0.15); color: var(--cyan-neon); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;">${c}</span>`).join('')}</div>` : '';
+
+            return `
             <tr>
                 <td><b>#${r.id}</b></td>
                 <td><b>${r.drug_a}</b> + <b>${r.drug_b}</b></td>
@@ -489,10 +526,11 @@ async function fetchPageData(page = 1) {
                 <td>
                     <div><b>Reaction:</b> ${r.reaction}</div>
                     <div style="color:#94a3b8; font-size:12px; margin-top:3px;"><b>Remedy:</b> ${r.remedy || 'N/A'}</div>
+                    ${badgeHtml}
                 </td>
                 <td><button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteRule(${r.id})">Delete</button></td>
             </tr>
-        `).join('');
+        `}).join('');
 
         document.getElementById('pageIndicator').textContent = `Page ${currentPage.toLocaleString()} of ${totalServerPages.toLocaleString()} (${totalServerRules.toLocaleString()} total rules)`;
         document.getElementById('btnPrev').disabled = (currentPage <= 1);
@@ -533,7 +571,13 @@ async function handleCreateRule(e) {
     const rx = document.getElementById('reactionText').value.trim();
     const rem = document.getElementById('remedyText').value.trim();
     const sev = document.getElementById('severity').value;
+    const timeWin = document.getElementById('timeWindow').value;
+    
+    const minAge = document.getElementById('minAge').value;
     const maxAge = document.getElementById('maxAge').value;
+    const minWeight = document.getElementById('minWeight').value;
+    const maxWeight = document.getElementById('maxWeight').value;
+    const gender = document.getElementById('genderRule').value;
 
     let mask = 0;
     document.querySelectorAll('.organ-checkboxes input:checked').forEach(cb => {
@@ -541,7 +585,11 @@ async function handleCreateRule(e) {
     });
 
     const custom_factors = {};
+    if (minAge) custom_factors.min_age = parseInt(minAge);
     if (maxAge) custom_factors.max_age = parseInt(maxAge);
+    if (minWeight) custom_factors.min_weight = parseInt(minWeight);
+    if (maxWeight) custom_factors.max_weight = parseInt(maxWeight);
+    if (gender && gender !== 'All') custom_factors.gender = gender;
 
     try {
         const res = await fetch(`${API_BASE}/api/admin/interactions/create/`, {
@@ -553,6 +601,7 @@ async function handleCreateRule(e) {
                 reaction: rx,
                 remedy: rem,
                 severity: sev,
+                time_window_hours: timeWin ? parseInt(timeWin) : 24,
                 organ_bitmask: mask,
                 custom_factors: custom_factors
             })
