@@ -64,7 +64,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Database is already fully populated with all pairs!"))
             return
 
-        to_process = missing_pairs[:limit]
         self.stdout.write(self.style.WARNING(f"Processing this batch limit: {len(to_process):,} pairs..."))
 
         causes = [
@@ -85,34 +84,50 @@ class Command(BaseCommand):
 
         generic_rx_obj, _ = ReactionDefinition.objects.get_or_create(name="Complex Polypharmacy Metabolic Interaction")
 
-        interactions_to_create = []
-        import random
-        
-        for d1, d2 in to_process:
-            cause_template = random.choice(causes)
-            remedy_template = random.choice(remedies)
-            
-            interactions_to_create.append(Interaction(
-                drug_a=d1,
-                drug_b=d2,
-                reaction=generic_rx_obj,
-                severity_slider=random.randint(4, 10),
-                remedy=remedy_template.format(d1=d1.title(), d2=d2.title()),
-                organ_bitmask=random.choice([8, 16, 256, 1, 4, 1|8, 16|256]),
-                custom_factors={
-                    "min_age": random.choice([None, 18, 45, 60]),
-                    "max_weight": random.choice([None, 120, 150, 200]),
-                    "gender": random.choice(["Male", "Female", "Any", "Any"])
-                }
-            ))
+        total_to_do = len(to_process)
+        chunk_size = 100000
+        n_causes = len(causes)
+        n_remedies = len(remedies)
+        organs_list = [8, 16, 256, 1, 4, 9, 272]
+        n_organs = len(organs_list)
 
-        self.stdout.write("Injecting batch into PostgreSQL/SQLite...")
-        with transaction.atomic():
-            Interaction.objects.bulk_create(interactions_to_create, batch_size=5000, ignore_conflicts=True)
-                    
+        self.stdout.write("Injecting in fast 100k memory streams with live progress...")
+        
+        inserted_so_far = 0
+        for i in range(0, total_to_do, chunk_size):
+            chunk = to_process[i:i + chunk_size]
+            interactions_chunk = []
+            
+            for idx, (d1, d2) in enumerate(chunk):
+                global_idx = i + idx
+                c_tmpl = causes[global_idx % n_causes]
+                r_tmpl = remedies[global_idx % n_remedies]
+                org = organs_list[global_idx % n_organs]
+                
+                interactions_chunk.append(Interaction(
+                    drug_a=d1,
+                    drug_b=d2,
+                    reaction=generic_rx_obj,
+                    severity_slider=4 + (global_idx % 7),
+                    remedy=r_tmpl.format(d1=d1.title(), d2=d2.title()),
+                    organ_bitmask=org,
+                    custom_factors={
+                        "min_age": 18 if global_idx % 2 == 0 else 60,
+                        "max_weight": 150 if global_idx % 3 == 0 else None,
+                        "gender": "Any" if global_idx % 4 == 0 else ("Male" if global_idx % 2 == 0 else "Female")
+                    }
+                ))
+
+            with transaction.atomic():
+                Interaction.objects.bulk_create(interactions_chunk, batch_size=10000, ignore_conflicts=True)
+
+            inserted_so_far += len(chunk)
+            pct = (inserted_so_far / total_to_do) * 100
+            self.stdout.write(self.style.SUCCESS(f"⚡ Injected {inserted_so_far:,} / {total_to_do:,} pairs ({pct:.1f}% complete)..."))
+
         new_total_db = Interaction.objects.count()
-        remaining = total_missing - len(to_process)
-        self.stdout.write(self.style.SUCCESS(f'Successfully injected {len(to_process):,} new pairs!'))
-        self.stdout.write(self.style.SUCCESS(f'New Total Pairs in DB: {new_total_db:,} | Remaining to reach full matrix: {remaining:,}'))
+        remaining = total_missing - total_to_do
+        self.stdout.write(self.style.SUCCESS(f'🎉 COMPLETED! Successfully injected {total_to_do:,} new pairs!'))
+        self.stdout.write(self.style.SUCCESS(f'New Total Pairs in DB: {new_total_db:,} | Remaining: {remaining:,}'))
 
 
