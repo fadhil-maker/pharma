@@ -375,7 +375,7 @@ def smart_fetch_drug_interactions(request):
     """
     drug_name = request.data.get('drug_name', '').strip().lower()
     if not drug_name:
-        return Response({'error': 'Drug name is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Drug name is required.'}, status=status.HTTP_200_OK)
 
     try:
         # Step 1: Fetch RxCUI code from NIH RxNav API
@@ -386,7 +386,7 @@ def smart_fetch_drug_interactions(request):
             id_group = data.get('idGroup', {})
             rxnorm_ids = id_group.get('rxnormId', [])
             if not rxnorm_ids:
-                return Response({'error': f"No official RxNorm concept found for '{drug_name}'."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': f"No official RxNorm concept found for '{drug_name}'."}, status=status.HTTP_200_OK)
             rxcui = rxnorm_ids[0]
 
         # Step 2: Query RxNorm Interaction API
@@ -485,4 +485,4 @@ def smart_fetch_drug_interactions(request):
         }, status=status.HTTP_201_CREATED)
 
     except Exception as e:
-        return Response({'error': f"Failed to fetch RxNorm data: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': f"Failed to fetch RxNorm data: {str(e)}"}, status=status.HTTP_200_OK)
