@@ -15,4 +15,6 @@ urlpatterns = [
     path('all-drugs/', views.get_all_drugs, name='get_all_drugs'),
     path('check-timeline/', views.check_timeline, name='check_timeline'),
     path('debug-db/', views.debug_db, name='debug-db'),
+    path('seed-test-pair/', views.seed_test_pair, name='seed_test_pair'),
+    path('seed-massive/', views.trigger_massive_seed, name='seed_massive'),
 ]

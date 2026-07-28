@@ -373,3 +373,58 @@ def search_drugs(request):
     formatted_drugs = sorted([d.title() for d in matches if query in d.lower()])[:20]
     
     return Response(formatted_drugs, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def seed_test_pair(request):
+    """
+    Injects 1 real test pair (Warfarin + Amiodarone) directly into Gunicorn's active database.
+    """
+    from .models import Drug, ReactionDefinition, Interaction
+    
+    d1, _ = Drug.objects.get_or_create(name="warfarin")
+    d2, _ = Drug.objects.get_or_create(name="amiodarone")
+    
+    rx, _ = ReactionDefinition.objects.get_or_create(
+        name="Amiodarone inhibits warfarin metabolism, severely increasing bleeding risk."
+    )
+    
+    inter, created = Interaction.objects.get_or_create(
+        drug_a="amiodarone",
+        drug_b="warfarin",
+        defaults={
+            'reaction': rx,
+            'severity_slider': 8,
+            'remedy': 'Decrease warfarin dose by 30-50% and monitor INR closely.',
+            'organ_bitmask': 1,
+            'time_window_hours': 24,
+            'custom_factors': {}
+        }
+    )
+    
+    return Response({
+        'message': 'Successfully injected Warfarin + Amiodarone pair into active web database!',
+        'drug_a': inter.drug_a,
+        'drug_b': inter.drug_b,
+        'severity': inter.severity_slider,
+        'total_drugs_in_db': Drug.objects.count(),
+        'total_rules_in_db': Interaction.objects.count()
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def trigger_massive_seed(request):
+    """
+    Triggers OpenFDA 4.5M pair generation directly inside Gunicorn process memory.
+    """
+    from django.core.management import call_command
+    try:
+        call_command('seed_openfda_massive')
+        return Response({
+            'status': 'Success',
+            'message': '4.5M OpenFDA pairs successfully injected into active Gunicorn database!'
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'status': 'Error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
