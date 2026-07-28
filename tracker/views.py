@@ -124,11 +124,16 @@ def list_interactions(request):
     elif sort_by == 'drug_a':
         sort_field = 'drug_a'
 
-    sort_secondary = '-id' if order == 'desc' else 'id'
     if order == 'desc':
         sort_field = '-' + sort_field
+        sort_secondary = '-id'
+    else:
+        sort_secondary = 'id'
 
-    qs = qs.order_by(sort_field, sort_secondary)
+    if sort_field.strip('-') == 'id':
+        qs = qs.order_by(sort_field)
+    else:
+        qs = qs.order_by(sort_field, sort_secondary)
 
     total_count = qs.count()
     start = (page - 1) * limit
