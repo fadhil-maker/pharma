@@ -751,7 +751,9 @@ let ALL_DRUGS = [];
 
 async function preloadDrugs() {
     try {
-        const res = await fetch(`${API_BASE}/api/all-drugs/`);
+        const res = await fetch(`${API_BASE}/api/all-drugs/`, {
+            headers: { 'Accept': 'application/json' }
+        });
         if (res.ok) {
             ALL_DRUGS = await res.json();
             console.log(`Preloaded ${ALL_DRUGS.length} drugs for instant autocomplete.`);
@@ -942,7 +944,10 @@ async function analyzeInteractions() {
     try {
         const res = await fetch(`${API_BASE}/api/check-timeline/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({ 
                 intakes: intakes,
                 age: ageVal,
