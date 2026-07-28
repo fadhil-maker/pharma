@@ -960,8 +960,9 @@ async function analyzeInteractions() {
     
     if(detailsUI) {
         detailsUI.innerHTML = warnings.map(w => `
-            <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity >= 8 ? '#ef4444' : (w.severity >= 4 ? '#f97316' : '#eab308')}; margin-bottom: 16px;">
-                <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px;">🚨 ${w.drug_a.toUpperCase()} + ${w.drug_b.toUpperCase()}</div>
+            <div style="padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 4px solid ${w.severity >= 8 ? '#ef4444' : (w.severity >= 4 ? '#f97316' : '#eab308')}; margin-bottom: 16px; position: relative;">
+                <div style="position: absolute; top: 20px; right: 20px; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; background: ${w.severity >= 8 ? '#fef2f2' : (w.severity >= 4 ? '#fff7ed' : '#fefce8')}; color: ${w.severity >= 8 ? '#ef4444' : (w.severity >= 4 ? '#f97316' : '#eab308')}; border: 1px solid currentColor;">SEVERITY: ${w.severity}/10</div>
+                <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px; padding-right: 100px;">🚨 ${w.drug_a.toUpperCase()} + ${w.drug_b.toUpperCase()}</div>
                 <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;"><strong>Cause:</strong> ${w.reaction}</div>
                 <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;"><strong>Remedy Suggestion:</strong> ${w.remedy || 'Consult Physician immediately.'}</div>
             </div>
