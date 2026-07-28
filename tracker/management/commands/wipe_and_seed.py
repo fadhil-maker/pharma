@@ -5,14 +5,14 @@ class Command(BaseCommand):
     help = 'Wipes the synthetic database completely and seeds the Drug model with real base APIs.'
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.WARNING("🚨 WIPING ENTIRE SYNTHETIC DATABASE... 🚨"))
+        self.stdout.write(self.style.WARNING("WIPING ENTIRE SYNTHETIC DATABASE..."))
         
         # 1. Wipe everything
         Interaction.objects.all().delete()
         ReactionDefinition.objects.all().delete()
         Drug.objects.all().delete()
         
-        self.stdout.write(self.style.SUCCESS("✅ Database wiped completely! 0 rows remain."))
+        self.stdout.write(self.style.SUCCESS("Database wiped completely! 0 rows remain."))
 
         # 2. Seed initial pure Drug selector
         self.stdout.write("Seeding Drug selector with top real APIs...")
@@ -35,5 +35,5 @@ class Command(BaseCommand):
         
         Drug.objects.bulk_create([Drug(name=d) for d in top_200])
         
-        self.stdout.write(self.style.SUCCESS(f"✅ Pre-seeded {len(top_200)} drugs into the selector!"))
-        self.stdout.write(self.style.SUCCESS("\n🎉 Production Architecture Ready! The Gemini engine will now handle new pairings dynamically."))
+        self.stdout.write(self.style.SUCCESS(f"Pre-seeded {len(top_200)} drugs into the selector!"))
+        self.stdout.write(self.style.SUCCESS("Production Architecture Ready! The Gemini engine will now handle new pairings dynamically."))
