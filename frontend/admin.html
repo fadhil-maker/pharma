@@ -70,6 +70,45 @@
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; 
             background: var(--card-bg); padding: 20px 32px; border-radius: var(--radius-lg); 
             box-shadow: var(--shadow-soft); border: 1px solid var(--border-light);
+            flex-wrap: wrap; gap: 16px;
+        }
+        
+        .hamburger { display: none; background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
+        .nav-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        .disclaimer-banner {
+            background-color: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .disclaimer-title {
+            color: #991b1b;
+            margin: 0 0 6px 0;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+        }
+        .disclaimer-text {
+            margin: 0;
+            color: #7f1d1d;
+            font-size: 13.5px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        [data-theme="dark"] .disclaimer-banner {
+            background-color: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        [data-theme="dark"] .disclaimer-title {
+            color: #fca5a5;
+        }
+        [data-theme="dark"] .disclaimer-text {
+            color: #f8fafc;
         }
         
         .brand-logo, .logo { 
@@ -103,10 +142,11 @@
 
         @media (max-width: 768px) { 
             .input-group, .form-grid { grid-template-columns: 1fr; } 
-            .top-header, .header { padding: 16px; flex-direction: column; gap: 16px; }
+            .top-header, .header { padding: 16px; flex-direction: column; align-items: flex-start; gap: 16px; }
+            .hamburger { display: block; }
             .pill-toggle-container { top: -20px; right: 10px; padding: 6px 12px; font-size: 12px; }
             .pill-icon { font-size: 16px; }
-            .nav-actions { width: 100%; justify-content: center; flex-wrap: wrap; }
+            .nav-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; display: flex; }
             .hero-title { font-size: 26px; }
         }
 
@@ -177,11 +217,11 @@
     
 
     <!-- Medical Liability Disclaimer Banner -->
-    <div style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 16px;">
+    <div class="disclaimer-banner">
         <span style="font-size: 24px; display: inline-block; transform: translateY(-2px);">⚠️</span>
         <div>
-            <h4 style="color: #fca5a5; margin: 0 0 8px 0; font-family: 'Outfit', sans-serif; font-size: 16px;">MEDICAL LIABILITY DISCLAIMER (TECHNICAL POC)</h4>
-            <p style="margin: 0; color: #cbd5e1; font-size: 14px; line-height: 1.5;">
+            <h4 class="disclaimer-title">MEDICAL LIABILITY DISCLAIMER (TECHNICAL POC)</h4>
+            <p class="disclaimer-text">
                 This software and its dynamically generated 64,825-pair dataset are for <b>software demonstration, UI testing, and architectural Proof of Concept (PoC) purposes only</b>. This system is <b>NOT</b> a legally certified medical database and must <b>never</b> be used for clinical diagnosis, patient treatment, or pharmaceutical dispensing. Doing so may result in severe injury or death. To deploy this application in a clinical environment, you must license and connect a certified medical API (e.g., FDA OpenData, Lexicomp, FDB).
             </p>
         </div>
