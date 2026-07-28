@@ -358,19 +358,11 @@ def check_timeline(request):
 @permission_classes([AllowAny])
 def get_all_drugs(request):
     """
-    Returns ALL unique drug names from the pure Drug model instantly (cached for 24 hours).
-    Perfect for 0ms frontend autocomplete.
+    Returns ALL unique drug names from the pure Drug model instantly.
     """
-    cached_drugs = cache.get('all_unique_drugs')
-    if cached_drugs:
-        return Response(cached_drugs, status=status.HTTP_200_OK)
-
     from .models import Drug
     matches = Drug.objects.values_list('name', flat=True)
-    
     formatted_drugs = sorted([d.title() for d in matches if d])
-    
-    cache.set('all_unique_drugs', formatted_drugs, timeout=86400) # 24 hours
     return Response(formatted_drugs, status=status.HTTP_200_OK)
 
 

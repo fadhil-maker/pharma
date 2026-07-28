@@ -5,12 +5,21 @@ import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
-# Configure Gemini API using environment variable
+# Configure Gemini API
+# Try to load .env file from the root
+env_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+if os.path.exists(env_file):
+    with open(env_file, 'r') as f:
+        for line in f:
+            if '=' in line and not line.startswith('#'):
+                k, v = line.strip().split('=', 1)
+                os.environ[k.strip()] = v.strip().strip('"').strip("'")
+
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 else:
-    logger.warning("GEMINI_API_KEY is not set in environment variables! Lazy Loading will fail.")
+    logger.warning("GEMINI_API_KEY is not set in environment or .env file! Lazy Loading will fail.")
 
 def check_drug_interaction(drug_a, drug_b):
     """
