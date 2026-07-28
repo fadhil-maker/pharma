@@ -780,11 +780,20 @@ function handleAddDrug(e) {
     const timeEl = document.getElementById('timeInput');
     if (!input || !timeEl) return;
     
+    // Enforce mandatory vitals
+    const age = document.getElementById('patientAgeInput') ? document.getElementById('patientAgeInput').value : '';
+    const gender = document.getElementById('patientGenderInput') ? document.getElementById('patientGenderInput').value : '';
+    const weight = document.getElementById('patientWeightInput') ? document.getElementById('patientWeightInput').value : '';
+    
+    if (!age || !gender || !weight) {
+        alert("⚠️ Please fill in all patient vitals (Age, Gender, and Weight) before adding drugs. These are mandatory to accurately evaluate risk constraints.");
+        return;
+    }
+
     const drugName = input.value.trim();
     if (!drugName) return;
 
     intakes.push({ drug_name: drugName, timestamp: timeEl.value });
-    
     
     input.value = '';
     renderQueue();
