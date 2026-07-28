@@ -72,7 +72,11 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.WARNING("Applying real clinical data to specific drug pairs..."))
 
+        from tracker.models import ReactionDefinition
+        reaction_obj, _ = ReactionDefinition.objects.get_or_create(name="Verified Clinical Reaction")
+
         updated_count = 0
+        created_count = 0
         for data in real_data:
             # Find the existing dummy interaction row
             interaction = Interaction.objects.filter(
@@ -84,13 +88,24 @@ class Command(BaseCommand):
                 interaction.severity_slider = data['severity']
                 interaction.cause = data['cause']
                 interaction.remedy = data['remedy']
-                # Blank out random timeline factors for these critical ones
                 interaction.custom_factors = {} 
                 interaction.time_window_hours = 24
                 interaction.save()
                 updated_count += 1
-                self.stdout.write(self.style.SUCCESS(f"✅ Updated: {data['drug_a'].title()} + {data['drug_b'].title()}"))
+                self.stdout.write(self.style.SUCCESS(f"✅ Updated existing pair: {data['drug_a'].title()} + {data['drug_b'].title()}"))
             else:
-                self.stdout.write(self.style.ERROR(f"❌ Could not find pair in DB: {data['drug_a']} + {data['drug_b']}"))
+                # The FDA base list didn't include these specific drugs, so we will forcibly create them!
+                Interaction.objects.create(
+                    drug_a=data['drug_a'],
+                    drug_b=data['drug_b'],
+                    reaction=reaction_obj,
+                    severity_slider=data['severity'],
+                    cause=data['cause'],
+                    remedy=data['remedy'],
+                    custom_factors={},
+                    time_window_hours=24
+                )
+                created_count += 1
+                self.stdout.write(self.style.WARNING(f"✨ Forcibly added missing drugs to DB: {data['drug_a'].title()} + {data['drug_b'].title()}"))
 
-        self.stdout.write(self.style.SUCCESS(f"\n🎉 Successfully injected {updated_count} real-world clinical pairs!"))
+        self.stdout.write(self.style.SUCCESS(f"\n🎉 Successfully injected {updated_count + created_count} real-world clinical pairs!"))
