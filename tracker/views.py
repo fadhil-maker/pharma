@@ -418,7 +418,6 @@ def smart_fetch_drug_interactions(request):
 
         # Step 3: Save top 15 interactions
         saved_count = 0
-        gemini_api_key = os.environ.get('GEMINI_API_KEY') or getattr(settings, 'GEMINI_API_KEY', None)
 
         for item in raw_interactions[:15]:
             drug_b = item['drug_b']
@@ -433,24 +432,6 @@ def smart_fetch_drug_interactions(request):
             if 'heart' in desc.lower() or 'cardiac' in desc.lower(): organ_bitmask |= 8
             if 'brain' in desc.lower() or 'cns' in desc.lower(): organ_bitmask |= 1
             if 'lung' in desc.lower() or 'respiratory' in desc.lower(): organ_bitmask |= 4
-
-            if gemini_api_key:
-                try:
-                    prompt = f"Analyze this interaction between {drug_name} and {drug_b}: '{desc}'. Return JSON with: severity (1-10 int), cause (1 sentence), remedy (1 sentence)."
-                    g_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
-                    payload = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode('utf-8')
-                    g_req = urllib.request.Request(g_url, data=payload, headers={'Content-Type': 'application/json'})
-                    with urllib.request.urlopen(g_req, timeout=5) as g_resp:
-                        g_data = json.loads(g_resp.read().decode())
-                        res_text = g_data['candidates'][0]['content']['parts'][0]['text']
-                        match = re.search(r'\{.*\}', res_text, re.DOTALL)
-                        if match:
-                            parsed = json.loads(match.group())
-                            sev_score = parsed.get('severity', sev_score)
-                            desc = parsed.get('cause', desc)
-                            remedy_text = parsed.get('remedy', remedy_text)
-                except Exception:
-                    pass
 
             d1, d2 = sorted([drug_name, drug_b])
             rx_obj, _ = ReactionDefinition.objects.get_or_create(name=desc[:500])
