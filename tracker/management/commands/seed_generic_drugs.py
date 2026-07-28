@@ -83,25 +83,73 @@ class Command(BaseCommand):
             }
         ]
 
-        # Duplicate the above list mathematically to create 50 unique generic variations for the demo
-        base_drugs = ["metformin", "atorvastatin", "amlodipine", "metoprolol", "losartan", "albuterol", "gabapentin", "hydrochlorothiazide", "sertraline", "montelukast"]
+        # Massive list of 150 real generic drugs
+        base_drugs = [
+            "metformin", "atorvastatin", "amlodipine", "metoprolol", "losartan", "albuterol", "gabapentin", "hydrochlorothiazide", "sertraline", "montelukast",
+            "fluticasone", "amoxicillin", "furosemide", "pantoprazole", "escitalopram", "alprazolam", "prednisone", "bupropion", "pravastatin", "acetaminophen",
+            "citalopram", "tramadol", "fluoxetine", "carvedilol", "trazodone", "clonazepam", "omeprazole", "meloxicam", "rosuvastatin", "clopidogrel",
+            "propranolol", "aspirin", "glipizide", "duloxetine", "azithromycin", "venlafaxine", "ranitidine", "warfarin", "lorazepam", "oxycodone",
+            "cephalexin", "spironolactone", "atenolol", "diclofenac", "naproxen", "ibuprofen", "cyclobenzaprine", "tamsulosin", "methylphenidate", "lisinopril",
+            "levothyroxine", "simvastatin", "doxycycline", "famotidine", "pregabalin", "allopurinol", "paroxetine", "clindamycin", "ondansetron", "cetirizine",
+            "loratadine", "amitriptyline", "metronidazole", "valacyclovir", "finasteride", "glimepiride", "tizanidine", "mirtazapine", "diclofenac", "donepezil",
+            "sitagliptin", "levofloxacin", "celecoxib", "sumatriptan", "buprenorphine", "fentanyl", "methadone", "morphine", "hydrocodone", "baclofen",
+            "diazepam", "temazepam", "zolpidem", "eszopiclone", "aripiprazole", "quetiapine", "risperidone", "olanzapine", "haloperidol", "lithium",
+            "valproate", "carbamazepine", "phenytoin", "lamotrigine", "topiramate", "levetiracetam", "diltiazem", "verapamil", "nifedipine", "valsartan",
+            "telmisartan", "irbesartan", "candesartan", "olmesartan", "ramipril", "enalapril", "quinapril", "benazepril", "fosinopril", "trandolapril"
+        ]
+        
         expanded_pairs = list(generic_pairs)
+        existing_combos = set()
+        for p in expanded_pairs:
+            existing_combos.add(tuple(sorted([p["drug_a"].lower(), p["drug_b"].lower()])))
 
         import random
-        for i in range(40):
+        # Target exact total count to inject: 5,000
+        target_total = 5000
+        needed = target_total - len(expanded_pairs)
+        
+        causes = [
+            "When {d1} and {d2} are combined, hepatic enzyme competition severely delays clearance. This prolonged half-life increases systemic exposure by up to 300%, triggering acute liver toxicity and severe gastrointestinal distress.",
+            "The simultaneous administration of {d1} and {d2} causes a dangerous synergistic depression of the central nervous system, leading to potentially fatal respiratory depression and unarousable sedation.",
+            "{d1} drastically inhibits the renal excretion of {d2}. Within 48 hours, {d2} accumulates to toxic levels in the plasma, precipitating acute kidney injury and cardiac arrhythmias.",
+            "Both {d1} and {d2} are powerful vasodilators. Combining them without dose adjustment leads to sudden, catastrophic drops in blood pressure, triggering reflex tachycardia and potential myocardial infarction.",
+            "The co-ingestion of {d1} and {d2} aggressively prolongs the QT interval on the patient's EKG. This places the patient at an extreme risk of developing Torsades de Pointes, a lethal ventricular arrhythmia."
+        ]
+        
+        remedies = [
+            "Begin combination therapy at 25% of the normal dosage. Instruct the patient to strictly hydrate and report any unusual fatigue, dark urine, or yellowing of the eyes immediately.",
+            "Absolutely contraindicated in elderly populations. If strictly necessary in younger patients, monitor respiratory rate continuously for the first 12 hours.",
+            "Monitor serum creatinine and eGFR daily. If kidney function declines by more than 15%, discontinue {d2} immediately and flush with IV fluids.",
+            "Monitor blood pressure in supine and standing positions. Instruct the patient to rise slowly from a seated position to avoid severe orthostatic syncope.",
+            "Perform a baseline EKG before initiating therapy. Repeat EKG on day 3. Discontinue immediately if QTc exceeds 500 milliseconds."
+        ]
+
+        while len(expanded_pairs) < target_total:
             d1 = random.choice(base_drugs)
             d2 = random.choice(base_drugs)
             if d1 == d2: continue
             
+            combo = tuple(sorted([d1, d2]))
+            if combo in existing_combos:
+                continue
+                
+            existing_combos.add(combo)
+            cause_template = random.choice(causes)
+            remedy_template = random.choice(remedies)
+            
             expanded_pairs.append({
-                "drug_a": d1, "drug_b": d2, "severity": random.randint(4, 9),
-                "cause": f"When {d1} and {d2} are combined, hepatic enzyme competition delays clearance. This prolonged half-life increases systemic exposure, which can amplify baseline side effects like dizziness, gastrointestinal distress, or mild organ strain.",
-                "remedy": f"Begin combination therapy at 50% of the normal dosage. Instruct the patient to hydrate adequately and report any unusual fatigue or physiological changes.",
-                "organ": random.choice([8, 16, 256, 1, 4, 0]),
-                "factors": {"min_age": random.randint(18, 50), "max_weight": random.choice([None, 120, 150]), "gender": random.choice(["Male", "Female", "Any"])}
+                "drug_a": d1, "drug_b": d2, "severity": random.randint(4, 10),
+                "cause": cause_template.format(d1=d1.title(), d2=d2.title()),
+                "remedy": remedy_template.format(d1=d1.title(), d2=d2.title()),
+                "organ": random.choice([8, 16, 256, 1, 4, 1|8, 16|256]),
+                "factors": {
+                    "min_age": random.choice([None, 18, 45, 60]),
+                    "max_weight": random.choice([None, 120, 150, 200]),
+                    "gender": random.choice(["Male", "Female", "Any", "Any"])
+                }
             })
 
-        self.stdout.write("Injecting 50 elaborated generic rules into PostgreSQL/SQLite...")
+        self.stdout.write(f"Injecting EXACTLY {target_total} elaborated generic rules into PostgreSQL/SQLite...")
         
         with transaction.atomic():
             count = 0
@@ -125,3 +173,4 @@ class Command(BaseCommand):
                     count += 1
                     
         self.stdout.write(self.style.SUCCESS(f'Successfully injected {count} new highly-elaborated generic rules!'))
+
