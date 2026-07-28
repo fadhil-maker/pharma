@@ -507,6 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     document.getElementById('adminName').textContent = adminUser;
+    preloadDrugs();
+    attachAutocomplete('drugA', 'drugASuggestions');
+    attachAutocomplete('drugB', 'drugBSuggestions');
     loadDashboardData();
 });
 
