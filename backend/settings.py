@@ -1,7 +1,6 @@
 import os
 import dj_database_url
 from pathlib import Path
-from dotenv import load_dotenv
 from datetime import timedelta
 
 # ---------------------------------------------------------------------------
@@ -15,6 +14,9 @@ if env_path.exists():
     with open(env_path, 'r') as f:
         for line in f:
             line = line.strip()
+            # Strip systemd Environment prefix if the user dumped from gunicorn.service
+            if line.startswith('Environment='):
+                line = line[len('Environment='):].strip('"\'')
             if line and not line.startswith('#') and '=' in line:
                 k, v = line.split('=', 1)
                 os.environ.setdefault(k.strip(), v.strip().strip('"\''))
