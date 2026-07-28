@@ -21,6 +21,7 @@ After=network.target
 [Service]
 User=root
 Group=www-data
+Environment="DEBUG=True"
 WorkingDirectory=/var/www/pharma
 ExecStart=/var/www/pharma/backend/venv/bin/gunicorn --access-logfile - --workers 3 --timeout 120 --bind unix:/run/gunicorn-pharma.sock backend.wsgi:application
 
