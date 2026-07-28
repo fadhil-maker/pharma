@@ -8,18 +8,30 @@ from datetime import timedelta
 # ---------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Lightweight native .env loader to guarantee terminal and web server always match
-env_path = BASE_DIR / '.env'
-if env_path.exists():
-    with open(env_path, 'r') as f:
-        for line in f:
-            line = line.strip()
-            # Strip systemd Environment prefix if the user dumped from gunicorn.service
-            if line.startswith('Environment='):
-                line = line[len('Environment='):].strip('"\'')
-            if line and not line.startswith('#') and '=' in line:
-                k, v = line.split('=', 1)
-                os.environ.setdefault(k.strip(), v.strip().strip('"\''))
+import re
+
+# Automatic DATABASE_URL System Discovery (Scans .env, gunicorn.service, /etc/environment)
+if 'DATABASE_URL' not in os.environ:
+    candidate_paths = [
+        BASE_DIR / '.env',
+        Path('/etc/systemd/system/gunicorn.service'),
+        Path('/etc/systemd/system/pharma.service'),
+        Path('/etc/environment')
+    ]
+    for cp in candidate_paths:
+        if cp.exists():
+            try:
+                with open(cp, 'r') as f:
+                    for line in f:
+                        if 'DATABASE_URL' in line and not line.strip().startswith('#'):
+                            m = re.search(r'DATABASE_URL=([^\s"\']+)', line)
+                            if m:
+                                os.environ['DATABASE_URL'] = m.group(1)
+                                break
+            except Exception:
+                pass
+        if 'DATABASE_URL' in os.environ:
+            break
 
 # ---------------------------------------------------------------------------
 # Security settings – ingested from environment, with safe production defaults
