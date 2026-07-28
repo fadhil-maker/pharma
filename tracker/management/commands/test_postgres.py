@@ -5,6 +5,11 @@ class Command(BaseCommand):
     help = 'Inject exactly 1 test rule into PostgreSQL to verify frontend connectivity'
 
     def handle(self, *args, **options):
+        from django.conf import settings
+        db_config = settings.DATABASES['default']
+        self.stdout.write(f"Connected Database Engine: {db_config['ENGINE']}")
+        self.stdout.write(f"Connected Database Name: {db_config['NAME']}")
+
         self.stdout.write("Wiping existing database to ensure a clean slate...")
         Interaction.objects.all().delete()
         ReactionDefinition.objects.all().delete()

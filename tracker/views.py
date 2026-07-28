@@ -330,6 +330,21 @@ def check_timeline(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def debug_db(request):
+    from django.conf import settings
+    db_config = settings.DATABASES['default']
+    
+    from .models import Interaction
+    count = Interaction.objects.count()
+    
+    return Response({
+        'engine': db_config['ENGINE'],
+        'name': db_config['NAME'],
+        'rules_count': count
+    }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_all_drugs(request):
     """
     Returns ALL unique drug names from the pure Drug model instantly.

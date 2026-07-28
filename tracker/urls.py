@@ -14,4 +14,5 @@ urlpatterns = [
     path('search-drugs/', views.search_drugs, name='search_drugs'),
     path('all-drugs/', views.get_all_drugs, name='get_all_drugs'),
     path('check-timeline/', views.check_timeline, name='check_timeline'),
+    path('debug-db/', views.debug_db, name='debug-db'),
 ]
