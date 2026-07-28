@@ -175,22 +175,40 @@ def create_interaction(request):
     if not drug_a or not drug_b or not reaction_name:
         return Response({'error': 'Drug A, Drug B, and Reaction text are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Bidirectional Deduplication Algorithm (Sort alphabetically)
+    d1, d2 = sorted([drug_a, drug_b])
+
     reaction_obj, _ = ReactionDefinition.objects.get_or_create(name=reaction_name)
     
-    interaction, created = Interaction.objects.update_or_create(
-        drug_a=drug_a,
-        drug_b=drug_b,
-        defaults={
-            'reaction': reaction_obj,
-            'severity_slider': severity,
-            'time_window_hours': time_window_hours,
-            'remedy': remedy,
-            'organ_bitmask': organ_bitmask,
-            'custom_factors': custom_factors
-        }
-    )
+    # Check for existing rule in either direction (A+B or B+A)
+    existing = Interaction.objects.filter(
+        (Q(drug_a=d1) & Q(drug_b=d2)) | (Q(drug_a=d2) & Q(drug_b=d1))
+    ).first()
+
+    if existing:
+        existing.drug_a = d1
+        existing.drug_b = d2
+        existing.reaction = reaction_obj
+        existing.severity_slider = severity
+        existing.time_window_hours = time_window_hours
+        existing.remedy = remedy
+        existing.organ_bitmask = organ_bitmask
+        existing.custom_factors = custom_factors
+        existing.save()
+        interaction = existing
+    else:
+        interaction = Interaction.objects.create(
+            drug_a=d1,
+            drug_b=d2,
+            reaction=reaction_obj,
+            severity_slider=severity,
+            time_window_hours=time_window_hours,
+            remedy=remedy,
+            organ_bitmask=organ_bitmask,
+            custom_factors=custom_factors
+        )
     
-    return Response({'message': 'Interaction rule saved successfully!', 'id': interaction.id}, status=status.HTTP_201_CREATED)
+    return Response({'message': 'Interaction rule saved & deduplicated successfully!', 'id': interaction.id}, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
@@ -409,18 +427,31 @@ def smart_fetch_drug_interactions(request):
                 except Exception:
                     pass
 
-            rx_obj, _ = ReactionDefinition.objects.get_or_create(name=desc[:255])
-            Interaction.objects.update_or_create(
-                drug_a=drug_name,
-                drug_b=drug_b,
-                defaults={
-                    'reaction': rx_obj,
-                    'severity_slider': sev_score,
-                    'time_window_hours': 24,
-                    'remedy': remedy_text,
-                    'organ_bitmask': organ_bitmask
-                }
-            )
+            d1, d2 = sorted([drug_name, drug_b])
+            rx_obj, _ = ReactionDefinition.objects.get_or_create(name=desc[:500])
+
+            existing = Interaction.objects.filter(
+                (Q(drug_a=d1) & Q(drug_b=d2)) | (Q(drug_a=d2) & Q(drug_b=d1))
+            ).first()
+
+            if existing:
+                existing.drug_a = d1
+                existing.drug_b = d2
+                existing.reaction = rx_obj
+                existing.severity_slider = sev_score
+                existing.remedy = remedy_text
+                existing.organ_bitmask = organ_bitmask
+                existing.save()
+            else:
+                Interaction.objects.create(
+                    drug_a=d1,
+                    drug_b=d2,
+                    reaction=rx_obj,
+                    severity_slider=sev_score,
+                    time_window_hours=24,
+                    remedy=remedy_text,
+                    organ_bitmask=organ_bitmask
+                )
             saved_count += 1
 
         return Response({

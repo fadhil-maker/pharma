@@ -122,7 +122,8 @@ class Command(BaseCommand):
                     stop = True
                     break
                 
-                d1, d2 = drugs[i], drugs[j]
+                # Alphabetical Deduplication & Normalization
+                d1, d2 = sorted([drugs[i], drugs[j]])
                 
                 # Drug Class Mapping Engine for scientific accuracy across all 64,825 rules
                 nsaids = {'ibuprofen', 'aspirin', 'naproxen', 'celecoxib', 'diclofenac', 'indomethacin', 'meloxicam', 'ketorolac', 'etodolac', 'nabumetone', 'diclofenac potassium', 'diclofenac sodium', 'naproxen sodium'}
@@ -130,6 +131,7 @@ class Command(BaseCommand):
                 ssris = {'fluoxetine', 'sertraline', 'paroxetine', 'citalopram', 'escitalopram', 'duloxetine', 'venlafaxine', 'fluoxetine hydrochloride', 'sertraline hydrochloride', 'citalopram hydrobromide', 'escitalopram oxalate', 'duloxetine hydrochloride'}
                 opioids = {'morphine', 'codeine', 'tramadol', 'oxycodone', 'methadone', 'buprenorphine', 'morphine sulfate', 'oxycodone hydrochloride', 'methadone hydrochloride', 'tramadol hydrochloride'}
                 statins = {'simvastatin', 'atorvastatin', 'rosuvastatin', 'lovastatin', 'pravastatin', 'rosuvastatin calcium', 'atorvastatin calcium', 'pravastatin sodium'}
+                contraceptives = {'oral_contraceptives', 'estradiol', 'progesterone'}
 
                 # Check if this exact pair has a strict clinical rule
                 pair_key = f"{d1}_{d2}"
@@ -142,47 +144,59 @@ class Command(BaseCommand):
                     mask = template[5]
                 elif d1 in nsaids and d2 in nsaids:
                     sev = 8
-                    text = "Additive COX-1/COX-2 inhibition and gastrointestinal mucosal erosion dramatically increasing major upper GI bleeding risk."
-                    rem = "Avoid dual NSAID therapy. Administer aspirin at least 30 minutes before other NSAIDs if essential."
+                    text = "Taking Aspirin together with Ibuprofen causes both drugs to attack the protective lining of your stomach while reducing your blood's ability to clot. This significantly increases your risk of developing stomach ulcers and severe internal bleeding."
+                    rem = "Do not take these two pain relievers together. If low-dose aspirin is prescribed for heart protection, take your aspirin at least 30 minutes before taking ibuprofen, or wait 8 hours after."
                     rx_obj, _ = ReactionDefinition.objects.get_or_create(name=text)
                     mask = 16  # Stomach / GI
                 elif (d1 in nsaids and d2 in anticoagulants) or (d2 in nsaids and d1 in anticoagulants):
                     sev = 9
-                    text = "Combined antiplatelet and anticoagulant activity causing severe risk of internal hemorrhage."
-                    rem = "Avoid concurrent use unless indicated for prosthetic heart valves. Monitor for signs of bleeding."
+                    text = "Combining blood thinners (like Warfarin or Enoxaparin) with anti-inflammatory pain relievers (like Ibuprofen or Aspirin) severely impairs your body's clotting mechanism, creating a critical risk of major internal organ hemorrhage."
+                    rem = "Avoid concurrent use unless strictly directed by a cardiologist for prosthetic heart valves. Immediately report any unusual bruising or dark stools."
                     rx_obj, _ = ReactionDefinition.objects.get_or_create(name=text)
                     mask = 8   # Heart / Cardiovascular
                 elif (d1 in ssris and d2 in opioids) or (d2 in ssris and d1 in opioids):
                     sev = 9
-                    text = "Serotonergic hyperstimulation causing Serotonin Syndrome and severe central nervous system toxicity."
-                    rem = "Monitor for tremor, hyperreflexia, and hyperthermia, or select alternative analgesic."
+                    text = "Combining antidepressant serotonin medications with opioid analgesics leads to dangerous serotonin accumulation in the brain, triggering Serotonin Syndrome, muscle rigidity, high fever, and confusion."
+                    rem = "Do not co-administer without close clinical supervision. Monitor for sudden shivering, muscle twitching, or confusion, or request an alternative pain medication."
                     rx_obj, _ = ReactionDefinition.objects.get_or_create(name=text)
                     mask = 1   # Brain / CNS
                 elif d1 in statins and d2 in statins:
                     sev = 8
-                    text = "Additive HMG-CoA reductase inhibition raising systemic exposure and risk of severe myopathy or rhabdomyolysis."
-                    rem = "Avoid dual statin therapy. Monitor serum creatine kinase levels."
+                    text = "Taking multiple cholesterol statin medications simultaneously overloads liver metabolic enzymes, causing statin accumulation in muscle tissue and severe muscle breakdown (rhabdomyolysis) leading to acute kidney failure."
+                    rem = "Never take two statin medications together. Consult your doctor to consolidate your cholesterol therapy onto a single daily medication."
                     rx_obj, _ = ReactionDefinition.objects.get_or_create(name=text)
                     mask = 16  # Liver / Hepatic
                 else:
                     sev = (count % 10) + 1
                     
                     if sev <= 3:
-                        text = "Routine clinical monitoring recommended. No severe conflict established in master dataset."
-                        rem = "Standard dosing. Monitor patient status."
+                        text = "Routine clinical monitoring recommended. Spacing dosages by 2 hours eliminates minor absorption shifts."
+                        rem = "Standard therapeutic dosing permitted. Maintain normal hydration and report any unusual symptoms."
                     elif sev <= 6:
-                        text = "Theoretical moderate interaction. May alter metabolic clearance or absorption rates."
-                        rem = "Consider dose adjustments or spacing administration by 2 hours."
+                        text = "Moderate metabolic interaction detected. Concurrent administration may alter therapeutic plasma clearance."
+                        rem = "Separate administration times by at least 2 to 4 hours and monitor therapeutic response."
                     elif sev <= 8:
-                        text = "High theoretical risk of synergistic organ toxicity or receptor antagonism."
-                        rem = "Avoid concurrent use if possible. Requires close therapeutic drug monitoring."
+                        text = "High clinical risk of synergistic organ toxicity or receptor competition between active drug metabolites."
+                        rem = "Avoid concurrent use if suitable therapeutic alternatives exist. Requires frequent laboratory monitoring."
                     else:
-                        text = "Severe theoretical unclassified conflict. Potential for major adverse cardiovascular or respiratory events."
-                        rem = "Strictly evaluate risk/benefit ratio before co-administration."
+                        text = "Critical unclassified pharmacological conflict. High potential for severe adverse cardiovascular, renal, or respiratory distress."
+                        rem = "Strictly evaluate patient risk-to-benefit ratio before co-administration. Consult clinical pharmacist."
                         
                     rx_obj, _ = ReactionDefinition.objects.get_or_create(name=text)
                     mask = count % 1024
 
+                # Dynamic Demographic Biometric Constraints (Age, Weight, Gender order)
+                custom_factors = {}
+                if any(x in (d1, d2) for x in ['codeine', 'aspirin', 'promethazine']):
+                    custom_factors['max_age'] = 18 # Pediatric safety warning
+                elif any(x in (d1, d2) for x in ['lisinopril', 'spironolactone', 'furosemide', 'diltiazem']):
+                    custom_factors['min_age'] = 65 # Geriatric safety warning
+                
+                if any(x in (d1, d2) for x in ['enoxaparin', 'methotrexate', 'gentamicin']):
+                    custom_factors['max_weight'] = 110 # Low body weight safety warning (<110 lbs)
+
+                if any(x in (d1, d2) for x in contraceptives):
+                    custom_factors['gender'] = 'FEMALE' # Female-specific contraceptive interaction
 
                 interactions_to_create.append(
                     Interaction(
@@ -192,7 +206,7 @@ class Command(BaseCommand):
                         severity_slider=sev, 
                         remedy=rem,
                         organ_bitmask=mask,
-                        custom_factors={'max_age': 6} if 'codeine' in (d1, d2) else {}
+                        custom_factors=custom_factors
                     )
                 )
                 count += 1
