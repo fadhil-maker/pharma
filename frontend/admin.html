@@ -231,7 +231,7 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-label">Registered Drugs</div>
-            <div class="stat-val">147,210</div>
+            <div class="stat-val" id="drugCount">--</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Active Database Rules</div>
@@ -552,6 +552,9 @@ async function fetchPageData(page = 1) {
         currentPage = data.page || 1;
 
         document.getElementById('ruleCount').textContent = totalServerRules.toLocaleString();
+        if (data.unique_drugs_count !== undefined) {
+            document.getElementById('drugCount').textContent = data.unique_drugs_count.toLocaleString();
+        }
         
         const rules = data.interactions || [];
         if (rules.length === 0) {

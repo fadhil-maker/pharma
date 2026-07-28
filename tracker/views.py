@@ -144,8 +144,14 @@ def list_interactions(request):
             'organ_bitmask': item.organ_bitmask,
             'custom_factors': item.custom_factors
         })
+    # Calculate true count of unique registered drugs
+    unique_drugs_count = Interaction.objects.values_list('drug_a', flat=True).union(
+        Interaction.objects.values_list('drug_b', flat=True)
+    ).count()
+
     return Response({
         'total': total_count,
+        'unique_drugs_count': unique_drugs_count,
         'page': page,
         'limit': limit,
         'total_pages': (total_count + limit - 1) // limit if total_count > 0 else 1,
