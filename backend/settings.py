@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 import re
 
-# Automatic DATABASE_URL System Discovery (Scans systemd configs, .env, and system defaults)
+# Automatic DATABASE_URL System & PostgreSQL Discovery
 if 'DATABASE_URL' not in os.environ:
     candidate_paths = [
         BASE_DIR / '.env',
@@ -34,6 +34,16 @@ if 'DATABASE_URL' not in os.environ:
                 pass
         if 'DATABASE_URL' in os.environ:
             break
+
+# If still not in os.environ, probe local PostgreSQL pharma_db socket
+if 'DATABASE_URL' not in os.environ:
+    try:
+        import psycopg2
+        conn = psycopg2.connect(dbname='pharma_db', user='postgres', host='/var/run/postgresql')
+        conn.close()
+        os.environ['DATABASE_URL'] = 'postgres://postgres@/pharma_db?host=/var/run/postgresql'
+    except Exception:
+        pass
 
 # ---------------------------------------------------------------------------
 # Security settings – ingested from environment, with safe production defaults
