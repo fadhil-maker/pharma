@@ -12,6 +12,7 @@ urlpatterns = [
     path('admin/interactions/delete/', views.delete_interaction, name='delete_interaction'),
     path('admin/interactions/smart-fetch/', views.smart_fetch_drug_interactions, name='smart_fetch_drug_interactions'),
     
-        path('search-drugs/', views.search_drugs, name='search_drugs'),
+    path('search-drugs/', views.search_drugs, name='search_drugs'),
+    path('all-drugs/', views.get_all_drugs, name='get_all_drugs'),
     path('check-timeline/', views.check_timeline, name='check_timeline'),
 ]

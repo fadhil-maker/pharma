@@ -7,12 +7,15 @@ import os
 import json
 import logging
 import re
+import urllib.request
 from datetime import datetime, timedelta, timezone
 
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
+from django.core.cache import cache
+from django.conf import settings
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -314,6 +317,27 @@ def check_timeline(request):
         'warnings': warnings,
         'intakes_processed': len(intakes)
     }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_drugs(request):
+    """
+    Returns ALL unique drug names instantly (cached for 24 hours).
+    Perfect for 0ms frontend autocomplete.
+    """
+    cached_drugs = cache.get('all_unique_drugs')
+    if cached_drugs:
+        return Response(cached_drugs, status=status.HTTP_200_OK)
+
+    matches_a = Interaction.objects.values_list('drug_a', flat=True).distinct()
+    matches_b = Interaction.objects.values_list('drug_b', flat=True).distinct()
+    
+    unique_drugs = set(matches_a).union(set(matches_b))
+    formatted_drugs = sorted([d.title() for d in unique_drugs if d])
+    
+    cache.set('all_unique_drugs', formatted_drugs, timeout=86400) # 24 hours
+    return Response(formatted_drugs, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
