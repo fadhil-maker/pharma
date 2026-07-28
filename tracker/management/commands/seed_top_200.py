@@ -119,31 +119,38 @@ class Command(BaseCommand):
         self.stdout.write("Clearing out old dummy records for these specific 200 drugs to inject real data...")
         Interaction.objects.filter(drug_a__in=top_200, drug_b__in=top_200).delete()
 
-        reaction_obj, _ = ReactionDefinition.objects.get_or_create(name="Verified Clinical Reaction")
+        reaction_obj_safe, _ = ReactionDefinition.objects.get_or_create(name="Extensive clinical trials and pharmacokinetic profiling demonstrate no significant systemic interaction, enzyme competition, or adverse pharmacological synergy between these two compounds.")
 
         self.stdout.write("Injecting 19,900 perfectly formatted real clinical rules...")
 
         new_interactions = []
         dangerous_count = 0
         safe_count = 0
+        
+        # Cache for reaction objects to speed up bulk insertion
+        reaction_cache = {}
 
         for d1, d2 in all_pairs:
             sorted_pair = tuple(sorted([d1, d2]))
             
             if sorted_pair in dangerous_interactions:
                 data = dangerous_interactions[sorted_pair]
+                cause_text = data["cause"][:499]
+                if cause_text not in reaction_cache:
+                    rx, _ = ReactionDefinition.objects.get_or_create(name=cause_text)
+                    reaction_cache[cause_text] = rx
+                    
                 new_interactions.append(Interaction(
-                    drug_a=d1, drug_b=d2, reaction=reaction_obj,
-                    severity_slider=data["severity"], cause=data["cause"], remedy=data["remedy"],
+                    drug_a=d1, drug_b=d2, reaction=reaction_cache[cause_text],
+                    severity_slider=data["severity"], remedy=data["remedy"],
                     time_window_hours=24, custom_factors={}
                 ))
                 dangerous_count += 1
             else:
                 # The remaining 19,800 Safe interactions
                 new_interactions.append(Interaction(
-                    drug_a=d1, drug_b=d2, reaction=reaction_obj,
+                    drug_a=d1, drug_b=d2, reaction=reaction_obj_safe,
                     severity_slider=1, 
-                    cause="Extensive clinical trials and pharmacokinetic profiling demonstrate no significant systemic interaction, enzyme competition, or adverse pharmacological synergy between these two compounds.", 
                     remedy="Safe for concurrent use. No dosage adjustments or specialized clinical monitoring are required beyond standard patient care.",
                     time_window_hours=24, custom_factors={}
                 ))

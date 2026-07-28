@@ -85,8 +85,9 @@ class Command(BaseCommand):
             ).first()
 
             if interaction:
+                rx_obj, _ = ReactionDefinition.objects.get_or_create(name=data['cause'][:499])
+                interaction.reaction = rx_obj
                 interaction.severity_slider = data['severity']
-                interaction.cause = data['cause']
                 interaction.remedy = data['remedy']
                 interaction.custom_factors = {} 
                 interaction.time_window_hours = 24
@@ -95,12 +96,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"✅ Updated existing pair: {data['drug_a'].title()} + {data['drug_b'].title()}"))
             else:
                 # The FDA base list didn't include these specific drugs, so we will forcibly create them!
+                rx_obj, _ = ReactionDefinition.objects.get_or_create(name=data['cause'][:499])
                 Interaction.objects.create(
                     drug_a=data['drug_a'],
                     drug_b=data['drug_b'],
-                    reaction=reaction_obj,
+                    reaction=rx_obj,
                     severity_slider=data['severity'],
-                    cause=data['cause'],
                     remedy=data['remedy'],
                     custom_factors={},
                     time_window_hours=24
