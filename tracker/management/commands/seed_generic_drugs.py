@@ -83,20 +83,23 @@ class Command(BaseCommand):
             }
         ]
 
-        # Massive list of 150 real generic drugs
-        base_drugs = [
-            "metformin", "atorvastatin", "amlodipine", "metoprolol", "losartan", "albuterol", "gabapentin", "hydrochlorothiazide", "sertraline", "montelukast",
-            "fluticasone", "amoxicillin", "furosemide", "pantoprazole", "escitalopram", "alprazolam", "prednisone", "bupropion", "pravastatin", "acetaminophen",
-            "citalopram", "tramadol", "fluoxetine", "carvedilol", "trazodone", "clonazepam", "omeprazole", "meloxicam", "rosuvastatin", "clopidogrel",
-            "propranolol", "aspirin", "glipizide", "duloxetine", "azithromycin", "venlafaxine", "ranitidine", "warfarin", "lorazepam", "oxycodone",
-            "cephalexin", "spironolactone", "atenolol", "diclofenac", "naproxen", "ibuprofen", "cyclobenzaprine", "tamsulosin", "methylphenidate", "lisinopril",
-            "levothyroxine", "simvastatin", "doxycycline", "famotidine", "pregabalin", "allopurinol", "paroxetine", "clindamycin", "ondansetron", "cetirizine",
-            "loratadine", "amitriptyline", "metronidazole", "valacyclovir", "finasteride", "glimepiride", "tizanidine", "mirtazapine", "diclofenac", "donepezil",
-            "sitagliptin", "levofloxacin", "celecoxib", "sumatriptan", "buprenorphine", "fentanyl", "methadone", "morphine", "hydrocodone", "baclofen",
-            "diazepam", "temazepam", "zolpidem", "eszopiclone", "aripiprazole", "quetiapine", "risperidone", "olanzapine", "haloperidol", "lithium",
-            "valproate", "carbamazepine", "phenytoin", "lamotrigine", "topiramate", "levetiracetam", "diltiazem", "verapamil", "nifedipine", "valsartan",
-            "telmisartan", "irbesartan", "candesartan", "olmesartan", "ramipril", "enalapril", "quinapril", "benazepril", "fosinopril", "trandolapril"
-        ]
+        self.stdout.write("Fetching top 1000 real generic drugs from the FDA Database...")
+        import urllib.request, json
+        fda_url = 'https://api.fda.gov/drug/label.json?count=openfda.generic_name.exact&limit=1000'
+        req = urllib.request.Request(fda_url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read().decode())
+                base_drugs = [item['term'].lower() for item in data.get('results', []) if len(item['term']) < 50 and ',' not in item['term']]
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"FDA API failed: {e}. Falling back to hardcoded list."))
+            base_drugs = [
+                "metformin", "atorvastatin", "amlodipine", "metoprolol", "losartan", "albuterol", "gabapentin", "hydrochlorothiazide", "sertraline", "montelukast",
+                "fluticasone", "amoxicillin", "furosemide", "pantoprazole", "escitalopram", "alprazolam", "prednisone", "bupropion", "pravastatin", "acetaminophen",
+                "citalopram", "tramadol", "fluoxetine", "carvedilol", "trazodone", "clonazepam", "omeprazole", "meloxicam", "rosuvastatin", "clopidogrel"
+            ]
+            
+        self.stdout.write(self.style.SUCCESS(f"Successfully loaded {len(base_drugs)} unique drugs!"))
         
         expanded_pairs = list(generic_pairs)
         existing_combos = set()
@@ -104,8 +107,8 @@ class Command(BaseCommand):
             existing_combos.add(tuple(sorted([p["drug_a"].lower(), p["drug_b"].lower()])))
 
         import random
-        # Target exact total count to inject: 5,000
-        target_total = 5000
+        # Target exact total count to inject: 50,000
+        target_total = 50000
         needed = target_total - len(expanded_pairs)
         
         causes = [
