@@ -549,7 +549,7 @@ async function fetchPageData(page = 1) {
             return;
         }
 
-        tbody.innerHTML = rules.map(r => {
+        tbody.innerHTML = rules.map((r, idx) => {
             let constraints = [];
             if(r.time_window_hours && r.time_window_hours !== 24) constraints.push(`${r.time_window_hours}hr window`);
             if(r.custom_factors) {
@@ -561,9 +561,11 @@ async function fetchPageData(page = 1) {
             }
             const badgeHtml = constraints.length > 0 ? `<div style="margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap;">${constraints.map(c => `<span style="background: rgba(14, 165, 233, 0.15); color: var(--cyan-neon); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;">${c}</span>`).join('')}</div>` : '';
 
+            const visualIndex = (currentPage - 1) * 10 + idx + 1;
+
             return `
             <tr>
-                <td><b>#${r.id}</b></td>
+                <td><b>#${visualIndex.toLocaleString()}</b> <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">(DB ID: ${r.id})</div></td>
                 <td><b>${r.drug_a}</b> + <b>${r.drug_b}</b></td>
                 <td>${getSevPill(r.severity)}</td>
                 <td>
