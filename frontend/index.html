@@ -889,12 +889,22 @@ async function analyzeInteractions() {
 
     let warnings = [];
 
+    // Get vitals
+    const ageVal = document.getElementById('patientAgeInput') && document.getElementById('patientAgeInput').value ? parseInt(document.getElementById('patientAgeInput').value) : null;
+    const genderVal = document.getElementById('patientGenderInput') && document.getElementById('patientGenderInput').value ? document.getElementById('patientGenderInput').value : null;
+    const weightVal = document.getElementById('patientWeightInput') && document.getElementById('patientWeightInput').value ? parseInt(document.getElementById('patientWeightInput').value) : null;
+
     // Query 100% accurate Django Backend
     try {
         const res = await fetch(`${API_BASE}/api/check-timeline/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ intakes: intakes })
+            body: JSON.stringify({ 
+                intakes: intakes,
+                age: ageVal,
+                gender: genderVal,
+                weight: weightVal
+            })
         });
         if(res.ok) {
             const data = await res.json();
