@@ -247,22 +247,6 @@
         </div>
     </div>
 
-    <!-- Smart Fetch Card -->
-    <div class="card" style="border: 1px solid var(--accent); background: rgba(14, 165, 233, 0.03);">
-        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>🌐 Smart Fetch Official RxNorm / FDA Interactions</span>
-            <span style="font-size: 12px; font-weight: normal; color: var(--accent);">Powered by NIH RxNav & Gemini AI</span>
-        </div>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: -8px; margin-bottom: 16px;">
-            Enter any drug name below to query the official U.S. Government RxNorm database and automatically parse & inject its real-world interaction rules directly into PostgreSQL.
-        </p>
-        <div style="display: flex; gap: 12px;">
-            <input type="text" id="smartFetchInput" placeholder="e.g. Fluoxetine, Warfarin, Metformin..." style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main);">
-            <button class="btn btn-cyan" id="btnSmartFetch" onclick="handleSmartFetch()" style="padding: 12px 24px;">⚡ Fetch & Inject Rules</button>
-        </div>
-        <div id="smartFetchStatus" style="margin-top: 12px; font-size: 13px; display: none;"></div>
-    </div>
-
     <!-- Rule & Combination Builder -->
     <div class="card">
         <div class="card-title">➕ Create Custom Drug Pair & Reaction Rule</div>
