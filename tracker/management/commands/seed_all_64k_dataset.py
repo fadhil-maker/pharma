@@ -172,9 +172,8 @@ class Command(BaseCommand):
         
         interactions_to_create = []
         count = 0
-        target_count = 100000
-        
-        # Build lookup for exact rules
+        target_count = len(drugs) * (len(drugs) - 1) // 2  # Exact C(508, 2) = 128,778 pairs
+        self.stdout.write(f"Generating all {target_count:,} unique Interaction Pairs with Accurate Clinical Severities...")
         exact_match_rules = {}
         for idx, (da, db, sev, text, rem, mask) in enumerate(clinical_rules_template):
             exact_match_rules[f"{da}_{db}"] = idx
