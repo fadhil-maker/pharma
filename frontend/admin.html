@@ -451,7 +451,9 @@ let ALL_DRUGS = [];
 
 async function preloadDrugs() {
     try {
-        const res = await fetch(`${API_BASE}/api/all-drugs/`);
+        const res = await fetch(`${API_BASE}/api/all-drugs/`, {
+            headers: { 'Accept': 'application/json' }
+        });
         if (res.ok) {
             ALL_DRUGS = await res.json();
             console.log(`Preloaded ${ALL_DRUGS.length} drugs for autocomplete.`);
@@ -525,7 +527,9 @@ async function loadDashboardData() {
     try {
         await fetchPageData(1);
 
-        const resAdmins = await fetch(`${API_BASE}/api/admin/list/`);
+        const resAdmins = await fetch(`${API_BASE}/api/admin/list/`, {
+            headers: { 'Accept': 'application/json' }
+        });
         const dataAdmins = await resAdmins.json();
         document.getElementById('adminCount').textContent = (dataAdmins.admins || []).length;
     } catch(e) {
@@ -584,7 +588,9 @@ async function fetchPageData(page = 1) {
 
     try {
         const url = `${API_BASE}/api/admin/interactions/?page=${page}&limit=10&search=${encodeURIComponent(currentSearch)}&sort_by=${sortBy}&order=${sortOrder}&min_severity=${minSev}`;
-        const res = await fetch(url);
+        const res = await fetch(url, {
+            headers: { 'Accept': 'application/json' }
+        });
         const data = await res.json();
         
         totalServerRules = data.total || 0;
@@ -695,7 +701,10 @@ async function handleCreateRule(e) {
     try {
         const res = await fetch(`${API_BASE}/api/admin/interactions/create/`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({
                 drug_a: da,
                 drug_b: db,
@@ -726,7 +735,10 @@ async function deleteRule(id) {
     try {
         await fetch(`${API_BASE}/api/admin/interactions/delete/`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({ id: id })
         });
         loadDashboardData();
@@ -854,7 +866,10 @@ async function deleteRule(id) {
             try {
                 const res = await fetch(`${API_BASE}/api/admin/interactions/smart-fetch/`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ drug_name: drugName })
                 });
 
