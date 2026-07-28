@@ -64,6 +64,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Database is already fully populated with all pairs!"))
             return
 
+        to_process = missing_pairs[:limit]
         self.stdout.write(self.style.WARNING(f"Processing this batch limit: {len(to_process):,} pairs..."))
 
         causes = [
