@@ -441,9 +441,7 @@
 </div>
 
 <script>
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-    ? 'http://127.0.0.1:8000' 
-    : 'https://pharma.shanudigicore.com';
+const API_BASE = window.location.origin;
 
 let currentSearch = '';
 let currentPage = 1;
