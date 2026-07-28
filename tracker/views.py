@@ -292,6 +292,41 @@ def check_timeline(request):
             )
 
             matched_interactions = []
+            
+            # -------------------------------------------------------------
+            # THE LAZY LOADING AI ENGINE (Gemini Integration)
+            # -------------------------------------------------------------
+            if not db_matches.exists():
+                from .gemini_service import check_drug_interaction
+                from .models import Drug, ReactionDefinition
+                
+                # Make sure both drugs are permanently added to the Drug directory for the UI
+                Drug.objects.get_or_create(name=n1)
+                Drug.objects.get_or_create(name=n2)
+                
+                # Ask Gemini if they interact
+                ai_data = check_drug_interaction(n1, n2)
+                
+                if ai_data and ai_data.get('severity', 0) > 0:
+                    # Gemini says it is dangerous. Save it to DB!
+                    rx_obj, _ = ReactionDefinition.objects.get_or_create(name=ai_data['cause'][:499])
+                    
+                    new_interaction = Interaction.objects.create(
+                        drug_a=n1,
+                        drug_b=n2,
+                        reaction=rx_obj,
+                        severity_slider=ai_data['severity'],
+                        remedy=ai_data['remedy'],
+                        time_window_hours=24,
+                        custom_factors={}
+                    )
+                    # Re-query to get it formatted correctly for the loop below
+                    db_matches = [new_interaction]
+                else:
+                    # Gemini says it is safe. Discard it completely.
+                    db_matches = []
+            # -------------------------------------------------------------
+
             for db_rule in db_matches:
                 # Strictly enforce time_window_hours constraint
                 if time_diff_hours > db_rule.time_window_hours:
@@ -323,18 +358,17 @@ def check_timeline(request):
 @permission_classes([AllowAny])
 def get_all_drugs(request):
     """
-    Returns ALL unique drug names instantly (cached for 24 hours).
+    Returns ALL unique drug names from the pure Drug model instantly (cached for 24 hours).
     Perfect for 0ms frontend autocomplete.
     """
     cached_drugs = cache.get('all_unique_drugs')
     if cached_drugs:
         return Response(cached_drugs, status=status.HTTP_200_OK)
 
-    matches_a = Interaction.objects.values_list('drug_a', flat=True).distinct()
-    matches_b = Interaction.objects.values_list('drug_b', flat=True).distinct()
+    from .models import Drug
+    matches = Drug.objects.values_list('name', flat=True)
     
-    unique_drugs = set(matches_a).union(set(matches_b))
-    formatted_drugs = sorted([d.title() for d in unique_drugs if d])
+    formatted_drugs = sorted([d.title() for d in matches if d])
     
     cache.set('all_unique_drugs', formatted_drugs, timeout=86400) # 24 hours
     return Response(formatted_drugs, status=status.HTTP_200_OK)
@@ -344,21 +378,17 @@ def get_all_drugs(request):
 @permission_classes([AllowAny])
 def search_drugs(request):
     """
-    Searches the massive interaction database for unique drug names matching the query.
+    Searches the pure Drug directory for unique drug names matching the query.
     """
     query = request.GET.get('q', '').strip().lower()
     
     if len(query) < 2:
         return Response([])
 
-    # Fast indexed search on drug_a and drug_b
-    matches_a = Interaction.objects.filter(drug_a__icontains=query).values_list('drug_a', flat=True)
-    matches_b = Interaction.objects.filter(drug_b__icontains=query).values_list('drug_b', flat=True)
-    
-    # Combine and deduplicate
-    unique_drugs = set(matches_a).union(set(matches_b))
+    from .models import Drug
+    matches = Drug.objects.filter(name__icontains=query).values_list('name', flat=True)
     
     # Convert to Title Case for UI presentation and return top 20 matches
-    formatted_drugs = sorted([d.title() for d in unique_drugs if query in d.lower()])[:20]
+    formatted_drugs = sorted([d.title() for d in matches if query in d.lower()])[:20]
     
     return Response(formatted_drugs, status=status.HTTP_200_OK)
