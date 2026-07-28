@@ -252,13 +252,15 @@
         <div class="card-title">➕ Create Custom Drug Pair & Reaction Rule</div>
         <form onsubmit="handleCreateRule(event)">
             <div class="form-grid">
-                <div>
+                <div style="position: relative;">
                     <label>Drug A (Name)</label>
-                    <input type="text" id="drugA" placeholder="e.g. enoxaparin" required>
+                    <input type="text" id="drugA" placeholder="e.g. enoxaparin" required autocomplete="off">
+                    <div id="drugASuggestions" class="suggestions-box" style="display:none; position:absolute; width:100%; background:#0f172a; border:1px solid #1e293b; border-radius:6px; z-index:1000; max-height:200px; overflow-y:auto; box-shadow:0 10px 15px -3px rgba(0,0,0,0.5);"></div>
                 </div>
-                <div>
+                <div style="position: relative;">
                     <label>Drug B (Name)</label>
-                    <input type="text" id="drugB" placeholder="e.g. ketorolac" required>
+                    <input type="text" id="drugB" placeholder="e.g. ketorolac" required autocomplete="off">
+                    <div id="drugBSuggestions" class="suggestions-box" style="display:none; position:absolute; width:100%; background:#0f172a; border:1px solid #1e293b; border-radius:6px; z-index:1000; max-height:200px; overflow-y:auto; box-shadow:0 10px 15px -3px rgba(0,0,0,0.5);"></div>
                 </div>
             </div>
 
@@ -447,6 +449,58 @@ let currentSearch = '';
 let currentPage = 1;
 let totalServerRules = 0;
 let totalServerPages = 1;
+let ALL_DRUGS = [];
+
+async function preloadDrugs() {
+    try {
+        const res = await fetch(`${API_BASE}/api/all-drugs/`);
+        if (res.ok) {
+            ALL_DRUGS = await res.json();
+            console.log(`Preloaded ${ALL_DRUGS.length} drugs for autocomplete.`);
+        }
+    } catch(e) {}
+}
+
+function attachAutocomplete(inputId, suggestionBoxId) {
+    const input = document.getElementById(inputId);
+    const box = document.getElementById(suggestionBoxId);
+    if (!input || !box) return;
+
+    input.addEventListener('input', function() {
+        const val = this.value.toLowerCase().trim();
+        box.innerHTML = '';
+        if (val.length < 1) {
+            box.style.display = 'none';
+            return;
+        }
+        const matches = ALL_DRUGS.filter(d => d.toLowerCase().includes(val)).slice(0, 15);
+        if (matches.length > 0) {
+            box.style.display = 'block';
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.style.padding = '8px 12px';
+                div.style.cursor = 'pointer';
+                div.style.borderBottom = '1px solid #1e293b';
+                div.textContent = match;
+                div.onmouseover = () => div.style.background = 'rgba(6,182,212,0.1)';
+                div.onmouseout = () => div.style.background = 'transparent';
+                div.onclick = function() {
+                    input.value = match;
+                    box.style.display = 'none';
+                };
+                box.appendChild(div);
+            });
+        } else {
+            box.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target !== input && e.target !== box) {
+            box.style.display = 'none';
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const adminUser = localStorage.getItem('adminUser');

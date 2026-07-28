@@ -247,7 +247,7 @@ def _evaluate_custom_factors(factors, age, gender, weight):
 def check_timeline(request):
     """
     Sub-millisecond dynamic timeline engine solver.
-    Accepts any number of drug intakes and evaluates interactions.
+    Accepts any number of drug intakes and evaluates interactions using a single BULK query.
     """
     intakes = request.data.get('intakes', [])
     age = request.data.get('age')
@@ -259,9 +259,9 @@ def check_timeline(request):
 
     # Step 1: Normalize drug names
     windows = []
+    drug_names = set()
     for item in intakes:
         raw_name = item.get('drug_name', '').strip().lower()
-        # Clean stereoisomer prefixes like (+)-, (-)-, (±)-
         drug_name = re.sub(r'^\s*(\([+\-±]\)-?|\([RS]\)-?|[dl]-)', '', raw_name, flags=re.IGNORECASE).strip()
         
         timestamp = item.get('timestamp', '')
@@ -275,79 +275,50 @@ def check_timeline(request):
             'clean_name': drug_name,
             'intake_time': intake_time
         })
+        drug_names.add(drug_name)
+
+    # Step 2: BULK QUERY to avoid N+1 crash
+    # Fetch ALL possible interactions involving ANY of the drugs in the timeline
+    all_possible_rules = Interaction.objects.select_related('reaction').filter(
+        drug_a__in=drug_names, drug_b__in=drug_names
+    )
+    
+    # Build a fast O(1) lookup dictionary in RAM
+    rule_dict = {}
+    for rule in all_possible_rules:
+        # Save both directions for easy lookup
+        rule_dict[(rule.drug_a, rule.drug_b)] = rule
+        rule_dict[(rule.drug_b, rule.drug_a)] = rule
 
     warnings = []
 
-    # Step 2: Evaluate all pairs
+    # Step 3: Evaluate all timeline pairs instantly in RAM
     for i in range(len(windows)):
         for j in range(i + 1, len(windows)):
             w1, w2 = windows[i], windows[j]
             n1, n2 = w1['clean_name'], w2['clean_name']
             
-            # Calculate time difference in hours
             time_diff_hours = abs((w1['intake_time'] - w2['intake_time']).total_seconds()) / 3600.0
 
-            db_matches = Interaction.objects.select_related('reaction').filter(
-                Q(drug_a=n1, drug_b=n2) | Q(drug_a=n2, drug_b=n1)
-            )
-
-            matched_interactions = []
+            db_rule = rule_dict.get((n1, n2))
             
-            # -------------------------------------------------------------
-            # THE LAZY LOADING AI ENGINE (Gemini Integration)
-            # -------------------------------------------------------------
-            if not db_matches.exists():
-                from .gemini_service import check_drug_interaction
-                from .models import Drug, ReactionDefinition
-                
-                # Make sure both drugs are permanently added to the Drug directory for the UI
-                Drug.objects.get_or_create(name=n1)
-                Drug.objects.get_or_create(name=n2)
-                
-                # Ask Gemini if they interact
-                ai_data = check_drug_interaction(n1, n2)
-                
-                if ai_data and ai_data.get('severity', 0) > 0:
-                    # Gemini says it is dangerous. Save it to DB!
-                    rx_obj, _ = ReactionDefinition.objects.get_or_create(name=ai_data['cause'][:499])
+            # If the DB returned a rule, and the severity is > 0
+            if db_rule and db_rule.severity_slider > 0:
+                if time_diff_hours <= db_rule.time_window_hours:
                     
-                    new_interaction = Interaction.objects.create(
-                        drug_a=n1,
-                        drug_b=n2,
-                        reaction=rx_obj,
-                        severity_slider=ai_data['severity'],
-                        remedy=ai_data['remedy'],
-                        time_window_hours=24,
-                        custom_factors={}
-                    )
-                    # Re-query to get it formatted correctly for the loop below
-                    db_matches = [new_interaction]
-                else:
-                    # Gemini says it is safe. Discard it completely.
-                    db_matches = []
-            # -------------------------------------------------------------
+                    if _evaluate_custom_factors(db_rule.custom_factors, age, gender, weight):
+                        warnings.append({
+                            'drug_a': w1['raw_name'],
+                            'drug_b': w2['raw_name'],
+                            'reaction': db_rule.reaction.name if db_rule.reaction else "Unknown interaction",
+                            'severity': db_rule.severity_slider,
+                            'remedy': db_rule.remedy,
+                            'organ_bitmask': db_rule.organ_bitmask,
+                            'custom_factors': db_rule.custom_factors
+                        })
 
-            for db_rule in db_matches:
-                # Strictly enforce time_window_hours constraint
-                if time_diff_hours > db_rule.time_window_hours:
-                    continue
-                    
-                matched_interactions.append({
-                    'drug_a': w1['raw_name'],
-                    'drug_b': w2['raw_name'],
-                    'reaction': db_rule.reaction.name,
-                    'severity': db_rule.severity_slider,
-                    'remedy': db_rule.remedy,
-                    'organ_bitmask': db_rule.organ_bitmask,
-                    'custom_factors': db_rule.custom_factors
-                })
-
-            if matched_interactions:
-                matched_interactions.sort(key=lambda x: x.get('severity', 0), reverse=True)
-                top_rule = matched_interactions[0]
-                
-                if _evaluate_custom_factors(top_rule.get('custom_factors', {}), age, gender, weight):
-                    warnings.append(top_rule)
+    # Sort warnings by highest severity
+    warnings.sort(key=lambda x: x.get('severity', 0), reverse=True)
 
     return Response({
         'warnings': warnings,
