@@ -10,12 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 import re
 
-# Automatic DATABASE_URL System Discovery (Scans .env, gunicorn.service, /etc/environment)
+# Automatic DATABASE_URL System Discovery (Scans systemd configs, .env, and system defaults)
 if 'DATABASE_URL' not in os.environ:
     candidate_paths = [
         BASE_DIR / '.env',
+        Path('/var/www/pharma/.env'),
         Path('/etc/systemd/system/gunicorn.service'),
-        Path('/etc/systemd/system/pharma.service'),
+        Path('/etc/systemd/system/gunicorn.service.d/override.conf'),
+        Path('/etc/default/gunicorn'),
         Path('/etc/environment')
     ]
     for cp in candidate_paths:
