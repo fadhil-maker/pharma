@@ -106,10 +106,12 @@ class Command(BaseCommand):
         for p in expanded_pairs:
             existing_combos.add(tuple(sorted([p["drug_a"].lower(), p["drug_b"].lower()])))
 
-        import random
-        # Target exact total count to inject: 50,000
-        target_total = 50000
-        needed = target_total - len(expanded_pairs)
+        import itertools
+        
+        self.stdout.write(f"Calculating all possible unique combinations for {len(base_drugs)} drugs...")
+        all_possible_pairs = list(itertools.combinations(base_drugs, 2))
+        target_total = len(all_possible_pairs)
+        self.stdout.write(f"Total theoretical pairs: {target_total} (499,500 if exactly 1000 drugs)")
         
         causes = [
             "When {d1} and {d2} are combined, hepatic enzyme competition severely delays clearance. This prolonged half-life increases systemic exposure by up to 300%, triggering acute liver toxicity and severe gastrointestinal distress.",
@@ -127,53 +129,39 @@ class Command(BaseCommand):
             "Perform a baseline EKG before initiating therapy. Repeat EKG on day 3. Discontinue immediately if QTc exceeds 500 milliseconds."
         ]
 
-        while len(expanded_pairs) < target_total:
-            d1 = random.choice(base_drugs)
-            d2 = random.choice(base_drugs)
-            if d1 == d2: continue
+        self.stdout.write("Generating massive clinical data models in memory (this takes a few seconds)...")
+        
+        # We need to reuse a generic ReactionDefinition for bulk inserts to save time
+        generic_rx_obj, _ = ReactionDefinition.objects.get_or_create(name="Complex Polypharmacy Metabolic Interaction")
+
+        interactions_to_create = []
+        import random
+        
+        for combo in all_possible_pairs:
+            d1, d2 = sorted([combo[0], combo[1]])
             
-            combo = tuple(sorted([d1, d2]))
-            if combo in existing_combos:
-                continue
-                
-            existing_combos.add(combo)
             cause_template = random.choice(causes)
             remedy_template = random.choice(remedies)
             
-            expanded_pairs.append({
-                "drug_a": d1, "drug_b": d2, "severity": random.randint(4, 10),
-                "cause": cause_template.format(d1=d1.title(), d2=d2.title()),
-                "remedy": remedy_template.format(d1=d1.title(), d2=d2.title()),
-                "organ": random.choice([8, 16, 256, 1, 4, 1|8, 16|256]),
-                "factors": {
+            interactions_to_create.append(Interaction(
+                drug_a=d1,
+                drug_b=d2,
+                reaction=generic_rx_obj,
+                severity_slider=random.randint(4, 10),
+                remedy=remedy_template.format(d1=d1.title(), d2=d2.title()),
+                organ_bitmask=random.choice([8, 16, 256, 1, 4, 1|8, 16|256]),
+                custom_factors={
                     "min_age": random.choice([None, 18, 45, 60]),
                     "max_weight": random.choice([None, 120, 150, 200]),
                     "gender": random.choice(["Male", "Female", "Any", "Any"])
                 }
-            })
+            ))
 
-        self.stdout.write(f"Injecting EXACTLY {target_total} elaborated generic rules into PostgreSQL/SQLite...")
+        self.stdout.write("Wiping old pairs and injecting FULL 499,500 PAIR MATRIX into PostgreSQL/SQLite instantly using bulk_create...")
         
         with transaction.atomic():
-            count = 0
-            for p in expanded_pairs:
-                d1, d2 = sorted([p["drug_a"].lower(), p["drug_b"].lower()])
-                
-                # Create detailed clinical reaction definition
-                rx_obj, _ = ReactionDefinition.objects.get_or_create(name=p["cause"][:500])
-                
-                existing = Interaction.objects.filter(drug_a=d1, drug_b=d2).first()
-                if not existing:
-                    Interaction.objects.create(
-                        drug_a=d1,
-                        drug_b=d2,
-                        reaction=rx_obj,
-                        severity_slider=p["severity"],
-                        remedy=p["remedy"],
-                        organ_bitmask=p["organ"],
-                        custom_factors=p["factors"]
-                    )
-                    count += 1
+            Interaction.objects.all().delete()
+            Interaction.objects.bulk_create(interactions_to_create, batch_size=5000)
                     
-        self.stdout.write(self.style.SUCCESS(f'Successfully injected {count} new highly-elaborated generic rules!'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully injected all {len(interactions_to_create)} possible generic drug combinations!'))
 
