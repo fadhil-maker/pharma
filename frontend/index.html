@@ -433,13 +433,13 @@
                             <!-- 1. Age -->
                             <div class="input-group" style="position: relative;">
                                 <label>AGE (YEARS)</label>
-                                <input type="number" id="patientAgeInput" placeholder="e.g. 35" min="1" max="120" onchange="analyzeInteractions()">
+                                <input type="number" id="patientAgeInput" placeholder="e.g. 35" min="1" max="120" onchange="analyzeInteractions()" form="drugForm" required>
                             </div>
 
                             <!-- 2. Gender -->
                             <div class="input-group" style="position: relative;">
                                 <label>GENDER</label>
-                                <select id="patientGenderInput" onchange="analyzeInteractions()">
+                                <select id="patientGenderInput" onchange="analyzeInteractions()" form="drugForm" required>
                                     <option value="" disabled selected>Select Gender</option>
                                     <option value="MALE">Male</option>
                                     <option value="FEMALE">Female</option>
@@ -450,7 +450,7 @@
                             <!-- 3. Weight -->
                             <div class="input-group" style="position: relative;">
                                 <label>WEIGHT (LBS)</label>
-                                <input type="number" id="patientWeightInput" placeholder="e.g. 180" min="1" max="500" onchange="analyzeInteractions()">
+                                <input type="number" id="patientWeightInput" placeholder="e.g. 180" min="1" max="500" onchange="analyzeInteractions()" form="drugForm" required>
                             </div>
                         </div>
                     </div>
@@ -465,7 +465,7 @@
                         Simple Drug Logger
                     </div>
                     
-                    <form onsubmit="handleAddDrug(event)">
+                    <form id="drugForm" onsubmit="handleAddDrug(event)">
                         <div class="logger-row">
                             <div class="input-group" style="position: relative;">
                                 <label>DRUG NAME</label>
@@ -474,7 +474,7 @@
                             </div>
                             <div class="input-group" style="position: relative;">
                                 <label>TIMESTAMP</label>
-                                <select id="timeInput">
+                                <select id="timeInput" form="drugForm" required>
                                     <option>08:00 AM</option>
                                     <option>12:30 PM</option>
                                     <option>06:00 PM</option>
@@ -780,15 +780,7 @@ function handleAddDrug(e) {
     const timeEl = document.getElementById('timeInput');
     if (!input || !timeEl) return;
     
-    // Enforce mandatory vitals
-    const age = document.getElementById('patientAgeInput') ? document.getElementById('patientAgeInput').value : '';
-    const gender = document.getElementById('patientGenderInput') ? document.getElementById('patientGenderInput').value : '';
-    const weight = document.getElementById('patientWeightInput') ? document.getElementById('patientWeightInput').value : '';
-    
-    if (!age || !gender || !weight) {
-        alert("⚠️ Please fill in all patient vitals (Age, Gender, and Weight) before adding drugs. These are mandatory to accurately evaluate risk constraints.");
-        return;
-    }
+    // HTML5 natively enforces mandatory vitals via form='drugForm' attribute on inputs
 
     const drugName = input.value.trim();
     if (!drugName) return;
