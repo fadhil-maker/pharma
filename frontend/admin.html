@@ -995,7 +995,7 @@ async function deleteRule(id) {
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button class="btn" style="padding: 8px 16px; font-size: 12px;" onclick="openEditAdminModal('${a.username}')">Edit</button>
-                                ${window.myAccount && window.myAccount.role === 'Superadmin' && a.username !== 'admin' && a.username !== currentUser ? `<button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAdmin('${a.username}')">Delete</button>` : ''}
+                                ${window.myAccount && window.myAccount.role === 'Superadmin' && a.username !== currentUser ? `<button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAdmin('${a.username}')">Delete</button>` : ''}
                             </div>
                         </div>
                     `).join('');

@@ -125,8 +125,6 @@ def delete_admin(request):
     username = request.data.get('username', '').strip()
     try:
         user = User.objects.get(username=username)
-        if user.username == 'admin':
-            return Response({'error': 'Cannot delete the default root admin account.'}, status=status.HTTP_403_FORBIDDEN)
         user.delete()
         return Response({'message': f'Admin "{username}" deleted successfully!'}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
