@@ -76,6 +76,7 @@ def add_admin(request):
     username = request.data.get('username', '').strip()
     password = request.data.get('password', '').strip()
     email = request.data.get('email', '').strip()
+    role = request.data.get('role', 'Superadmin').strip()
     
     if not username or not password:
         return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -84,9 +85,52 @@ def add_admin(request):
         
     user = User.objects.create_user(username=username, email=email, password=password)
     user.is_staff = True
-    user.is_superuser = True
+    user.is_superuser = (role == 'Superadmin')
     user.save()
-    return Response({'message': f'Admin "{username}" created successfully!'}, status=status.HTTP_201_CREATED)
+    return Response({'message': f'{role} "{username}" created successfully!'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def edit_admin(request):
+    """Edit an admin account."""
+    old_username = request.data.get('old_username', '').strip()
+    new_username = request.data.get('new_username', '').strip()
+    new_password = request.data.get('new_password', '').strip()
+    new_role = request.data.get('new_role', '').strip()
+    
+    try:
+        user = User.objects.get(username=old_username)
+        if new_username and new_username != old_username:
+            if User.objects.filter(username=new_username).exists():
+                return Response({'error': f'Username "{new_username}" is already taken.'}, status=status.HTTP_409_CONFLICT)
+            user.username = new_username
+        
+        if new_password:
+            user.set_password(new_password)
+            
+        if new_role:
+            user.is_superuser = (new_role == 'Superadmin')
+            
+        user.save()
+        return Response({'message': f'Admin "{user.username}" updated successfully!'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def delete_admin(request):
+    """Delete an admin account."""
+    username = request.data.get('username', '').strip()
+    try:
+        user = User.objects.get(username=username)
+        if user.username == 'admin':
+            return Response({'error': 'Cannot delete the default root admin account.'}, status=status.HTTP_403_FORBIDDEN)
+        user.delete()
+        return Response({'message': f'Admin "{username}" deleted successfully!'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # ── 3. Rule CRUD Endpoints for Admin View ───────────────────────────────────

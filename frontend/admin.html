@@ -851,12 +851,13 @@ async function handleAddAdmin(e) {
     e.preventDefault();
     const u = document.getElementById('newAdminUser').value.trim();
     const p = document.getElementById('newAdminPass').value.trim();
+    const r = document.getElementById('newAdminRole').value;
     
     try {
         const res = await fetch(`${API_BASE}/api/admin/add/`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ username: u, password: p })
+            body: JSON.stringify({ username: u, password: p, role: r })
         });
         const data = await res.json();
         if (res.ok) {
@@ -1008,20 +1009,29 @@ async function deleteRule(id) {
             document.getElementById('manageAdminsModal').classList.remove('show');
         }
 
-        function deleteAdmin(username) {
-            if(confirm('Are you sure you want to delete admin: ' + username + '?')) {
-                let admins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
-                admins = admins.filter(a => a.username !== username);
-                localStorage.setItem('pharma_admins', JSON.stringify(admins));
-                openManageAdminsModal(); // refresh
-                updateAdminCount();
+        async function deleteAdmin(username) {
+            if(confirm('Are you sure you want to permanently delete admin: ' + username + '?')) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/admin/delete/`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ username: username })
+                    });
+                    const data = await res.json();
+                    if(res.ok) {
+                        openManageAdminsModal(); // refresh list
+                        loadDashboardData(); // update counter
+                    } else {
+                        alert(`⚠️ ${data.error}`);
+                    }
+                } catch(e) { alert('Failed to delete admin.'); }
             }
         }
 
-        function openEditAdminModal(oldUser, oldPass) {
+        function openEditAdminModal(oldUser) {
             document.getElementById('editAdminOldUsername').value = oldUser;
             document.getElementById('editAdminUsername').value = oldUser;
-            document.getElementById('editAdminPassword').value = oldPass;
+            document.getElementById('editAdminPassword').value = '';
             closeManageAdminsModal();
             document.getElementById('editAdminModal').classList.add('show');
         }
@@ -1031,29 +1041,38 @@ async function deleteRule(id) {
             openManageAdminsModal();
         }
 
-        function saveEditAdmin() {
+        async function saveEditAdmin() {
             const oldUser = document.getElementById('editAdminOldUsername').value;
             const newUser = document.getElementById('editAdminUsername').value.trim();
             const newPass = document.getElementById('editAdminPassword').value.trim();
+            const newRole = document.getElementById('editAdminRole').value;
             
-            if(!newUser || !newPass) return alert('Fill all fields');
+            if(!newUser) return alert('Username is required.');
             
-            let admins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
-            let target = admins.find(a => a.username === oldUser);
-            if(target) {
-                target.username = newUser;
-                target.password = newPass;
-                localStorage.setItem('pharma_admins', JSON.stringify(admins));
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/edit/`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        old_username: oldUser,
+                        new_username: newUser,
+                        new_password: newPass,
+                        new_role: newRole
+                    })
+                });
+                const data = await res.json();
                 
-                // If they edited themselves, update login session
-                if(localStorage.getItem('adminUser') === oldUser) {
-                    localStorage.setItem('adminUser', newUser);
-                    document.getElementById('adminName').textContent = newUser;
+                if (res.ok) {
+                    if (localStorage.getItem('adminUser') === oldUser) {
+                        localStorage.setItem('adminUser', newUser);
+                        document.getElementById('adminName').textContent = newUser;
+                    }
+                    document.getElementById('editAdminModal').classList.remove('show');
+                    openManageAdminsModal();
+                } else {
+                    alert(`⚠️ ${data.error}`);
                 }
-            }
-            
-            document.getElementById('editAdminModal').classList.remove('show');
-            openManageAdminsModal();
+            } catch(e) { alert('Failed to edit admin.'); }
         }
 
 
@@ -1142,7 +1161,14 @@ async function deleteRule(id) {
                 </div>
                 <div>
                     <label>New Password</label>
-                    <input type="password" id="editAdminPassword" required>
+                    <input type="password" id="editAdminPassword" placeholder="Leave blank to keep unchanged">
+                </div>
+                <div>
+                    <label>Role</label>
+                    <select id="editAdminRole">
+                        <option value="Staff">Staff (View & Edit Own Only)</option>
+                        <option value="Superadmin">Superadmin (Full Access)</option>
+                    </select>
                 </div>
             </div>
             <div style="display: flex; gap: 12px; margin-top: 16px;">
