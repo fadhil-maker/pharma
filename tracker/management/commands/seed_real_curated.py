@@ -228,6 +228,39 @@ class Command(BaseCommand):
                     if d1_s != d2_s:
                         real_interactions_dict[(d1_s, d2_s)] = (sev, cause, rem, org)
 
+        # ── MASSIVE CLASS COMBINATIONS (Explodes into tens of thousands of rules) ──
+        qtc_drugs = macrolides + fluoroquinolones + ssris + ["amiodarone", "sotalol", "haloperidol", "chlorpromazine", "ondansetron", "methadone"]
+        cns_depressants = benzos + opioids + ["haloperidol", "chlorpromazine", "zolpidem", "zaleplon", "eszopiclone", "diphenhydramine", "hydroxyzine", "promethazine", "cyclobenzaprine", "baclofen", "carisoprodol", "tizanidine", "gabapentin", "pregabalin", "propofol", "ketamine", "midazolam"]
+        bleeding_drugs = nsaids + ssris + ["warfarin", "clopidogrel", "prasugrel", "ticagrelor", "apixaban", "rivaroxaban", "dabigatran", "heparin", "enoxaparin", "aspirin"]
+        serotonin_drugs = ssris + ["tramadol", "linezolid", "fentanyl", "methadone", "sumatriptan", "rizatriptan", "ondansetron", "lithium", "mirtazapine", "venlafaxine", "duloxetine", "amitriptyline", "imipramine", "selegiline"]
+        cyp3a4_inhibitors = macrolides + antifungals + ["ritonavir", "diltiazem", "verapamil", "amiodarone"]
+        cyp3a4_substrates = statins + benzos + pde5 + ["amlodipine", "nifedipine", "felodipine", "apixaban", "rivaroxaban", "ticagrelor"]
+
+        # 1. QTc Prolongation
+        for q1 in qtc_drugs:
+            for q2 in qtc_drugs:
+                if q1 != q2: add_rule(q1, q2, 9, "Both drugs significantly prolong the QT interval, leading to a high risk of fatal Torsades de Pointes arrhythmia.", "Strictly avoid combination. Monitor ECG if unavoidable.", 2) # Heart
+        
+        # 2. CNS Depression
+        for c1 in cns_depressants:
+            for c2 in cns_depressants:
+                if c1 != c2: add_rule(c1, c2, 8, "Additive CNS and respiratory depression can lead to profound sedation, coma, or fatal respiratory failure.", "Avoid combination or use lowest possible doses with extreme caution.", 4 | 1) # Lungs & Brain
+        
+        # 3. Severe Bleeding Risk
+        for b1 in bleeding_drugs:
+            for b2 in bleeding_drugs:
+                if b1 != b2: add_rule(b1, b2, 7, "Concomitant use significantly increases the risk of severe gastrointestinal or intracranial bleeding.", "Monitor for signs of bleeding. Consider a PPI for GI protection.", 64 | 16) # Blood & GI
+        
+        # 4. Serotonin Syndrome
+        for s1 in serotonin_drugs:
+            for s2 in serotonin_drugs:
+                if s1 != s2: add_rule(s1, s2, 8, "Additive serotonergic effects dramatically increase the risk of Serotonin Syndrome (fever, tremor, rigidity, seizures).", "Monitor closely for confusion, hyperreflexia, and fever.", 1) # Brain
+        
+        # 5. CYP3A4 Inhibition (Liver Toxicity & Overdose)
+        for inh in cyp3a4_inhibitors:
+            for sub in cyp3a4_substrates:
+                if inh != sub: add_rule(inh, sub, 7, f"{inh.title()} strongly inhibits CYP3A4, causing massive toxic spikes in {sub} levels.", "Avoid combination or drastically reduce substrate dose.", 8) # Liver
+
         # NSAID Interactions
         for nsaid in nsaids:
             add_rule("warfarin", nsaid, 8, "NSAIDs inhibit platelet function and cause GI ulcers, greatly increasing bleeding risk with warfarin.", "Avoid NSAIDs; use paracetamol for pain instead.", 64 | 16) # Blood & GI
