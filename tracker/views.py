@@ -428,3 +428,62 @@ def trigger_massive_seed(request):
         }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'status': 'Error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ── 5. Drug Dictionary Management Endpoints ──────────────────────────────
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def list_drugs(request):
+    """List drugs with server-side pagination, search, sorting & filtering."""
+    search_q = request.GET.get('search', '').strip().lower()
+    page = int(request.GET.get('page', 1))
+    limit = int(request.GET.get('limit', 10))
+    
+    from .models import Drug
+    qs = Drug.objects.all()
+    
+    if search_q:
+        qs = qs.filter(name__icontains=search_q)
+        
+    qs = qs.order_by('name')
+
+    total_count = qs.count()
+    start = (page - 1) * limit
+    end = start + limit
+    page_qs = qs[start:end]
+    
+    data = [{'id': item.id, 'name': item.name.title()} for item in page_qs]
+
+    return Response({
+        'total': total_count,
+        'page': page,
+        'limit': limit,
+        'total_pages': (total_count + limit - 1) // limit if total_count > 0 else 1,
+        'drugs': data
+    })
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_drug(request):
+    """Create a new drug."""
+    name = request.data.get('name', '').strip().lower()
+    if not name:
+        return Response({'error': 'Drug name is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    from .models import Drug
+    if Drug.objects.filter(name=name).exists():
+        return Response({'error': f'Drug "{name}" already exists.'}, status=status.HTTP_409_CONFLICT)
+        
+    drug = Drug.objects.create(name=name)
+    return Response({'message': 'Drug created successfully!', 'id': drug.id}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def delete_drug(request):
+    """Delete a drug by ID."""
+    drug_id = request.data.get('id')
+    if not drug_id:
+        return Response({'error': 'Drug ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    from .models import Drug
+    Drug.objects.filter(id=drug_id).delete()
+    return Response({'message': 'Drug deleted successfully.'})

@@ -17,4 +17,9 @@ urlpatterns = [
     path('debug-db/', views.debug_db, name='debug-db'),
     path('seed-test-pair/', views.seed_test_pair, name='seed_test_pair'),
     path('seed-massive/', views.trigger_massive_seed, name='seed_massive'),
+
+    # Drug Dictionary Management
+    path('admin/drugs/', views.list_drugs, name='list_drugs'),
+    path('admin/drugs/create/', views.create_drug, name='create_drug'),
+    path('admin/drugs/delete/', views.delete_drug, name='delete_drug'),
 ]

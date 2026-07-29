@@ -247,8 +247,66 @@
         </div>
     </div>
 
-    <!-- Rule & Combination Builder -->
-    <div class="card">
+    <!-- TABS Navigation -->
+    <div style="display: flex; gap: 12px; margin-bottom: 24px; width: 100%;">
+        <button id="tabBtnDrugs" class="btn btn-cyan" style="flex:1;" onclick="switchTab('drugs')">💊 Drug Dictionary</button>
+        <button id="tabBtnRules" class="btn" style="flex:1; background: var(--card-bg); color: var(--text-muted);" onclick="switchTab('rules')">🔗 Interaction Rules</button>
+    </div>
+
+    <!-- DRUGS DICTIONARY SECTION -->
+    <div id="sectionDrugs" style="width: 100%;">
+        <div class="card">
+            <div class="card-title">➕ Add New Generic Drug</div>
+            <form onsubmit="handleCreateDrug(event)">
+                <div class="form-grid">
+                    <div>
+                        <label>Drug Name</label>
+                        <input type="text" id="newDrugName" placeholder="e.g. paracetamol" required autocomplete="off">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button type="submit" class="btn btn-cyan" style="width: 100%;">💾 Add Drug to Database</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>📋 Master Drug Dictionary</span>
+                <input type="text" id="drugSearch" placeholder="🔍 Search drugs..." oninput="onDrugSearchInput(this.value)" style="width:260px; font-weight:normal;">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Drug Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="drugsTable">
+                    <tr><td colspan="3" style="color:#94a3b8; text-align:center;">Loading drugs...</td></tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination-bar" style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                <div class="page-controls">
+                    <button class="btn btn-ghost" id="btnPrevDrug" onclick="changeDrugPage(-1)">◄ Prev 10</button>
+                    <span style="font-size:13.5px; color:#cbd5e1; font-weight:700;" id="drugPageIndicator">Page 1 of 1</span>
+                    <button class="btn btn-ghost" id="btnNextDrug" onclick="changeDrugPage(1)">Next 10 ►</button>
+                </div>
+                <div class="controls-group" style="display: flex; align-items: center; gap: 8px;">
+                    <label style="margin:0;">Quick Jump:</label>
+                    <input type="number" id="drugPageJump" min="1" placeholder="Page #" style="width:90px;" onkeydown="if(event.key==='Enter') jumpToDrugPage()">
+                    <button class="btn btn-cyan" style="padding:8px 14px; font-size:12px;" onclick="jumpToDrugPage()">Go ➔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERACTION RULES SECTION -->
+    <div id="sectionRules" style="display: none; width: 100%;">
+        <!-- Rule & Combination Builder -->
+        <div class="card">
         <div class="card-title">➕ Create Custom Drug Pair & Reaction Rule</div>
         <form onsubmit="handleCreateRule(event)">
             <div class="form-grid">
@@ -406,6 +464,8 @@
             </div>
         </div>
     </div>
+    
+    </div> <!-- END INTERACTION RULES SECTION -->
 
 </div>
 
@@ -522,6 +582,7 @@ function closeAdminModal() { document.getElementById('adminModal').classList.rem
 async function loadDashboardData() {
     try {
         await fetchPageData(1);
+        await fetchDrugPageData(1);
 
         const resAdmins = await fetch(`${API_BASE}/api/admin/list/`, {
             headers: { 'Accept': 'application/json' }
@@ -531,6 +592,144 @@ async function loadDashboardData() {
     } catch(e) {
         console.warn('Dashboard load error:', e);
     }
+}
+
+function switchTab(tab) {
+    const btnDrugs = document.getElementById('tabBtnDrugs');
+    const btnRules = document.getElementById('tabBtnRules');
+    const secDrugs = document.getElementById('sectionDrugs');
+    const secRules = document.getElementById('sectionRules');
+
+    if (tab === 'drugs') {
+        btnDrugs.className = 'btn btn-cyan';
+        btnDrugs.style.background = '';
+        btnDrugs.style.color = '';
+        btnRules.className = 'btn';
+        btnRules.style.background = 'var(--card-bg)';
+        btnRules.style.color = 'var(--text-muted)';
+        secDrugs.style.display = 'block';
+        secRules.style.display = 'none';
+    } else {
+        btnRules.className = 'btn btn-cyan';
+        btnRules.style.background = '';
+        btnRules.style.color = '';
+        btnDrugs.className = 'btn';
+        btnDrugs.style.background = 'var(--card-bg)';
+        btnDrugs.style.color = 'var(--text-muted)';
+        secRules.style.display = 'block';
+        secDrugs.style.display = 'none';
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// DRUG DICTIONARY JS
+// ─────────────────────────────────────────────────────────────────
+let currentDrugSearch = '';
+let currentDrugPage = 1;
+let totalServerDrugPages = 1;
+let drugSearchTimer;
+
+function onDrugSearchInput(query) {
+    clearTimeout(drugSearchTimer);
+    drugSearchTimer = setTimeout(() => {
+        currentDrugSearch = query.trim();
+        currentDrugPage = 1;
+        fetchDrugPageData(1);
+    }, 300);
+}
+
+function jumpToDrugPage() {
+    const p = parseInt(document.getElementById('drugPageJump').value);
+    if (p && p >= 1 && p <= totalServerDrugPages) {
+        currentDrugPage = p;
+        fetchDrugPageData(currentDrugPage);
+    } else {
+        alert(`Please enter a valid page number between 1 and ${totalServerDrugPages}`);
+    }
+}
+
+function changeDrugPage(delta) {
+    const targetPage = currentDrugPage + delta;
+    if (targetPage >= 1 && targetPage <= totalServerDrugPages) {
+        currentDrugPage = targetPage;
+        fetchDrugPageData(currentDrugPage);
+    }
+}
+
+async function fetchDrugPageData(page = 1) {
+    const tbody = document.getElementById('drugsTable');
+    tbody.innerHTML = '<tr><td colspan="3" style="color:#94a3b8; text-align:center;">Loading drugs...</td></tr>';
+    
+    try {
+        const url = `${API_BASE}/api/admin/drugs/?page=${page}&limit=10&search=${encodeURIComponent(currentDrugSearch)}`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        
+        const totalDrugs = data.total || 0;
+        totalServerDrugPages = data.total_pages || 1;
+        currentDrugPage = data.page || 1;
+
+        document.getElementById('drugCount').textContent = totalDrugs.toLocaleString();
+        
+        const drugs = data.drugs || [];
+        if (drugs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="color:#94a3b8; text-align:center;">No matching drugs found.</td></tr>';
+            document.getElementById('drugPageIndicator').textContent = 'Page 0 of 0';
+            document.getElementById('btnPrevDrug').disabled = true;
+            document.getElementById('btnNextDrug').disabled = true;
+            return;
+        }
+
+        tbody.innerHTML = drugs.map((d, idx) => {
+            const visualIndex = (currentDrugPage - 1) * 10 + idx + 1;
+            return `
+            <tr>
+                <td><b>#${visualIndex.toLocaleString()}</b> <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">(DB ID: ${d.id})</div></td>
+                <td style="font-size: 16px; font-weight: 800;">${d.name}</td>
+                <td><button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteDrugUI(${d.id})">Delete</button></td>
+            </tr>
+        `}).join('');
+
+        document.getElementById('drugPageIndicator').textContent = `Page ${currentDrugPage.toLocaleString()} of ${totalServerDrugPages.toLocaleString()} (${totalDrugs.toLocaleString()} total drugs)`;
+        document.getElementById('btnPrevDrug').disabled = (currentDrugPage <= 1);
+        document.getElementById('btnNextDrug').disabled = (currentDrugPage >= totalServerDrugPages);
+    } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="3" style="color:#ef4444; text-align:center;">Failed to load drugs from server.</td></tr>';
+    }
+}
+
+async function handleCreateDrug(e) {
+    e.preventDefault();
+    const name = document.getElementById('newDrugName').value.trim();
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/drugs/create/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ name: name })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert('✅ Drug Added Successfully!');
+            document.getElementById('newDrugName').value = '';
+            fetchDrugPageData(currentDrugPage);
+            preloadDrugs();
+        } else {
+            alert(`⚠️ ${data.error}`);
+        }
+    } catch(e) { alert('Failed to save drug.'); }
+}
+
+async function deleteDrugUI(id) {
+    if (!confirm('Are you sure you want to delete this drug?')) return;
+    try {
+        await fetch(`${API_BASE}/api/admin/drugs/delete/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+        fetchDrugPageData(currentDrugPage);
+        preloadDrugs();
+    } catch(e) { alert('Failed to delete drug.'); }
 }
 
 let searchTimer;
