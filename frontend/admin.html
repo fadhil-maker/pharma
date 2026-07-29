@@ -255,12 +255,12 @@
                 <div style="position: relative;">
                     <label>Drug A (Name)</label>
                     <input type="text" id="drugA" placeholder="e.g. enoxaparin" required autocomplete="off">
-                    <div id="drugASuggestions" class="suggestions-box" style="display:none; position:absolute; width:100%; background:#0f172a; border:1px solid #1e293b; border-radius:6px; z-index:1000; max-height:200px; overflow-y:auto; box-shadow:0 10px 15px -3px rgba(0,0,0,0.5);"></div>
+                    <div id="drugASuggestions" class="premium-dropdown"></div>
                 </div>
                 <div style="position: relative;">
                     <label>Drug B (Name)</label>
                     <input type="text" id="drugB" placeholder="e.g. ketorolac" required autocomplete="off">
-                    <div id="drugBSuggestions" class="suggestions-box" style="display:none; position:absolute; width:100%; background:#0f172a; border:1px solid #1e293b; border-radius:6px; z-index:1000; max-height:200px; overflow-y:auto; box-shadow:0 10px 15px -3px rgba(0,0,0,0.5);"></div>
+                    <div id="drugBSuggestions" class="premium-dropdown"></div>
                 </div>
             </div>
 
@@ -478,12 +478,8 @@ function attachAutocomplete(inputId, suggestionBoxId) {
             box.style.display = 'block';
             matches.forEach(match => {
                 const div = document.createElement('div');
-                div.style.padding = '8px 12px';
-                div.style.cursor = 'pointer';
-                div.style.borderBottom = '1px solid #1e293b';
+                div.className = 'dropdown-item';
                 div.textContent = match;
-                div.onmouseover = () => div.style.background = 'rgba(6,182,212,0.1)';
-                div.onmouseout = () => div.style.background = 'transparent';
                 div.onclick = function() {
                     input.value = match;
                     box.style.display = 'none';
