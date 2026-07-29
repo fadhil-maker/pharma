@@ -217,18 +217,16 @@ class Command(BaseCommand):
         # 2. Build the Real Clinical Rules Engine
         real_interactions_dict = {}
 
-        def add_rule(d1, d2, sev, cause, rem, org):
-            # Find all variations (salts) of the base drugs present in our 1000 drug list
-            d1_variants = [d for d in final_drugs if d == d1 or d.startswith(d1 + " ")]
-            d2_variants = [d for d in final_drugs if d == d2 or d.startswith(d2 + " ")]
-            
-            if not d1_variants: d1_variants = [d1]
-            if not d2_variants: d2_variants = [d2]
-            
-            for v1 in d1_variants:
-                for v2 in d2_variants:
-                    v1_s, v2_s = sorted([v1, v2])
-                    real_interactions_dict[(v1_s, v2_s)] = (sev, cause, rem, org)
+        def get_all_forms(base_name):
+            # Find all drugs in final_drugs that start with this base name (e.g. ibuprofen, ibuprofen sodium)
+            return [d for d in final_drugs if d == base_name or d.startswith(base_name + " ")]
+
+        def add_rule(d1_base, d2_base, sev, cause, rem, org):
+            for d1 in get_all_forms(d1_base):
+                for d2 in get_all_forms(d2_base):
+                    d1_s, d2_s = sorted([d1, d2])
+                    if d1_s != d2_s:
+                        real_interactions_dict[(d1_s, d2_s)] = (sev, cause, rem, org)
 
         # NSAID Interactions
         for nsaid in nsaids:
