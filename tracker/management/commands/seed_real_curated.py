@@ -218,8 +218,17 @@ class Command(BaseCommand):
         real_interactions_dict = {}
 
         def add_rule(d1, d2, sev, cause, rem, org):
-            d1, d2 = sorted([d1, d2])
-            real_interactions_dict[(d1, d2)] = (sev, cause, rem, org)
+            # Find all variations (salts) of the base drugs present in our 1000 drug list
+            d1_variants = [d for d in final_drugs if d == d1 or d.startswith(d1 + " ")]
+            d2_variants = [d for d in final_drugs if d == d2 or d.startswith(d2 + " ")]
+            
+            if not d1_variants: d1_variants = [d1]
+            if not d2_variants: d2_variants = [d2]
+            
+            for v1 in d1_variants:
+                for v2 in d2_variants:
+                    v1_s, v2_s = sorted([v1, v2])
+                    real_interactions_dict[(v1_s, v2_s)] = (sev, cause, rem, org)
 
         # NSAID Interactions
         for nsaid in nsaids:
