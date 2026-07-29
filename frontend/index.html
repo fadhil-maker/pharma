@@ -542,7 +542,7 @@
                         Optical Prescription Scanner
                     </div>
                     
-                    <div class="premium-dropzone">
+                    <div class="premium-dropzone" id="scannerDropzone">
                         <div class="asset-group">
                             <img src="assets/box.png" alt="Box">
                             <img src="assets/camera.png" alt="Camera" style="z-index: 2; transform: scale(1.1);">
@@ -552,9 +552,10 @@
                         <div class="dropzone-sub">Drag & drop or select an action below</div>
                         
                         <div class="btn-group">
-                            <button class="btn-secondary" onclick="document.getElementById('ocrFile').click()">[+] Take Photo</button>
+                            <button class="btn-secondary" onclick="document.getElementById('ocrCamera').click()">[+] Take Photo</button>
                             <button class="btn-secondary" onclick="document.getElementById('ocrFile').click()">[ ] Browse Files</button>
                         </div>
+                        <input type="file" id="ocrCamera" accept="image/*" capture="environment" style="display:none" onchange="handleOCRScan(this)">
                         <input type="file" id="ocrFile" accept="image/*" style="display:none" onchange="handleOCRScan(this)">
                     </div>
                 </div>
@@ -638,6 +639,26 @@
             </div>
         </footer>
         <style>
+            .premium-dropzone {
+                border: 2px dashed rgba(0,0,0,0.1);
+                border-radius: 12px;
+                padding: 32px 20px;
+                text-align: center;
+                background: rgba(0,0,0,0.02);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                margin-top: 16px;
+                position: relative;
+                overflow: hidden;
+            }
+            [data-theme="dark"] .premium-dropzone {
+                border-color: rgba(255,255,255,0.1);
+                background: rgba(255,255,255,0.02);
+            }
+            .premium-dropzone:hover, .premium-dropzone.drag-active {
+                border-color: var(--accent);
+                background: rgba(16, 185, 129, 0.05);
+                transform: scale(1.01);
+            }
             .clinical-footer {
                 margin-top: 60px;
                 padding: 40px 20px;
@@ -766,13 +787,14 @@ async function preloadDrugs() {
 document.addEventListener('DOMContentLoaded', () => { 
     loadVitals(); 
     preloadDrugs();
-    setupAutocomplete(); 
+    setupAutocomplete();
+    setupDragAndDrop();
 });
 
 
 // ── 3.5. Drug Autocomplete & Suggestions ──────────────────────────────────
 
-async function setupAutocomplete() {
+function setupAutocomplete() {
     const input = document.getElementById('drugInput');
     const suggestionsBox = document.getElementById('drugSuggestions');
     if (!input || !suggestionsBox) return;
@@ -814,6 +836,30 @@ async function setupAutocomplete() {
             suggestionsBox.style.display = 'none';
         }
     });
+}
+
+// ── 3.6. Drag & Drop Scanner Integration ──────────────────────────────────
+function setupDragAndDrop() {
+    const dropzone = document.getElementById('scannerDropzone');
+    if(!dropzone) return;
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.add('drag-active'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.remove('drag-active'), false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        if(e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleOCRScan({ files: e.dataTransfer.files });
+        }
+    }, false);
 }
 
 // ── 3. Queue Management & Rendering ─────────────────────────────────────────
