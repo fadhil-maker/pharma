@@ -196,6 +196,11 @@
         
         .organ-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
         .organ-card { background: var(--bg-main); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border-light); font-weight: 700; font-size: 13px; }
+        
+        .organ-checkboxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 8px; }
+        .organ-label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: var(--text-main); background: var(--bg-main); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light); cursor: pointer; text-transform: none; margin: 0; }
+        .organ-label:hover { border-color: var(--accent); background: rgba(14, 165, 233, 0.05); }
+        .organ-label input[type="checkbox"] { width: 16px; height: 16px; padding: 0; margin: 0; background: transparent; border: none; box-shadow: none; }
     </style>
 </head>
 <body>
