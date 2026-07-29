@@ -362,11 +362,20 @@ def check_timeline(request):
                             'custom_factors': db_rule.custom_factors
                         })
 
+    # Deduplicate warnings to avoid spamming the UI if the user scans the same drug twice
+    unique_warnings = {}
+    for w in warnings:
+        key = tuple(sorted([w['drug_a'].lower(), w['drug_b'].lower()]))
+        if key not in unique_warnings:
+            unique_warnings[key] = w
+            
+    final_warnings = list(unique_warnings.values())
+
     # Sort warnings by highest severity
-    warnings.sort(key=lambda x: x.get('severity', 0), reverse=True)
+    final_warnings.sort(key=lambda x: x.get('severity', 0), reverse=True)
 
     return Response({
-        'warnings': warnings,
+        'warnings': final_warnings,
         'intakes_processed': len(intakes)
     }, status=status.HTTP_200_OK)
 
