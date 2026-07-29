@@ -888,11 +888,15 @@ async function handleOCRScan(input) {
         let cleanText = extractedText.toLowerCase().replace(/\([+\-±rsdl,]+\)-?/g, ' ').replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e');
         const tokens = cleanText.replace(/[^a-z0-9\s]/g, ' ').trim().split(/\s+/);
         
-        const COMMON_DRUGS = ["methotrexate", "ibuprofen", "enoxaparin", "ketorolac", "promethazine", "codeine", "lithium", "hydrochlorothiazide", "ritonavir", "midazolam", "warfarin", "aspirin", "advil", "tylenol", "lipitor", "crestor", "viagra", "paracetamol", "amoxicillin", "ciprofloxacin", "metformin", "lisinopril"];
+        const databaseDrugs = ALL_DRUGS.map(d => d.toLowerCase());
         
         let found = new Set();
         tokens.forEach(t => {
-            if (COMMON_DRUGS.includes(t) && found.size < 5) found.add(t);
+            if (t.length > 3 && databaseDrugs.some(d => d.includes(t) || t.includes(d)) && found.size < 5) {
+                // Find the exact name from the database to add it correctly
+                const exactMatch = databaseDrugs.find(d => d.includes(t) || t.includes(d));
+                if (exactMatch) found.add(exactMatch);
+            }
         });
 
         if (found.size > 0) {
