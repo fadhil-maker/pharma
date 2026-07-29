@@ -593,7 +593,28 @@ async function loadDashboardData() {
             headers: { 'Accept': 'application/json' }
         });
         const dataAdmins = await resAdmins.json();
-        document.getElementById('adminCount').textContent = (dataAdmins.admins || []).length;
+        const admins = dataAdmins.admins || [];
+        document.getElementById('adminCount').textContent = admins.length;
+        
+        // Enforce RBAC securely from backend response
+        const currentUser = localStorage.getItem('adminUser');
+        window.myAccount = admins.find(a => a.username === currentUser);
+        
+        if (window.myAccount) {
+            window.myAccount.role = window.myAccount.is_superuser ? 'Superadmin' : 'Staff';
+        } else {
+            // Failsafe fallback
+            window.myAccount = { role: 'Superadmin' };
+        }
+        
+        document.getElementById('adminRoleBadge').textContent = window.myAccount.role;
+        
+        if (window.myAccount.role !== 'Superadmin') {
+            document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'none');
+        } else {
+            document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'block'); // reset if changed
+        }
+        
     } catch(e) {
         console.warn('Dashboard load error:', e);
     }
@@ -947,33 +968,13 @@ async function deleteRule(id) {
 }
 
         
-        // Check Role on Load
-        let currentUser = localStorage.getItem('adminUser');
-        let allAdmins = JSON.parse(localStorage.getItem('pharma_admins')) || [];
-        
-        // Ensure default admin is Superadmin
-        if(allAdmins.length === 0) {
-            allAdmins.push({ username: 'admin', password: 'password', role: 'Superadmin' });
-            localStorage.setItem('pharma_admins', JSON.stringify(allAdmins));
-        }
 
-        let myAccount = allAdmins.find(a => a.username === currentUser);
-        if(!myAccount) {
-            // Failsafe
-            myAccount = { role: 'Superadmin' };
-        }
-        
-        document.getElementById('adminRoleBadge').textContent = myAccount.role;
-        
-        // Hide Superadmin features if Staff
-        if(myAccount.role !== 'Superadmin') {
-            document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'none');
-        }
 
         async function openManageAdminsModal() {
             const container = document.getElementById('adminsListContainer');
             container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);">Loading admins from server...</div>';
             document.getElementById('manageAdminsModal').classList.add('show');
+            const currentUser = localStorage.getItem('adminUser');
             
             try {
                 const res = await fetch(`${API_BASE}/api/admin/list/`, { headers: { 'Accept': 'application/json' }});
@@ -982,7 +983,7 @@ async function deleteRule(id) {
                     let admins = data.admins || [];
                     
                     // RBAC Filter
-                    if(myAccount.role !== 'Superadmin') {
+                    if(window.myAccount && window.myAccount.role !== 'Superadmin') {
                         admins = admins.filter(a => a.username === currentUser);
                     }
 
@@ -994,7 +995,7 @@ async function deleteRule(id) {
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button class="btn" style="padding: 8px 16px; font-size: 12px;" onclick="openEditAdminModal('${a.username}')">Edit</button>
-                                ${myAccount.role === 'Superadmin' && a.username !== 'admin' && a.username !== currentUser ? `<button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAdmin('${a.username}')">Delete</button>` : ''}
+                                ${window.myAccount && window.myAccount.role === 'Superadmin' && a.username !== 'admin' && a.username !== currentUser ? `<button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAdmin('${a.username}')">Delete</button>` : ''}
                             </div>
                         </div>
                     `).join('');
