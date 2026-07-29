@@ -109,6 +109,19 @@ class Command(BaseCommand):
         for fq in fluoroquinolones:
             add_rule(fq, "tizanidine", 9, f"{fq.title()} strongly inhibits CYP1A2, causing tizanidine levels to spike, leading to severe hypotension and sedation.", "Strictly contraindicated.", 2 | 1) # Heart & Brain
             add_rule(fq, "amiodarone", 8, "Additive QT interval prolongation, high risk of Torsades de Pointes arrhythmias.", "Avoid combination. Monitor ECG closely.", 2) # Heart
+            add_rule(fq, "calcium carbonate", 4, "Calcium binds to fluoroquinolones in the gut, reducing antibiotic absorption.", "Take fluoroquinolone 2 hours before or 4 hours after calcium.", 16) # GI
+
+        # Minor / Low Severity Interactions (Severities 1 - 5)
+        for ppi in ppis:
+            add_rule(ppi, "calcium carbonate", 2, "PPIs reduce stomach acid, mildly decreasing the absorption of calcium carbonate.", "Consider switching to calcium citrate which does not need acid for absorption.", 16) # GI
+            add_rule(ppi, "levothyroxine", 3, "PPIs can slightly reduce the absorption of levothyroxine.", "Monitor thyroid function and adjust dose if needed.", 512) # Thyroid
+
+        for ssri in ssris:
+            add_rule(ssri, "ibuprofen", 5, "Combined use slightly increases the risk of upper GI bleeding due to platelet inhibition.", "Monitor for signs of GI bleeding. Consider a PPI if high risk.", 16) # GI
+            
+        add_rule("vitamin c", "ferrous ascorbate", 1, "Vitamin C actively increases the absorption of iron supplements. This is a beneficial interaction.", "No action needed. Helpful interaction.", 16) # GI
+        add_rule("metformin", "furosemide", 3, "Furosemide can mildly increase metformin plasma levels, theoretically increasing lactic acidosis risk.", "Monitor kidney function and blood glucose.", 32) # Kidneys
+        add_rule("atorvastatin", "amlodipine", 4, "Amlodipine weakly inhibits CYP3A4, causing a minor increase in statin levels.", "Monitor for muscle pain. Usually safe at normal doses.", 256) # Muscle
 
         # Specific isolated highly dangerous interactions
         add_rule("clopidogrel", "omeprazole", 6, "Omeprazole inhibits CYP2C19, reducing conversion of clopidogrel to its active blood-thinning form.", "Switch to pantoprazole or rabeprazole.", 8 | 64) # Liver & Blood
