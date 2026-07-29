@@ -993,7 +993,8 @@ async function deleteRule(id) {
                                 <div style="font-size: 11px; color: var(--accent); text-transform: uppercase;">${a.is_superuser ? 'Superadmin' : 'Staff'} • Joined ${new Date(a.date_joined).toLocaleDateString()}</div>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <span style="font-size:10px; color:var(--text-muted);">Backend Managed</span>
+                                <button class="btn" style="padding: 8px 16px; font-size: 12px;" onclick="openEditAdminModal('${a.username}')">Edit</button>
+                                ${myAccount.role === 'Superadmin' && a.username !== 'admin' && a.username !== currentUser ? `<button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAdmin('${a.username}')">Delete</button>` : ''}
                             </div>
                         </div>
                     `).join('');
