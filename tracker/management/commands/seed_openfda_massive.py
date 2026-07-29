@@ -114,33 +114,17 @@ class Command(BaseCommand):
                     custom_factors={}
                 ))
             else:
-                import random
-                # 5% chance of being a dangerous interaction for demonstration purposes
-                if random.random() < 0.05:
-                    rand_sev = random.randint(2, 9)
-                    organs = [1, 2, 4, 8, 16, 32, 64]
-                    batch.append(Interaction(
-                        drug_a=d1,
-                        drug_b=d2,
-                        reaction=safe_rx,
-                        severity_slider=rand_sev,
-                        remedy="Monitor patient closely.",
-                        organ_bitmask=random.choice(organs),
-                        time_window_hours=24,
-                        custom_factors={}
-                    ))
-                else:
-                    # 0 Severity (Safe) Baseline
-                    batch.append(Interaction(
-                        drug_a=d1,
-                        drug_b=d2,
-                        reaction=safe_rx,
-                        severity_slider=0,
-                        remedy="",
-                        organ_bitmask=0,
-                        time_window_hours=24,
-                        custom_factors={}
-                    ))
+                # 0 Severity (Safe) Baseline for everything else
+                batch.append(Interaction(
+                    drug_a=d1,
+                    drug_b=d2,
+                    reaction=safe_rx,
+                    severity_slider=0,
+                    remedy="",
+                    organ_bitmask=0,
+                    time_window_hours=24,
+                    custom_factors={}
+                ))
             
             if len(batch) >= batch_size:
                 Interaction.objects.bulk_create(batch)
